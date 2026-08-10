@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import Link from 'next/link'
 
 export default async function Households() {
   const supabase = await createClient()
@@ -32,7 +33,11 @@ export default async function Households() {
       ) : (
         <ul>
           {households.map((household) => (
-            <li key={household.id}>{household.name}</li>
+            <li key={household.id}>
+              <Link href={`/household/${encodeURIComponent(household.name)}`}>
+                {household.name}
+              </Link>
+            </li>
           ))}
         </ul>
       )}
