@@ -12,6 +12,8 @@ export default async function Home() {
   return (
     <div>
       <p>Logged in as {user.email}</p>
+      <a href="/household/setup">Create or Join a Household</a> <br></br>
+      <a href="/household">View Current Households</a>
     </div>
   )
 }
