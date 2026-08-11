@@ -88,3 +88,18 @@ export async function deleteGrocery(formData: FormData) {
 
     revalidatePath(`/household/${encodeURIComponent(householdName)}/groceries`)
 }
+
+export async function toggleGrocery(
+  itemId: string,
+  isPurchased: boolean,
+  householdName: string
+) {
+  const supabase = await createClient()
+  const { error } = await supabase
+    .from('grocery_items')
+    .update({ is_purchased: isPurchased })
+    .eq('id', itemId)
+
+  if (error) console.error(error)
+  revalidatePath(`/household/${encodeURIComponent(householdName)}/groceries`)
+}

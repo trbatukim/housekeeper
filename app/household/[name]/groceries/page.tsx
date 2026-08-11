@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
-import { addGroceryItem, clearGroceryList, deleteGrocery } from './actions'
+import { addGroceryItem, clearGroceryList, deleteGrocery, toggleGrocery } from './actions'
+import GroceryItem from './GroceryItem'
 
 export default async function Groceries({
   params,
@@ -55,8 +56,8 @@ export default async function Groceries({
 
             <ul>
                 {groceries?.map((item) => (
-                    <li key={item.id}>
-                        {item.name}
+                    <li key={item.id} style={{ display: 'flex', gap: '8px' }}>
+                        <GroceryItem item={item} householdName={decodedName} />
                         <form action={deleteGrocery} style={{ display: 'inline' }}>
                             <input type="hidden" name="householdId" value={household.id} />
                             <input type="hidden" name="householdName" value={decodedName} />
