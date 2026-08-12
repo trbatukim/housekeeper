@@ -1,6 +1,7 @@
 import { addExpense, deleteExpense } from './actions'
 import { createClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
+import ExpenseItem from './ExpenseItem'
 
 export default async function ExpensesPage({
     params,
@@ -32,14 +33,9 @@ export default async function ExpensesPage({
 
     const { data: expenses } = await supabase
         .from('expenses')
-        .select('id, description, amount, category, paid_on')
+        .select('id, description, amount, category, paid_on, is_paid')
         .eq('household_id', household.id)
         .order('paid_on', { ascending: false })
-
-    const formatDate = (dateString: string) => {
-        const [year, month, day] = dateString.split('-')
-        return `${day}-${month}-${year}`
-    }
 
     return (
         <>
@@ -62,8 +58,8 @@ export default async function ExpensesPage({
 
             <ul>
                 {expenses?.map((expense) => (
-                    <li key={expense.id}>
-                        {formatDate(expense.paid_on)} — {expense.description} — €{expense.amount} ({expense.category})
+                    <li key={expense.id} style={{ display: 'flex', gap: '8px' }}>
+                        <ExpenseItem expense={expense} householdName={decodedName} />
                         <form action={deleteExpense} style={{ display: 'inline' }}>
                             <input type="hidden" name="householdId" value={household.id} />
                             <input type="hidden" name="householdName" value={decodedName} />

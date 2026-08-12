@@ -81,3 +81,18 @@ export async function deleteExpense(formData: FormData) {
 
     revalidatePath(`/household/${encodeURIComponent(householdName)}/expenses`)
 }
+
+export async function toggleExpense(
+    expenseId: string,
+    isPaid: boolean,
+    householdName: string
+) {
+    const supabase = await createClient()
+    const { error } = await supabase
+        .from('expenses')
+        .update({ is_paid: isPaid })
+        .eq('id', expenseId)
+
+    if (error) console.error(error)
+    revalidatePath(`/household/${encodeURIComponent(householdName)}/expenses`)
+}
