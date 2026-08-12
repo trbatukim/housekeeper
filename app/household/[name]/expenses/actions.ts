@@ -82,6 +82,44 @@ export async function deleteExpense(formData: FormData) {
     revalidatePath(`/household/${encodeURIComponent(householdName)}/expenses`)
 }
 
+function addOneMonth(dateStr: string): string {
+    const [year, month, day] = dateStr.split('-').map(Number)
+    const date = new Date(Date.UTC(year, month - 1, day))
+    date.setUTCMonth(date.getUTCMonth() + 1)
+    return date.toISOString().split('T')[0]
+}
+
+export async function rolloverRecurringExpenses(householdId: string) {
+    const supabase = await createClient()
+    const todayStr = new Date().toISOString().split('T')[0]
+
+    const { data: dueExpenses, error: fetchError } = await supabase
+        .from('expenses')
+        .select('id, paid_on')
+        .eq('household_id', householdId)
+        .eq('category', 'recurring')
+        .lt('paid_on', todayStr)
+
+    if (fetchError) {
+        console.error(fetchError)
+        return
+    }
+
+    for (const expense of dueExpenses ?? []) {
+        let nextPaidOn = expense.paid_on
+        while (nextPaidOn < todayStr) {
+            nextPaidOn = addOneMonth(nextPaidOn)
+        }
+
+        const { error } = await supabase
+            .from('expenses')
+            .update({ is_paid: false, paid_on: nextPaidOn })
+            .eq('id', expense.id)
+
+        if (error) console.error(error)
+    }
+}
+
 export async function toggleExpense(
     expenseId: string,
     isPaid: boolean,

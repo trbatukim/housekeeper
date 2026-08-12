@@ -1,4 +1,4 @@
-import { addExpense, deleteExpense } from './actions'
+import { addExpense, deleteExpense, rolloverRecurringExpenses } from './actions'
 import { createClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import ExpenseItem from './ExpenseItem'
@@ -30,6 +30,8 @@ export default async function ExpensesPage({
     if (!household) {
         notFound()
     }
+
+    await rolloverRecurringExpenses(household.id)
 
     const { data: expenses } = await supabase
         .from('expenses')
