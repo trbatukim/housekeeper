@@ -1,14 +1,19 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
-import { addGroceryItem, clearGroceryList, deleteGrocery, toggleGrocery } from './actions'
+import Link from 'next/link'
+import type { CSSProperties } from 'react'
+import { addGroceryItem, clearGroceryList, deleteGrocery } from './actions'
 import GroceryItem from './GroceryItem'
+import styles from '../theme.module.css'
+
+const DEFAULT_COLOR = '#66e0c3'
 
 export default async function Groceries({
-  params,
-  searchParams,
+    params,
+    searchParams,
 }: {
-  params: Promise<{ name: string }>
-  searchParams: Promise<{ error?: string }>
+    params: Promise<{ name: string }>
+    searchParams: Promise<{ error?: string }>
 }) {
     const { name } = await params
     const decodedName = decodeURIComponent(name)
@@ -23,7 +28,7 @@ export default async function Groceries({
 
     const { data: household } = await supabase
         .from('households')
-        .select('id')
+        .select('id, primary_color')
         .eq('name', decodedName)
         .maybeSingle()
 
@@ -37,36 +42,41 @@ export default async function Groceries({
         .eq('household_id', household.id)
         .order('created_at')
 
+    const primaryColor = household.primary_color ?? DEFAULT_COLOR
+
     return (
-        <>
-            <form action={addGroceryItem}>
+        <div className={styles.page} style={{ '--primary': primaryColor } as CSSProperties}>
+            <Link href={`/household/${decodedName}`} className={styles.backButton}>&larr; Back</Link>
+            <h1 className={styles.pageTitle}>Groceries</h1>
+
+            <form action={addGroceryItem} className={styles.form}>
                 <input type="hidden" name="householdId" value={household.id} />
                 <input type="hidden" name="householdName" value={decodedName} />
-                <input type="text" name="name" placeholder="Add an item" required />
-                <button type="submit">Add</button>
+                <input type="text" name="name" placeholder="Add an item" required className={styles.input} />
+                <button type="submit" className={styles.button}>Add</button>
             </form>
 
-            {errorMessage && <p>{errorMessage}</p>}
+            {errorMessage && <p className={styles.error}>{errorMessage}</p>}
 
             <form action={clearGroceryList}>
                 <input type="hidden" name="householdId" value={household.id} />
                 <input type="hidden" name="householdName" value={decodedName} />
-                <button type="submit">Clear list</button>
+                <button type="submit" className={styles.button}>Clear list</button>
             </form>
 
-            <ul>
+            <ul className={styles.list}>
                 {groceries?.map((item) => (
-                    <li key={item.id} style={{ display: 'flex', gap: '8px' }}>
+                    <li key={item.id} className={styles.item}>
                         <GroceryItem item={item} householdName={decodedName} />
-                        <form action={deleteGrocery} style={{ display: 'inline' }}>
+                        <form action={deleteGrocery}>
                             <input type="hidden" name="householdId" value={household.id} />
                             <input type="hidden" name="householdName" value={decodedName} />
                             <input type="hidden" name="itemId" value={item.id} />
-                            <button type="submit">Delete</button>
+                            <button type="submit" className={styles.deleteButton}>Delete</button>
                         </form>
                     </li>
                 ))}
             </ul>
-        </>
+        </div>
     )
 }

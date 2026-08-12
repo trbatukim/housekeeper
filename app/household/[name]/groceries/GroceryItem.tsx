@@ -27,6 +27,7 @@ export default function GroceryItem({
         checked={isPurchased}
         onChange={handleToggle}
         autoComplete="off"
+        style={{ accentColor: 'var(--primary)' }}
       />
       <span style={{ textDecoration: isPurchased ? 'line-through' : 'none' }}>
         {item.name}

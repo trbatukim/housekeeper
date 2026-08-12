@@ -1,6 +1,11 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
+import type { CSSProperties } from 'react'
+import styles from './theme.module.css'
+import ColorPicker from './ColorPicker'
+
+const DEFAULT_COLOR = '#66e0c3'
 
 export default async function HouseholdPage({
   params,
@@ -19,7 +24,7 @@ export default async function HouseholdPage({
 
   const { data: membership, error } = await supabase
     .from('profiles_to_households')
-    .select('households!inner(id, name)')
+    .select('households!inner(id, name, primary_color)')
     .eq('profile_id', user.id)
     .eq('households.name', decodedName)
     .maybeSingle()
@@ -32,13 +37,29 @@ export default async function HouseholdPage({
     ? membership.households[0]
     : membership.households
 
+  const primaryColor = household.primary_color ?? DEFAULT_COLOR
+
   return (
-    <div>
-      <h1>{household.name}</h1>
-      <p>Household ID: {household.id}</p> <br></br>
-      <Link href={`/household/${household.name}/groceries`}>Groceries</Link> <br></br>
-      <Link href={`/household/${household.name}/expenses`}>Expenses</Link> <br></br>
-      <Link href={`/household/${household.name}/laundry`}>Laundry</Link>
+    <div className={styles.page} style={{ '--primary': primaryColor } as CSSProperties}>
+      <Link href="/household" className={styles.backButton}>&larr; Back</Link>
+      <div className={styles.card}>
+        <div className={styles.header}>
+          <h1 className={styles.title}>{household.name}</h1>
+          <span className={styles.idBadge}>ID: {household.id}</span>
+        </div>
+        <nav className={styles.nav}>
+          <Link href={`/household/${household.name}/groceries`} className={styles.navLink}>
+            Groceries
+          </Link>
+          <Link href={`/household/${household.name}/expenses`} className={styles.navLink}>
+            Expenses
+          </Link>
+          <Link href={`/household/${household.name}/laundry`} className={styles.navLink}>
+            Laundry
+          </Link>
+        </nav>
+        <ColorPicker householdId={household.id} householdName={household.name} color={primaryColor} />
+      </div>
     </div>
   )
 }

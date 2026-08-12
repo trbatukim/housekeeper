@@ -39,6 +39,7 @@ export default function ExpenseItem({
                 checked={isPaid}
                 onChange={handleToggle}
                 autoComplete="off"
+                style={{ accentColor: 'var(--primary)' }}
             />
             <span style={{ textDecoration: isPaid ? 'line-through' : 'none' }}>
                 {formatDate(expense.paid_on)} — {expense.description} — €{expense.amount} ({expense.category})
