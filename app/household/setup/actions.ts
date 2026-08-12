@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation'
 
 export async function createHousehold(formData: FormData) {
   const supabase = await createClient()
-  const name = formData.get('name') as string
+  const name = (formData.get('name') as string).trim()
 
   const { error } = await supabase.rpc('create_household_and_join', { household_name: name })
   if (error) redirect(`/household/setup?error=${encodeURIComponent(error.message)}`)
