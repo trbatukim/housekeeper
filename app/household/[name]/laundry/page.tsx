@@ -41,6 +41,7 @@ export default async function LaundryPage({
     return (
         <>
             <h1>Laundry</h1>
+            <h2>To get notifications, subscribe to the ntfy topic: ntfy.sh/{household.id}</h2>
 
             <form action={addLaundry}>
                 <input type="hidden" name="householdId" value={household.id} />
