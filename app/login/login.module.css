@@ -18,7 +18,7 @@
 .logo {
   margin: 0;
 
-  font-family: "Comic Sans MS", "Comic Sans", cursive;
+  font-family: "Comic Sans MS", var(--font-comic-neue);
   font-size: 31px;
   font-weight: 700;
   letter-spacing: 0.5px;
