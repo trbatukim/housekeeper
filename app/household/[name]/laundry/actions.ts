@@ -13,50 +13,29 @@ export async function addLaundry(formData: FormData) {
 
     const householdId = formData.get('householdId') as string
     const householdName = formData.get('householdName') as string
-    const description = (formData.get('description') as string).trim()
-    const amount = Number(formData.get('amount') as string)
-    const category = formData.get('category') as string
-    const paidOn = formData.get('paidOn') as string
-    const expensesPath = `/household/${encodeURIComponent(householdName)}/expenses`
+    const endsAt = formData.get('endsAt') as string
+    const laundryPath = `/household/${encodeURIComponent(householdName)}/laundry`
 
-    if (!description || Number.isNaN(amount) || amount <= 0) {
-        redirect(`${expensesPath}?error=${encodeURIComponent('Enter a valid description and amount')}`)
-    }
-
-    if (category !== 'recurring' && category !== 'one-time') {
-        redirect(`${expensesPath}?error=${encodeURIComponent('Invalid category')}`)
-    }
-
-    const { data: existing } = await supabase
-        .from('expenses')
-        .select('id')
-        .eq('household_id', householdId)
-        .eq('paid_on', paidOn || new Date().toISOString().split('T')[0])
-        .ilike('description', description)
-        .maybeSingle()
-
-    if (existing) {
-        redirect(`${expensesPath}?error=${encodeURIComponent(`"${description}" is already logged for that date`)}`)
+    if (!endsAt) {
+        redirect(`${laundryPath}?error=${encodeURIComponent('Set an end time for the load')}`)
     }
 
     const { error } = await supabase
-        .from('expenses')
+        .from('laundry_loads')
         .insert({
             household_id: householdId,
-            description,
-            amount,
-            category,
-            ...(paidOn ? { paid_on: paidOn } : {}),
+            ends_at: endsAt,
+            status: 'running',
         })
 
     if (error) {
-        redirect(`${expensesPath}?error=${encodeURIComponent(error.message)}`)
+        redirect(`${laundryPath}?error=${encodeURIComponent(error.message)}`)
     }
 
-    revalidatePath(expensesPath)
+    revalidatePath(laundryPath)
 }
 
-export async function deleteExpense(formData: FormData) {
+export async function deleteLaundry(formData: FormData) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
@@ -66,18 +45,33 @@ export async function deleteExpense(formData: FormData) {
 
     const householdId = formData.get('householdId') as string
     const householdName = formData.get('householdName') as string
-    const expenseId = formData.get('expenseId') as string
+    const laundryId = formData.get('laundryId') as string
 
     const { error } = await supabase
-        .from('expenses')
+        .from('laundry_loads')
         .delete()
         .eq('household_id', householdId)
-        .eq('id', expenseId)
+        .eq('id', laundryId)
 
     if (error) {
         console.error(error)
         return
     }
 
-    revalidatePath(`/household/${encodeURIComponent(householdName)}/expenses`)
+    revalidatePath(`/household/${encodeURIComponent(householdName)}/laundry`)
+}
+
+export async function toggleLaundry(
+    laundryId: string,
+    isDone: boolean,
+    householdName: string
+) {
+    const supabase = await createClient()
+    const { error } = await supabase
+        .from('laundry_loads')
+        .update({ status: isDone ? 'done' : 'running' })
+        .eq('id', laundryId)
+
+    if (error) console.error(error)
+    revalidatePath(`/household/${encodeURIComponent(householdName)}/laundry`)
 }
