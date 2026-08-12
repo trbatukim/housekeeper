@@ -1,4 +1,4 @@
-import { addExpense } from './actions'
+import { addExpense, deleteExpense } from './actions'
 import { createClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 
@@ -59,6 +59,12 @@ export default async function ExpensesPage({
                 {expenses?.map((expense) => (
                     <li key={expense.id}>
                         {expense.paid_on} — {expense.description} — €{expense.amount} ({expense.category})
+                        <form action={deleteExpense} style={{ display: 'inline' }}>
+                            <input type="hidden" name="householdId" value={household.id} />
+                            <input type="hidden" name="householdName" value={decodedName} />
+                            <input type="hidden" name="expenseId" value={expense.id} />
+                            <button type="submit">Delete</button>
+                        </form>
                     </li>
                 ))}
             </ul>

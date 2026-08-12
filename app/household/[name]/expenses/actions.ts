@@ -55,3 +55,29 @@ export async function addExpense(formData: FormData) {
 
     revalidatePath(expensesPath)
 }
+
+export async function deleteExpense(formData: FormData) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+        return
+    }
+
+    const householdId = formData.get('householdId') as string
+    const householdName = formData.get('householdName') as string
+    const expenseId = formData.get('expenseId') as string
+
+    const { error } = await supabase
+        .from('expenses')
+        .delete()
+        .eq('household_id', householdId)
+        .eq('id', expenseId)
+
+    if (error) {
+        console.error(error)
+        return
+    }
+
+    revalidatePath(`/household/${encodeURIComponent(householdName)}/expenses`)
+}
