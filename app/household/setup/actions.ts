@@ -21,6 +21,11 @@ export async function joinHousehold(formData: FormData) {
     .from('profiles_to_households')
     .insert({ profile_id: user.id, household_id: householdId })
 
-  if (error) redirect(`/household/setup?error=${encodeURIComponent(error.message)}`)
+  if (error) {
+    const message = error.code === '23505'
+      ? 'You are already a member of this household'
+      : error.message
+    redirect(`/household/setup?error=${encodeURIComponent(message)}`)
+  }
   redirect('/')
 }

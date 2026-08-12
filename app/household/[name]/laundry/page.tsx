@@ -1,8 +1,13 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
+import Link from 'next/link'
+import type { CSSProperties } from 'react'
 import { addLaundry, deleteLaundry } from './actions'
 import EndTimePicker from './EndTimePicker'
 import LaundryItem from './LaundryItem'
+import styles from '../theme.module.css'
+
+const DEFAULT_COLOR = '#a98bff'
 
 export default async function LaundryPage({
     params,
@@ -24,7 +29,7 @@ export default async function LaundryPage({
 
     const { data: household } = await supabase
         .from('households')
-        .select('id')
+        .select('id, primary_color')
         .eq('name', decodedName)
         .maybeSingle()
 
@@ -38,34 +43,37 @@ export default async function LaundryPage({
         .eq('household_id', household.id)
         .order('created_at')
 
-    return (
-        <>
-            <h1>Laundry</h1>
-            <h2>To get notifications, subscribe to the ntfy topic: ntfy.sh/{household.id}</h2>
+    const primaryColor = household.primary_color ?? DEFAULT_COLOR
 
-            <form action={addLaundry}>
+    return (
+        <div className={styles.page} style={{ '--primary': primaryColor } as CSSProperties}>
+            <Link href={`/household/${decodedName}`} className={styles.backButton}>&larr; Back</Link>
+            <h1 className={styles.pageTitle}>Laundry</h1>
+            <p className={styles.note}>To get notifications, subscribe to the ntfy topic: ntfy.sh/{household.id}</p>
+
+            <form action={addLaundry} className={styles.form}>
                 <input type="hidden" name="householdId" value={household.id} />
                 <input type="hidden" name="householdName" value={decodedName} />
                 <EndTimePicker />
-                <button type="submit">Add</button>
+                <button type="submit" className={styles.button}>Add</button>
             </form>
 
-            {errorMessage && <p>{errorMessage}</p>}
+            {errorMessage && <p className={styles.error}>{errorMessage}</p>}
 
-            <ul>
+            <ul className={styles.list}>
                 {laundryLoads?.map((load) => (
-                    <li key={load.id} style={{ display: 'flex', gap: '8px' }}>
+                    <li key={load.id} className={styles.item}>
                         <LaundryItem item={load} householdName={decodedName} />
-                        <form action={deleteLaundry} style={{ display: 'inline' }}>
+                        <form action={deleteLaundry}>
                             <input type="hidden" name="householdId" value={household.id} />
                             <input type="hidden" name="householdName" value={decodedName} />
                             <input type="hidden" name="laundryId" value={load.id} />
                             <input type="hidden" name="notificationId" value={load.ntfy_seq_id ?? ''} />
-                            <button type="submit">Delete</button>
+                            <button type="submit" className={styles.deleteButton}>Delete</button>
                         </form>
                     </li>
                 ))}
             </ul>
-        </>
+        </div>
     )
 }

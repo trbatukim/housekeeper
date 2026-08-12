@@ -1,7 +1,12 @@
 import { addExpense, deleteExpense, rolloverRecurringExpenses } from './actions'
 import { createClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
+import Link from 'next/link'
+import type { CSSProperties } from 'react'
 import ExpenseItem from './ExpenseItem'
+import styles from '../theme.module.css'
+
+const DEFAULT_COLOR = '#a98bff'
 
 export default async function ExpensesPage({
     params,
@@ -23,7 +28,7 @@ export default async function ExpensesPage({
 
     const { data: household } = await supabase
         .from('households')
-        .select('id')
+        .select('id, primary_color')
         .eq('name', decodedName)
         .maybeSingle()
 
@@ -39,38 +44,41 @@ export default async function ExpensesPage({
         .eq('household_id', household.id)
         .order('paid_on', { ascending: false })
 
-    return (
-        <>
-            <h1>Expenses</h1>
+    const primaryColor = household.primary_color ?? DEFAULT_COLOR
 
-            <form action={addExpense}>
+    return (
+        <div className={styles.page} style={{ '--primary': primaryColor } as CSSProperties}>
+            <Link href={`/household/${decodedName}`} className={styles.backButton}>&larr; Back</Link>
+            <h1 className={styles.pageTitle}>Expenses</h1>
+
+            <form action={addExpense} className={styles.form}>
                 <input type="hidden" name="householdId" value={household.id} />
                 <input type="hidden" name="householdName" value={decodedName} />
-                <input type="text" name="description" placeholder="Description" required />
-                <input type="number" name="amount" placeholder="Amount" step="0.01" min="0.01" required />
-                <select name="category" required>
+                <input type="text" name="description" placeholder="Description" required className={styles.input} />
+                <input type="number" name="amount" placeholder="Amount" step="0.01" min="0.01" required className={styles.input} />
+                <select name="category" required className={styles.select}>
                     <option value="one-time">One-time</option>
                     <option value="recurring">Recurring</option>
                 </select>
-                <input type="date" name="paidOn" />
-                <button type="submit">Add</button>
+                <input type="date" name="paidOn" className={styles.input} />
+                <button type="submit" className={styles.button}>Add</button>
             </form>
 
-            {errorMessage && <p>{errorMessage}</p>}
+            {errorMessage && <p className={styles.error}>{errorMessage}</p>}
 
-            <ul>
+            <ul className={styles.list}>
                 {expenses?.map((expense) => (
-                    <li key={expense.id} style={{ display: 'flex', gap: '8px' }}>
+                    <li key={expense.id} className={styles.item}>
                         <ExpenseItem expense={expense} householdName={decodedName} />
-                        <form action={deleteExpense} style={{ display: 'inline' }}>
+                        <form action={deleteExpense}>
                             <input type="hidden" name="householdId" value={household.id} />
                             <input type="hidden" name="householdName" value={decodedName} />
                             <input type="hidden" name="expenseId" value={expense.id} />
-                            <button type="submit">Delete</button>
+                            <button type="submit" className={styles.deleteButton}>Delete</button>
                         </form>
                     </li>
                 ))}
             </ul>
-        </>
+        </div>
     )
 }
