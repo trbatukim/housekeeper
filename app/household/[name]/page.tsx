@@ -37,7 +37,8 @@ export default async function HouseholdPage({
       <h1>{household.name}</h1>
       <p>Household ID: {household.id}</p> <br></br>
       <Link href={`/household/${household.name}/groceries`}>Groceries</Link> <br></br>
-      <Link href={`/household/${household.name}/expenses`}>Expenses</Link>
+      <Link href={`/household/${household.name}/expenses`}>Expenses</Link> <br></br>
+      <Link href={`/household/${household.name}/laundry`}>Laundry</Link>
     </div>
   )
 }
