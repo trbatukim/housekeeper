@@ -46,32 +46,22 @@ export async function deleteLaundry(formData: FormData) {
     const householdId = formData.get('householdId') as string
     const householdName = formData.get('householdName') as string
     const laundryId = formData.get('laundryId') as string
+    const laundryPath = `/household/${encodeURIComponent(householdName)}/laundry`
 
-    const { error } = await supabase
+    const { data, error } = await supabase
         .from('laundry_loads')
         .delete()
         .eq('household_id', householdId)
         .eq('id', laundryId)
+        .select('id')
 
     if (error) {
-        console.error(error)
-        return
+        redirect(`${laundryPath}?error=${encodeURIComponent(error.message)}`)
     }
 
-    revalidatePath(`/household/${encodeURIComponent(householdName)}/laundry`)
-}
+    if (!data || data.length === 0) {
+        redirect(`${laundryPath}?error=${encodeURIComponent('Delete was blocked (check RLS delete policy on laundry_loads)')}`)
+    }
 
-export async function toggleLaundry(
-    laundryId: string,
-    isDone: boolean,
-    householdName: string
-) {
-    const supabase = await createClient()
-    const { error } = await supabase
-        .from('laundry_loads')
-        .update({ status: isDone ? 'done' : 'running' })
-        .eq('id', laundryId)
-
-    if (error) console.error(error)
-    revalidatePath(`/household/${encodeURIComponent(householdName)}/laundry`)
+    revalidatePath(laundryPath)
 }
