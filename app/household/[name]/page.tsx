@@ -5,7 +5,7 @@ import type { CSSProperties } from 'react'
 import styles from './theme.module.css'
 import ColorPicker from './ColorPicker'
 
-const DEFAULT_COLOR = '#66e0c3'
+const DEFAULT_COLOR = '#a98bff'
 
 export default async function HouseholdPage({
   params,

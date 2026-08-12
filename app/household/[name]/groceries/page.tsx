@@ -6,7 +6,7 @@ import { addGroceryItem, clearGroceryList, deleteGrocery } from './actions'
 import GroceryItem from './GroceryItem'
 import styles from '../theme.module.css'
 
-const DEFAULT_COLOR = '#66e0c3'
+const DEFAULT_COLOR = '#a98bff'
 
 export default async function Groceries({
     params,

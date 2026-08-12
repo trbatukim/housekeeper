@@ -6,7 +6,7 @@ import type { CSSProperties } from 'react'
 import ExpenseItem from './ExpenseItem'
 import styles from '../theme.module.css'
 
-const DEFAULT_COLOR = '#66e0c3'
+const DEFAULT_COLOR = '#a98bff'
 
 export default async function ExpensesPage({
     params,

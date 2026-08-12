@@ -7,7 +7,7 @@ import EndTimePicker from './EndTimePicker'
 import LaundryItem from './LaundryItem'
 import styles from '../theme.module.css'
 
-const DEFAULT_COLOR = '#66e0c3'
+const DEFAULT_COLOR = '#a98bff'
 
 export default async function LaundryPage({
     params,
