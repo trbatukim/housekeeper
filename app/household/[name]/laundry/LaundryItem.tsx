@@ -1,9 +1,9 @@
 'use client'
 
 function formatEndsAt(dateString: string) {
-    dateString = new Date(dateString).toLocaleString()
-    dateString = dateString.split(" ")[1]
-    return dateString.split(":")[0] + ":" + dateString.split(":")[1]
+    const time = new Date(dateString).toLocaleString().split(' ')[1]
+    const [hours, minutes] = time.split(':')
+    return `${hours}:${minutes}`
 }
 
 export default function LaundryItem({

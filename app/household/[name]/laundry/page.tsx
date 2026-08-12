@@ -34,7 +34,7 @@ export default async function LaundryPage({
 
     const { data: laundryLoads } = await supabase
         .from('laundry_loads')
-        .select('id, ends_at, status')
+        .select('id, ends_at, status, ntfy_seq_id')
         .eq('household_id', household.id)
         .order('created_at')
 
@@ -59,6 +59,7 @@ export default async function LaundryPage({
                             <input type="hidden" name="householdId" value={household.id} />
                             <input type="hidden" name="householdName" value={decodedName} />
                             <input type="hidden" name="laundryId" value={load.id} />
+                            <input type="hidden" name="notificationId" value={load.ntfy_seq_id} />
                             <button type="submit">Delete</button>
                         </form>
                     </li>
