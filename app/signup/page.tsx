@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import styles from '../login/login.module.css'
 
 export default function SignupPage() {
   const [email, setEmail] = useState('')
@@ -15,11 +16,16 @@ export default function SignupPage() {
   }
 
   return (
-    <form onSubmit={handleSignup}>
-      <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" required />
-      <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" required />
-      <button type="submit">Sign up</button>
-      {message && <p>{message}</p>}
-    </form>
+    <div className={styles.container}>
+      <h1 className={styles.logo}>HouseKeeper</h1>
+      <form onSubmit={handleSignup} className={styles.form}>
+        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" required className={styles.input} />
+        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" required className={styles.input} />
+        <button type="submit" className={styles.button}>
+          Sign up
+        </button>
+        {message && <p className={styles.error}>{message}</p>}
+      </form>
+    </div>
   )
 }
