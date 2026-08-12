@@ -57,12 +57,14 @@ export async function addLaundry(formData: FormData) {
 
     const householdId = formData.get('householdId') as string
     const householdName = formData.get('householdName') as string
-    const endsAt = formData.get('endsAt') as string
+    const durationSeconds = Number(formData.get('durationSeconds'))
     const laundryPath = `/household/${encodeURIComponent(householdName)}/laundry`
 
-    if (!endsAt) {
+    if (!durationSeconds || durationSeconds <= 0) {
         redirect(`${laundryPath}?error=${encodeURIComponent('Set an end time for the load')}`)
     }
+
+    const endsAt = new Date(Date.now() + durationSeconds * 1000).toISOString()
 
     const notificationId = await sendNtfyReq("Laundry done!", endsAt, householdName, householdId)
 
@@ -76,7 +78,9 @@ export async function addLaundry(formData: FormData) {
         })
 
     if (error) {
-        cancelNtfyReq(String(notificationId), householdId)
+        if (notificationId) {
+            cancelNtfyReq(notificationId, householdId)
+        }
         redirect(`${laundryPath}?error=${encodeURIComponent(error.message)}`)
     }
 
@@ -112,7 +116,9 @@ export async function deleteLaundry(formData: FormData) {
         redirect(`${laundryPath}?error=${encodeURIComponent('Delete was blocked (check RLS delete policy on laundry_loads)')}`)
     }
 
-    cancelNtfyReq(notificationId, householdId)
+    if (notificationId) {
+        cancelNtfyReq(notificationId, householdId)
+    }
 
     revalidatePath(laundryPath)
 }
