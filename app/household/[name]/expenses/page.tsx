@@ -36,8 +36,13 @@ export default async function ExpensesPage({
         .eq('household_id', household.id)
         .order('paid_on', { ascending: false })
 
+    const formatDate = (dateString: string) => {
+        const [year, month, day] = dateString.split('-')
+        return `${day}-${month}-${year}`
+    }
+
     return (
-        <>    
+        <>
             <h1>Expenses</h1>
 
             <form action={addExpense}>
@@ -58,7 +63,7 @@ export default async function ExpensesPage({
             <ul>
                 {expenses?.map((expense) => (
                     <li key={expense.id}>
-                        {expense.paid_on} — {expense.description} — €{expense.amount} ({expense.category})
+                        {formatDate(expense.paid_on)} — {expense.description} — €{expense.amount} ({expense.category})
                         <form action={deleteExpense} style={{ display: 'inline' }}>
                             <input type="hidden" name="householdId" value={household.id} />
                             <input type="hidden" name="householdName" value={decodedName} />
