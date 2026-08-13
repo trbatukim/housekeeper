@@ -1,5 +1,7 @@
 'use client'
 
+import Timer from './Timer'
+
 function formatEndsAt(dateString: string) {
     const time = new Date(dateString).toLocaleString().split(' ')[1]
     const [hours, minutes] = time.split(':')
@@ -16,7 +18,7 @@ export default function LaundryItem({
     return (
         <>
             <span>
-                Laundry ends at {formatEndsAt(item.ends_at)}
+                Laundry ends at {formatEndsAt(item.ends_at)} (<Timer endsAt={item.ends_at} />)
             </span>
         </>
     )
