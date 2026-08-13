@@ -1,17 +1,18 @@
+import styles from '../theme.module.css'
 import { createClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import type { CSSProperties } from 'react'
-import { addLaundry, deleteLaundry } from './actions'
+import DishesItem from './DishesItem'
+import DishwasherItem from './DishwasherItem'
+import { deleteDishwasher, addDishwasher } from './actions'
 import EndTimePicker from '@/components/EndTimePicker'
-import LaundryItem from './LaundryItem'
-import styles from '../theme.module.css'
 
 const DEFAULT_COLOR = '#a98bff'
 
-export default async function LaundryPage({
+export default async function DishesPage({
     params,
-    searchParams,
+    searchParams
 }: {
     params: Promise<{ name: string }>
     searchParams: Promise<{ error?: string }>
@@ -37,37 +38,49 @@ export default async function LaundryPage({
         notFound()
     }
 
-    const { data: laundryLoads } = await supabase
-        .from('laundry_loads')
+    const { data: dishesStatus } = await supabase
+        .from('dishes_status')
+        .select('status')
+        .eq('household_id', household.id)
+
+    const { data: dishwasherLoads } = await supabase
+        .from('dishwasher_loads')
         .select('id, ends_at, status, ntfy_seq_id')
         .eq('household_id', household.id)
         .order('created_at')
 
     const primaryColor = household.primary_color ?? DEFAULT_COLOR
+    const isDishwasherRunning = dishwasherLoads?.some((load) => load.status === 'running') ?? false
 
     return (
         <div className={styles.page} style={{ '--primary': primaryColor } as CSSProperties}>
             <Link href={`/household/${decodedName}`} className={styles.backButton}>&larr; Back</Link>
-            <h1 className={styles.pageTitle}>Laundry</h1>
+            <h1 className={styles.title}>Dishes</h1>
             <p className={styles.note}>To get notifications, subscribe to the ntfy topic: ntfy.sh/{household.id}</p>
 
-            <form action={addLaundry} className={styles.form}>
+            <ul className={styles.list}>
+                {dishesStatus?.map((dishes, index) => (
+                    <li className={styles.item} key={index}>
+                        <DishesItem householdId={household.id} status={dishes.status} householdName={decodedName} locked={isDishwasherRunning} />
+                    </li>
+                ))}
+            </ul>
+
+            <form action={addDishwasher} className={styles.form}>
                 <input type="hidden" name="householdId" value={household.id} />
                 <input type="hidden" name="householdName" value={decodedName} />
                 <EndTimePicker />
                 <button type="submit" className={styles.button}>Add</button>
             </form>
 
-            {errorMessage && <p className={styles.error}>{errorMessage}</p>}
-
             <ul className={styles.list}>
-                {laundryLoads?.map((load) => (
+                {dishwasherLoads?.map((load) => (
                     <li key={load.id} className={styles.item}>
-                        <LaundryItem item={load} householdName={decodedName} />
-                        <form action={deleteLaundry}>
+                        <DishwasherItem item={load} householdName={decodedName} />
+                        <form action={deleteDishwasher}>
                             <input type="hidden" name="householdId" value={household.id} />
                             <input type="hidden" name="householdName" value={decodedName} />
-                            <input type="hidden" name="laundryId" value={load.id} />
+                            <input type="hidden" name="dishwasherId" value={load.id} />
                             <input type="hidden" name="notificationId" value={load.ntfy_seq_id ?? ''} />
                             <button type="submit" className={styles.deleteButton}>Delete</button>
                         </form>
@@ -76,4 +89,4 @@ export default async function LaundryPage({
             </ul>
         </div>
     )
-}
+} 

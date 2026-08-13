@@ -2,6 +2,12 @@
 
 import { useState, useEffect } from 'react'
 
+export function formatEndsAt(dateString: string) {
+    const time = new Date(dateString).toLocaleString().split(' ')[1]
+    const [hours, minutes] = time.split(':')
+    return `${hours}:${minutes}`
+}
+
 function formatRemaining(ms: number) {
     if (ms <= 0) return 'Done'
 
