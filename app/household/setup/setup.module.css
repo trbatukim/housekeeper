@@ -28,14 +28,18 @@
 
   font-size: 14px;
 
-  transition: background 0.15s ease, color 0.15s ease;
+  transition: 
+    background 0.15s ease, 
+    color 0.15s ease;
 }
 
 .backButton:hover {
   background: rgba(30, 25, 40, 0.4);
   color: rgb(174, 161, 205);
 
-  transition: background 0.15s ease, color 0.15s ease;
+  transition: 
+    background 0.15s ease, 
+    color 0.15s ease;
 }
 
 .title {
@@ -53,78 +57,112 @@
 .contentBox {
   color: white;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: stretch;
-  gap: 1rem;
+  justify-content: center;
+  gap: 1.8rem;
   width: 100%;
   max-width: 500px;
-  padding: 60px 50px;
+  padding: 4rem 2rem;
   border-radius: 13px;
   background: rgba(230, 220, 255, 0.12);
   backdrop-filter: blur(8px);
 }
 
-.empty {
-  color: #F5F1FF;
-  font-size: 16px;
-  text-align: center;
-  margin: 0;
-}
-
-.list {
+.formSection {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.item {
-  display: flex;
   align-items: center;
-  gap: 0.75rem;
+  justify-content: center;
+  flex: 1;
+  gap: 0.5rem;
+  text-align: center;
 }
 
-.link {
-  display: block;
+.formSection h2 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.divider {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: #9187A3;
+  font-size: 0.85rem;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
   flex: 1;
+  width: 1px;
+  background: rgba(245, 241, 255, 0.15);
+}
+
+.button {
+  display: block;
+  width: 100%;
   color: #F5F1FF;
   text-align: center;
+  box-sizing: border-box;
 
-  padding: 10px 16px;
-  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
   background: rgba(169, 139, 255, 0.25);
 
-  transition: background 0.15s ease, color 0.15s ease;
+  transition: 
+    background 0.15s ease, 
+    color 0.15s ease;
 }
 
-.link:hover {
+.button:hover {
   background: rgba(0, 0, 0, 0.4);
   color: rgb(174, 161, 205);
 
-  transition: background 0.15s ease, color 0.15s ease;
+  transition: 
+    background 0.15s ease, 
+    color 0.15s ease;
 }
 
-.leaveButton {
-  color: #FF8A80;
+.input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px 1rem;
 
-  padding: 10px 16px;
-  border: 1px solid rgba(255, 138, 128, 0.4);
-  border-radius: 8px;
-  background: rgba(255, 138, 128, 0.1);
+  border: 1px solid #403653;
+  border-radius: 0.5rem;
+
+  background: #21192F;
+  color: #F5F1FF;
 
   font-size: 14px;
-  cursor: pointer;
 
-  transition: background 0.15s ease, color 0.15s ease;
+  outline: none;
+
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
-.leaveButton:hover {
-  background: rgba(255, 138, 128, 0.25);
-  color: #FFB3AB;
+.input::placeholder {
+  color: #9187A3;
+}
 
-  transition: background 0.15s ease, color 0.15s ease;
+.input:focus {
+  border-color: #A98BFF;
+
+  box-shadow:
+    0 0 0 3px rgba(169, 139, 255, 0.12);
 }
 
 .error {
