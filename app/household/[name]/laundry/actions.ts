@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { sendNtfyReq, cancelNtfyReq } from '@/lib/ntfy'
+import { computeDurationSeconds, isValidDuration } from '@/lib/duration'
 
 export async function addLaundry(formData: FormData) {
     const supabase = await createClient()
@@ -16,10 +17,10 @@ export async function addLaundry(formData: FormData) {
     const householdName = formData.get('householdName') as string
     const hours = Number(formData.get('hours')) || 0
     const minutes = Number(formData.get('minutes')) || 0
-    const durationSeconds = hours * 3600 + minutes * 60
+    const durationSeconds = computeDurationSeconds(hours, minutes)
     const laundryPath = `/household/${encodeURIComponent(householdName)}/laundry`
 
-    if (!durationSeconds || durationSeconds <= 0) {
+    if (!isValidDuration(durationSeconds)) {
         redirect(`${laundryPath}?error=${encodeURIComponent('Set an end time for the load')}`)
     }
 

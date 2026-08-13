@@ -8,7 +8,7 @@ export function formatEndsAt(dateString: string) {
     return `${hours}:${minutes}`
 }
 
-function formatRemaining(ms: number) {
+export function formatRemaining(ms: number) {
     if (ms <= 0) return 'Done'
 
     const totalSeconds = Math.floor(ms / 1000)
