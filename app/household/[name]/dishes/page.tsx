@@ -4,6 +4,9 @@ import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import type { CSSProperties } from 'react'
 import DishesItem from './DishesItem'
+import DishwasherItem from './DishwasherItem'
+import { deleteDishwasher, addDishwasher } from './actions'
+import EndTimePicker from '@/components/EndTimePicker'
 
 const DEFAULT_COLOR = '#a98bff'
 
@@ -40,6 +43,12 @@ export default async function DishesPage({
         .select('status')
         .eq('household_id', household.id)
 
+    const { data: dishwasherLoads } = await supabase
+        .from('dishwasher_loads')
+        .select('id, ends_at, status, ntfy_seq_id')
+        .eq('household_id', household.id)
+        .order('created_at')
+
     const primaryColor = household.primary_color ?? DEFAULT_COLOR
 
     return (
@@ -52,6 +61,28 @@ export default async function DishesPage({
                 {dishesStatus?.map((dishes, index) => (
                     <li className={styles.item} key={index}>
                         <DishesItem householdId={household.id} status={dishes.status} householdName={decodedName} />
+                    </li>
+                ))}
+            </ul>
+
+            <form action={addDishwasher} className={styles.form}>
+                <input type="hidden" name="householdId" value={household.id} />
+                <input type="hidden" name="householdName" value={decodedName} />
+                <EndTimePicker />
+                <button type="submit" className={styles.button}>Add</button>
+            </form>
+
+            <ul className={styles.list}>
+                {dishwasherLoads?.map((load) => (
+                    <li key={load.id} className={styles.item}>
+                        <DishwasherItem item={load} householdName={decodedName} />
+                        <form action={deleteDishwasher}>
+                            <input type="hidden" name="householdId" value={household.id} />
+                            <input type="hidden" name="householdName" value={decodedName} />
+                            <input type="hidden" name="laundryId" value={load.id} />
+                            <input type="hidden" name="notificationId" value={load.ntfy_seq_id ?? ''} />
+                            <button type="submit" className={styles.deleteButton}>Delete</button>
+                        </form>
                     </li>
                 ))}
             </ul>

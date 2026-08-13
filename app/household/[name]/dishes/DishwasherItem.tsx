@@ -3,7 +3,7 @@
 import Timer from '@/components/Timer'
 import { formatEndsAt } from '@/components/Timer'
 
-export default function LaundryItem({
+export default function DishwasherItem({
     item,
 }: {
     item: { id: string; ends_at: string; status: string }
@@ -13,7 +13,7 @@ export default function LaundryItem({
     return (
         <>
             <span>
-                Laundry ends at {formatEndsAt(item.ends_at)} (<Timer endsAt={item.ends_at} />)
+                Dishwasher ends at {formatEndsAt(item.ends_at)} (<Timer endsAt={item.ends_at} />)
             </span>
         </>
     )

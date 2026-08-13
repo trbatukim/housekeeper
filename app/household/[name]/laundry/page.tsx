@@ -3,7 +3,7 @@ import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import type { CSSProperties } from 'react'
 import { addLaundry, deleteLaundry } from './actions'
-import EndTimePicker from './EndTimePicker'
+import EndTimePicker from '@/components/EndTimePicker'
 import LaundryItem from './LaundryItem'
 import styles from '../theme.module.css'
 

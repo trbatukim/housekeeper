@@ -31,6 +31,7 @@ export default function DishesItem({
           value="clean"
           checked={currentStatus === 'clean'}
           onChange={() => handleChange('clean')}
+          disabled={false}
         />
         Clean
       </label>
@@ -39,8 +40,20 @@ export default function DishesItem({
           type="radio"
           name="status"
           value="dirty"
+          checked={currentStatus === 'cleaning'}
+          onChange={() => handleChange('cleaning')}
+          disabled={true}
+        />
+        Cleaning
+      </label>
+      <label>
+        <input
+          type="radio"
+          name="status"
+          value="dirty"
           checked={currentStatus === 'dirty'}
           onChange={() => handleChange('dirty')}
+          disabled={false}
         />
         Dirty
       </label>
