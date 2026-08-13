@@ -3,12 +3,13 @@
 import { useState, useEffect } from 'react'
 
 export function formatEndsAt(dateString: string) {
-    const time = new Date(dateString).toLocaleString().split(' ')[1]
-    const [hours, minutes] = time.split(':')
+    const date = new Date(dateString)
+    const hours = String(date.getHours()).padStart(2, '0')
+    const minutes = String(date.getMinutes()).padStart(2, '0')
     return `${hours}:${minutes}`
 }
 
-function formatRemaining(ms: number) {
+export function formatRemaining(ms: number) {
     if (ms <= 0) return 'Done'
 
     const totalSeconds = Math.floor(ms / 1000)

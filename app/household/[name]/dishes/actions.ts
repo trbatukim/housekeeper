@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { sendNtfyReq, cancelNtfyReq } from '@/lib/ntfy'
+import { computeDurationSeconds, isValidDuration } from '@/lib/duration'
 
 export async function toggleDishesStatus(
     householdId: string,
@@ -31,10 +32,10 @@ export async function addDishwasher(formData: FormData) {
     const householdName = formData.get('householdName') as string
     const hours = Number(formData.get('hours')) || 0
     const minutes = Number(formData.get('minutes')) || 0
-    const durationSeconds = hours * 3600 + minutes * 60
+    const durationSeconds = computeDurationSeconds(hours, minutes)
     const dishesPath = `/household/${encodeURIComponent(householdName)}/dishes`
 
-    if (!durationSeconds || durationSeconds <= 0) {
+    if (!isValidDuration(durationSeconds)) {
         redirect(`${dishesPath}?error=${encodeURIComponent('Set an end time for the load')}`)
     }
 
@@ -92,7 +93,7 @@ export async function deleteDishwasher(formData: FormData) {
     }
 
     if (!data || data.length === 0) {
-        redirect(`${dishesPath}?error=${encodeURIComponent('Delete was blocked (check RLS delete policy on laundry_loads)')}`)
+        redirect(`${dishesPath}?error=${encodeURIComponent('Delete was blocked (check RLS delete policy on dishwasher_loads)')}`)
     }
 
     if (notificationId) {
