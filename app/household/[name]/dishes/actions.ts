@@ -58,6 +58,11 @@ export async function addDishwasher(formData: FormData) {
         redirect(`${dishesPath}?error=${encodeURIComponent(error.message)}`)
     }
 
+    await supabase
+        .from('dishes_status')
+        .update({ status: 'cleaning' })
+        .eq('household_id', householdId)
+
     revalidatePath(dishesPath)
 }
 
@@ -71,7 +76,7 @@ export async function deleteDishwasher(formData: FormData) {
 
     const householdId = formData.get('householdId') as string
     const householdName = formData.get('householdName') as string
-    const laundryId = formData.get('laundryId') as string
+    const dishwasherId = formData.get('dishwasherId') as string
     const notificationId = formData.get('notificationId') as string
     const dishesPath = `/household/${encodeURIComponent(householdName)}/dishes`
 
@@ -79,7 +84,7 @@ export async function deleteDishwasher(formData: FormData) {
         .from('dishwasher_loads')
         .delete()
         .eq('household_id', householdId)
-        .eq('id', laundryId)
+        .eq('id', dishwasherId)
         .select('id')
 
     if (error) {
@@ -92,6 +97,19 @@ export async function deleteDishwasher(formData: FormData) {
 
     if (notificationId) {
         cancelNtfyReq(notificationId, householdId)
+    }
+
+    const { data: remainingLoads } = await supabase
+        .from('dishwasher_loads')
+        .select('id')
+        .eq('household_id', householdId)
+        .eq('status', 'running')
+
+    if (!remainingLoads || remainingLoads.length === 0) {
+        await supabase
+            .from('dishes_status')
+            .update({ status: 'clean' })
+            .eq('household_id', householdId)
     }
 
     revalidatePath(dishesPath)

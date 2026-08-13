@@ -50,6 +50,7 @@ export default async function DishesPage({
         .order('created_at')
 
     const primaryColor = household.primary_color ?? DEFAULT_COLOR
+    const isDishwasherRunning = dishwasherLoads?.some((load) => load.status === 'running') ?? false
 
     return (
         <div className={styles.page} style={{ '--primary': primaryColor } as CSSProperties}>
@@ -60,7 +61,7 @@ export default async function DishesPage({
             <ul className={styles.list}>
                 {dishesStatus?.map((dishes, index) => (
                     <li className={styles.item} key={index}>
-                        <DishesItem householdId={household.id} status={dishes.status} householdName={decodedName} />
+                        <DishesItem householdId={household.id} status={dishes.status} householdName={decodedName} locked={isDishwasherRunning} />
                     </li>
                 ))}
             </ul>
@@ -79,7 +80,7 @@ export default async function DishesPage({
                         <form action={deleteDishwasher}>
                             <input type="hidden" name="householdId" value={household.id} />
                             <input type="hidden" name="householdName" value={decodedName} />
-                            <input type="hidden" name="laundryId" value={load.id} />
+                            <input type="hidden" name="dishwasherId" value={load.id} />
                             <input type="hidden" name="notificationId" value={load.ntfy_seq_id ?? ''} />
                             <button type="submit" className={styles.deleteButton}>Delete</button>
                         </form>
