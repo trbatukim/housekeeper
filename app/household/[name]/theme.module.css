@@ -7,9 +7,9 @@
   padding: 24px;
 
   background: linear-gradient(
-    135deg,
-    #10151a 0%,
-    color-mix(in srgb, var(--primary, #a98bff) 18%, #0f1a1f) 100%
+    170deg,
+    #14101f 0%,
+    var(--bg-end, #1c1330) 100%
   );
 }
 
@@ -19,7 +19,7 @@
   left: 24px;
 
   display: inline-block;
-  color: #f5fbf9;
+  color: #f5f1ff;
 
   padding: 8px 14px;
   border-radius: 8px;
@@ -31,12 +31,12 @@
 }
 
 .backButton:hover {
-  background: rgba(15, 20, 24, 0.5);
+  background: rgba(20, 16, 31, 0.5);
   color: var(--primary, #a98bff);
 }
 
 .card {
-  color: white;
+  color: #f5f1ff;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -46,7 +46,7 @@
   padding: 48px 44px;
   border-radius: 18px;
   border: 1px solid color-mix(in srgb, var(--primary, #a98bff) 20%, transparent);
-  background: color-mix(in srgb, var(--primary, #a98bff) 6%, rgba(255, 255, 255, 0.03));
+  background: color-mix(in srgb, var(--primary, #a98bff) 6%, rgba(230, 220, 255, 0.06));
   backdrop-filter: blur(10px);
 }
 
@@ -67,7 +67,7 @@
 }
 
 .idBadge {
-  color: #d9efe8;
+  color: #9187a3;
   font-size: 12px;
   letter-spacing: 0.03em;
 
@@ -93,7 +93,7 @@
   border-radius: 12px;
   border: 1px solid color-mix(in srgb, var(--primary, #a98bff) 18%, transparent);
   background: color-mix(in srgb, var(--primary, #a98bff) 10%, transparent);
-  color: #f5fbf9;
+  color: #f5f1ff;
   font-weight: 500;
 
   transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
@@ -107,26 +107,99 @@
 
 .colorPickerForm {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 6px;
 }
 
-.colorPickerLabel {
+.colorPickerRow {
   display: flex;
   align-items: center;
-  gap: 8px;
-  color: #d9efe8;
+  justify-content: center;
+  gap: 10px;
+}
+
+.colorPickerLabelText {
+  color: #9187a3;
   font-size: 13px;
 }
 
-.colorInput {
-  width: 34px;
-  height: 34px;
+.colorPickerDetails {
+  position: relative;
+}
+
+.colorPickerSwatchButton {
+  display: block;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(128, 128, 128, 0.5);
+  list-style: none;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.colorPickerSwatchButton::-webkit-details-marker {
+  display: none;
+}
+
+.colorPickerSwatchButton:hover {
+  transform: scale(1.1);
+}
+
+.colorPickerPanel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 10;
+  width: max-content;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--primary, #a98bff) 20%, transparent);
+  background: #1c1330;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.swatchRow {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  max-width: 220px;
+}
+
+.swatch {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(128, 128, 128, 0.35);
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.swatch:hover {
+  transform: scale(1.12);
+}
+
+.swatch[aria-pressed='true'] {
+  border-color: #f5f1ff;
+}
+
+.resetLink {
   padding: 0;
   border: none;
-  border-radius: 8px;
   background: none;
+  color: var(--primary, #a98bff);
+  font-size: 11px;
+  text-decoration: underline;
   cursor: pointer;
+}
+
+.resetLink:hover {
+  opacity: 0.8;
 }
 
 .pageTitle {
@@ -137,7 +210,7 @@
 }
 
 .note {
-  color: #d9efe8;
+  color: #9187a3;
   font-size: 13px;
   margin: 0;
 }
@@ -156,8 +229,8 @@
   padding: 8px 12px;
   border-radius: 8px;
   border: 1px solid color-mix(in srgb, var(--primary, #a98bff) 25%, transparent);
-  background: rgba(255, 255, 255, 0.05);
-  color: #f5fbf9;
+  background: rgba(230, 220, 255, 0.06);
+  color: #f5f1ff;
 }
 
 .button {
@@ -165,7 +238,7 @@
   border-radius: 8px;
   border: none;
   background: color-mix(in srgb, var(--primary, #a98bff) 30%, transparent);
-  color: #f5fbf9;
+  color: #f5f1ff;
   cursor: pointer;
   transition: background 0.15s ease;
 }
@@ -192,9 +265,9 @@
   gap: 8px;
   padding: 10px 14px;
   border-radius: 8px;
-  background: color-mix(in srgb, var(--primary, #a98bff) 8%, rgba(255, 255, 255, 0.03));
+  background: color-mix(in srgb, var(--primary, #a98bff) 8%, rgba(230, 220, 255, 0.05));
   border: 1px solid color-mix(in srgb, var(--primary, #a98bff) 12%, transparent);
-  color: #f5fbf9;
+  color: #f5f1ff;
 }
 
 .deleteButton {
