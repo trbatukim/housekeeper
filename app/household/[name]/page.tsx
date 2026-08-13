@@ -87,6 +87,9 @@ export default async function HouseholdPage({
           <Link href={`/household/${household.name}/laundry`} className={styles.navLink}>
             Laundry
           </Link>
+          <Link href={`/household/${household.name}/dishes`} className={styles.navLink}>
+            Dishes
+          </Link>
         </nav>
         <ColorPicker householdId={household.id} householdName={household.name} color={primaryColor} />
       </div>
