@@ -7,6 +7,25 @@ import ColorPicker from './ColorPicker'
 
 const DEFAULT_COLOR = '#a98bff'
 
+// Background end-color for the page gradient. At DEFAULT_COLOR this
+// resolves to exactly #1c1330, matching the default gradient.
+const GRADIENT_BASE: [number, number, number] = [28, 19, 48] // #1c1330
+const TINT_WEIGHT = 0.18
+
+function hexToRgb(hex: string): [number, number, number] {
+  const n = parseInt(hex.slice(1), 16)
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255]
+}
+
+function gradientEndColor(primaryColor: string): string {
+  const defaultRgb = hexToRgb(DEFAULT_COLOR)
+  const primaryRgb = hexToRgb(primaryColor)
+  const [r, g, b] = GRADIENT_BASE.map((base, i) =>
+    Math.min(255, Math.max(0, Math.round(base + TINT_WEIGHT * (primaryRgb[i] - defaultRgb[i]))))
+  )
+  return `rgb(${r}, ${g}, ${b})`
+}
+
 export default async function HouseholdPage({
   params,
 }: {
@@ -38,11 +57,22 @@ export default async function HouseholdPage({
     : membership.households
 
   const primaryColor = household.primary_color ?? DEFAULT_COLOR
+  const isBlackTheme = primaryColor.toLowerCase() === '#000000'
 
   return (
-    <div className={styles.page} style={{ '--primary': primaryColor } as CSSProperties}>
+    <div
+      className={styles.page}
+      style={{ '--primary': primaryColor, '--bg-end': gradientEndColor(primaryColor) } as CSSProperties}
+    >
       <Link href="/household" className={styles.backButton}>&larr; Back</Link>
-      <div className={styles.card}>
+      <div
+        className={styles.card}
+        style={
+          isBlackTheme
+            ? { background: 'rgba(255, 255, 255, 0.08)', borderColor: 'rgba(255, 255, 255, 0.18)' }
+            : undefined
+        }
+      >
         <div className={styles.header}>
           <h1 className={styles.title}>{household.name}</h1>
           <span className={styles.idBadge}>ID: {household.id}</span>
