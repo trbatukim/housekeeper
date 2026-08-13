@@ -57,7 +57,9 @@ export async function addLaundry(formData: FormData) {
 
     const householdId = formData.get('householdId') as string
     const householdName = formData.get('householdName') as string
-    const durationSeconds = Number(formData.get('durationSeconds'))
+    const hours = Number(formData.get('hours')) || 0
+    const minutes = Number(formData.get('minutes')) || 0
+    const durationSeconds = hours * 3600 + minutes * 60
     const laundryPath = `/household/${encodeURIComponent(householdName)}/laundry`
 
     if (!durationSeconds || durationSeconds <= 0) {

@@ -7,16 +7,12 @@ function clamp(value: number, max: number) {
 }
 
 export default function EndTimePicker({
-    name = 'durationSeconds',
     label = 'Ends in',
 }: {
-    name?: string
     label?: string
 }) {
     const [hours, setHours] = useState('00')
     const [minutes, setMinutes] = useState('00')
-
-    const totalSeconds = Number(hours) * 3600 + Number(minutes) * 60
 
     function handleChange(setter: (value: string) => void, max: number) {
         return (e: ChangeEvent<HTMLInputElement>) => {
@@ -35,6 +31,7 @@ export default function EndTimePicker({
             <input
                 type="text"
                 inputMode="numeric"
+                name="hours"
                 value={hours}
                 onChange={handleChange(setHours, 99)}
                 onBlur={handleBlur(hours, setHours)}
@@ -46,6 +43,7 @@ export default function EndTimePicker({
             <input
                 type="text"
                 inputMode="numeric"
+                name="minutes"
                 value={minutes}
                 onChange={handleChange(setMinutes, 59)}
                 onBlur={handleBlur(minutes, setMinutes)}
@@ -53,7 +51,6 @@ export default function EndTimePicker({
                 maxLength={2}
                 style={{ width: '2.5em', textAlign: 'center' }}
             />
-            <input type="hidden" name={name} value={totalSeconds} />
         </span>
     )
 }
