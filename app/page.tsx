@@ -12,13 +12,13 @@ export default async function Home() {
   }
 
   return (
-    <div className={styles.container}>
-      <h1 className={styles.title}>Home</h1>
-      <div className={styles.contentBox}>
+    <div className="container">
+      <h1 className="title">Home</h1>
+      <div className="contentBox">
         <p className={styles.userEmail}>Logged in as {user.email}</p>
         <div className={styles.actions}>
-          <Link href="/household/setup" className={styles.link}>Create or Join a Household</Link>
-          <Link href="/household" className={styles.link}>View Current Households</Link>
+          <Link href="/household/setup" className="link">Create or Join a Household</Link>
+          <Link href="/household" className="link">View Current Households</Link>
         </div>
       </div>
     </div>

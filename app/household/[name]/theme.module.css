@@ -13,7 +13,7 @@
   );
 }
 
-.backButton {
+.themedBackButton {
   position: fixed;
   top: 24px;
   left: 24px;
@@ -30,7 +30,7 @@
   transition: background 0.15s ease, color 0.15s ease;
 }
 
-.backButton:hover {
+.themedBackButton:hover {
   background: rgba(20, 16, 31, 0.5);
   color: var(--primary, #a98bff);
 }
@@ -58,7 +58,7 @@
   text-align: center;
 }
 
-.title {
+.themedTitle {
   color: var(--primary, #a98bff);
   font-size: 32px;
   font-weight: 700;
@@ -282,10 +282,4 @@
 
 .deleteButton:hover {
   background: rgba(255, 138, 128, 0.25);
-}
-
-.error {
-  color: #ff8a80;
-  font-size: 14px;
-  margin: 0;
 }

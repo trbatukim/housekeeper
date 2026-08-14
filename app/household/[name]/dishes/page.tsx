@@ -54,8 +54,8 @@ export default async function DishesPage({
 
     return (
         <div className={styles.page} style={{ '--primary': primaryColor } as CSSProperties}>
-            <Link href={`/household/${decodedName}`} className={styles.backButton}>&larr; Back</Link>
-            <h1 className={styles.title}>Dishes</h1>
+            <Link href={`/household/${decodedName}`} className={styles.themedBackButton}>&larr; Back</Link>
+            <h1 className={styles.themedTitle}>Dishes</h1>
             <p className={styles.note}>To get notifications, subscribe to the ntfy topic: ntfy.sh/{household.id}</p>
 
             <ul className={styles.list}>

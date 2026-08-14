@@ -16,15 +16,15 @@ export default function SignupPage() {
   }
 
   return (
-    <div className={styles.container}>
+    <div className="container">
       <h1 className={styles.logo}>HouseKeeper</h1>
-      <form onSubmit={handleSignup} className={styles.form}>
-        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" required className={styles.input} />
-        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" required className={styles.input} />
-        <button type="submit" className={styles.button}>
+      <form onSubmit={handleSignup} className={styles.loginForm}>
+        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" required className="input" />
+        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" required className="input" />
+        <button type="submit" className={styles.loginButton}>
           Sign up
         </button>
-        {message && <p className={styles.error}>{message}</p>}
+        {message && <p className="error">{message}</p>}
       </form>
     </div>
   )
