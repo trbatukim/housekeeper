@@ -47,7 +47,7 @@ export default async function LaundryPage({
 
     return (
         <div className={styles.page} style={{ '--primary': primaryColor } as CSSProperties}>
-            <Link href={`/household/${decodedName}`} className={styles.backButton}>&larr; Back</Link>
+            <Link href={`/household/${decodedName}`} className={styles.themedBackButton}>&larr; Back</Link>
             <h1 className={styles.pageTitle}>Laundry</h1>
             <p className={styles.note}>To get notifications, subscribe to the ntfy topic: ntfy.sh/{household.id}</p>
 
@@ -58,7 +58,7 @@ export default async function LaundryPage({
                 <button type="submit" className={styles.button}>Add</button>
             </form>
 
-            {errorMessage && <p className={styles.error}>{errorMessage}</p>}
+            {errorMessage && <p className="error">{errorMessage}</p>}
 
             <ul className={styles.list}>
                 {laundryLoads?.map((load) => (

@@ -1,67 +1,6 @@
-.container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  min-height: 100vh;
-  padding: 24px;
-
-  background: linear-gradient(
-    170deg,
-    #14101F 0%,
-    #1c1330 100%
-  );
-}
-
-.backButton {
-  position: fixed;
-  top: 24px;
-  left: 24px;
-
-  display: inline-block;
-  color: #F5F1FF;
-
-  padding: 8px 14px;
-  border-radius: 8px;
-  background: rgba(169, 139, 255, 0.25);
-
-  font-size: 14px;
-
-  transition: background 0.15s ease, color 0.15s ease;
-}
-
-.backButton:hover {
-  background: rgba(30, 25, 40, 0.4);
-  color: rgb(174, 161, 205);
-
-  transition: background 0.15s ease, color 0.15s ease;
-}
-
-.title {
-  background: rgb(174, 161, 205);
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
-
-  font-size: 34px;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  margin: 0;
-}
-
-.contentBox {
-  color: white;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 1rem;
-  width: 100%;
-  max-width: 500px;
-  padding: 60px 50px;
-  border-radius: 13px;
-  background: rgba(230, 220, 255, 0.12);
-  backdrop-filter: blur(8px);
+.listBox {
+  --content-box-align: stretch;
+  --content-box-gap: 1rem;
 }
 
 .empty {
@@ -86,24 +25,8 @@
   gap: 0.75rem;
 }
 
-.link {
-  display: block;
+.linkGrow {
   flex: 1;
-  color: #F5F1FF;
-  text-align: center;
-
-  padding: 10px 16px;
-  border-radius: 8px;
-  background: rgba(169, 139, 255, 0.25);
-
-  transition: background 0.15s ease, color 0.15s ease;
-}
-
-.link:hover {
-  background: rgba(0, 0, 0, 0.4);
-  color: rgb(174, 161, 205);
-
-  transition: background 0.15s ease, color 0.15s ease;
 }
 
 .leaveButton {
@@ -125,10 +48,4 @@
   color: #FFB3AB;
 
   transition: background 0.15s ease, color 0.15s ease;
-}
-
-.error {
-  color: #FF8A80;
-  font-size: 14px;
-  margin: 0;
 }

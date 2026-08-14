@@ -46,7 +46,7 @@ export default async function Groceries({
 
     return (
         <div className={styles.page} style={{ '--primary': primaryColor } as CSSProperties}>
-            <Link href={`/household/${decodedName}`} className={styles.backButton}>&larr; Back</Link>
+            <Link href={`/household/${decodedName}`} className={styles.themedBackButton}>&larr; Back</Link>
             <h1 className={styles.pageTitle}>Groceries</h1>
 
             <form action={addGroceryItem} className={styles.form}>
@@ -56,7 +56,7 @@ export default async function Groceries({
                 <button type="submit" className={styles.button}>Add</button>
             </form>
 
-            {errorMessage && <p className={styles.error}>{errorMessage}</p>}
+            {errorMessage && <p className="error">{errorMessage}</p>}
 
             <form action={clearGroceryList}>
                 <input type="hidden" name="householdId" value={household.id} />

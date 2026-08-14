@@ -48,7 +48,7 @@ export default async function ExpensesPage({
 
     return (
         <div className={styles.page} style={{ '--primary': primaryColor } as CSSProperties}>
-            <Link href={`/household/${decodedName}`} className={styles.backButton}>&larr; Back</Link>
+            <Link href={`/household/${decodedName}`} className={styles.themedBackButton}>&larr; Back</Link>
             <h1 className={styles.pageTitle}>Expenses</h1>
 
             <form action={addExpense} className={styles.form}>
@@ -64,7 +64,7 @@ export default async function ExpensesPage({
                 <button type="submit" className={styles.button}>Add</button>
             </form>
 
-            {errorMessage && <p className={styles.error}>{errorMessage}</p>}
+            {errorMessage && <p className="error">{errorMessage}</p>}
 
             <ul className={styles.list}>
                 {expenses?.map((expense) => (

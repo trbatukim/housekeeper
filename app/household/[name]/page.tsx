@@ -64,7 +64,7 @@ export default async function HouseholdPage({
       className={styles.page}
       style={{ '--primary': primaryColor, '--bg-end': gradientEndColor(primaryColor) } as CSSProperties}
     >
-      <Link href="/household" className={styles.backButton}>&larr; Back</Link>
+      <Link href="/household" className={styles.themedBackButton}>&larr; Back</Link>
       <div
         className={styles.card}
         style={
@@ -74,7 +74,7 @@ export default async function HouseholdPage({
         }
       >
         <div className={styles.header}>
-          <h1 className={styles.title}>{household.name}</h1>
+          <h1 className={styles.themedTitle}>{household.name}</h1>
           <span className={styles.idBadge}>ID: {household.id}</span>
         </div>
         <nav className={styles.nav}>

@@ -19,9 +19,9 @@ export default async function Households() {
 
   if (error) {
     return (
-      <div className={styles.container}>
-        <Link href="/" className={styles.backButton}>&larr; Back</Link>
-        <p className={styles.error}>Failed to load households: {error.message}</p>
+      <div className="container">
+        <Link href="/" className="backButton">&larr; Back</Link>
+        <p className="error">Failed to load households: {error.message}</p>
       </div>
     )
   }
@@ -29,10 +29,10 @@ export default async function Households() {
   const households = memberships.flatMap((m) => m.households)
 
   return (
-    <div className={styles.container}>
-      <Link href="/" className={styles.backButton}>&larr; Back</Link>
-      <h1 className={styles.title}>Your Households</h1>
-      <div className={styles.contentBox}>
+    <div className="container">
+      <Link href="/" className="backButton">&larr; Back</Link>
+      <h1 className="title">Your Households</h1>
+      <div className={`contentBox ${styles.listBox}`}>
         {households.length === 0 ? (
           <p className={styles.empty}>You haven&apos;t joined any households yet.</p>
         ) : (
@@ -41,7 +41,7 @@ export default async function Households() {
               <li key={household.id} className={styles.item}>
                 <Link
                   href={`/household/${encodeURIComponent(household.name)}`}
-                  className={styles.link}
+                  className={`link ${styles.linkGrow}`}
                 >
                   {household.name}
                 </Link>
