@@ -41,6 +41,7 @@ export function mockSupabaseClient(overrides: {
     auth: {
       getUser: vi.fn(async () => ({ data: { user: overrides.user ?? null } })),
       signInWithPassword: vi.fn(async () => ({ error: overrides.authError ?? null })),
+      signUp: vi.fn(async () => ({ error: overrides.authError ?? null })),
     },
     from: fromMock,
     rpc: vi.fn(async () => overrides.rpcResult ?? queryResult(null)),
