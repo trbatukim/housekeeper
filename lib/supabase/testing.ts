@@ -1,5 +1,11 @@
 import { vi } from 'vitest'
 
+export function formData(fields: Record<string, string>) {
+  const fd = new FormData()
+  for (const [key, value] of Object.entries(fields)) fd.set(key, value)
+  return fd
+}
+
 type PostgrestError = { message: string; code?: string }
 type QueryResult<T = unknown> = { data: T | null; error: PostgrestError | null }
 

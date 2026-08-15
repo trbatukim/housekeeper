@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { signup } from './actions'
 import { createClient } from '@/lib/supabase/server'
-import { mockSupabaseClient } from '@/lib/supabase/testing'
+import { mockSupabaseClient, formData } from '@/lib/supabase/testing'
 
 vi.mock('@/lib/supabase/server', () => ({
   createClient: vi.fn(),
@@ -10,12 +10,6 @@ vi.mock('@/lib/supabase/server', () => ({
 vi.mock('next/navigation', () => ({
   redirect: vi.fn((url: string) => { throw new Error(`REDIRECT:${url}`) }),
 }))
-
-function formData(fields: Record<string, string>) {
-  const fd = new FormData()
-  for (const [key, value] of Object.entries(fields)) fd.set(key, value)
-  return fd
-}
 
 describe('signup', () => {
   beforeEach(() => {
