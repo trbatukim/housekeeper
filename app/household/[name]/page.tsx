@@ -4,6 +4,7 @@ import Link from 'next/link'
 import type { CSSProperties } from 'react'
 import styles from './theme.module.css'
 import ColorPicker from './ColorPicker'
+import MembersSidebar from './MembersSidebar'
 
 const DEFAULT_COLOR = '#a98bff'
 
@@ -59,12 +60,22 @@ export default async function HouseholdPage({
   const primaryColor = household.primary_color ?? DEFAULT_COLOR
   const isBlackTheme = primaryColor.toLowerCase() === '#000000'
 
+  const { data: memberRows } = await supabase
+    .from('profiles_to_households')
+    .select('profiles(id, name)')
+    .eq('household_id', household.id)
+
+  const members = (memberRows ?? []).map((row) =>
+    Array.isArray(row.profiles) ? row.profiles[0] : row.profiles
+  ).filter((profile): profile is { id: string; name: string } => Boolean(profile))
+
   return (
     <div
       className={styles.page}
       style={{ '--primary': primaryColor, '--bg-end': gradientEndColor(primaryColor) } as CSSProperties}
     >
       <Link href="/household" className={styles.themedBackButton}>&larr; Back</Link>
+      <MembersSidebar members={members} />
       <div
         className={styles.card}
         style={

@@ -283,3 +283,109 @@
 .deleteButton:hover {
   background: rgba(255, 138, 128, 0.25);
 }
+
+.membersToggle {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 20;
+
+  display: inline-block;
+  color: #f5f1ff;
+
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--primary, #a98bff) 25%, transparent);
+
+  font-size: 14px;
+  cursor: pointer;
+
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.membersToggle:hover {
+  background: rgba(20, 16, 31, 0.5);
+  color: var(--primary, #a98bff);
+}
+
+.membersOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  background: rgba(10, 8, 16, 0.55);
+}
+
+.membersPanel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 31;
+  width: min(280px, 80vw);
+
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px 20px;
+
+  background: var(--bg-end, #1c1330);
+  border-left: 1px solid color-mix(in srgb, var(--primary, #a98bff) 20%, transparent);
+  box-shadow: -8px 0 24px rgba(0, 0, 0, 0.4);
+
+  animation: slideIn 0.18s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.membersHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.membersTitle {
+  color: var(--primary, #a98bff);
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.membersClose {
+  padding: 2px 8px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #9187a3;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.membersClose:hover {
+  color: #f5f1ff;
+}
+
+.membersList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.membersItem {
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--primary, #a98bff) 8%, rgba(230, 220, 255, 0.05));
+  border: 1px solid color-mix(in srgb, var(--primary, #a98bff) 12%, transparent);
+  color: #f5f1ff;
+}
