@@ -20,12 +20,13 @@ describe('signup', () => {
     const supabase = mockSupabaseClient({ authError: null })
     vi.mocked(createClient).mockResolvedValue(supabase as never)
 
-    await expect(signup(formData({ email: 'a@b.com', password: 'secret' })))
+    await expect(signup(formData({ name: 'name', email: 'a@b.com', password: 'secret' })))
       .rejects.toThrow('REDIRECT:/signup?message=Check%20your%20email%20to%20confirm%20your%20account.')
 
     expect(supabase.auth.signUp).toHaveBeenCalledWith({
       email: 'a@b.com',
       password: 'secret',
+      options: { data: { name: 'name' } }
     })
   })
 
@@ -33,7 +34,7 @@ describe('signup', () => {
     const supabase = mockSupabaseClient({ authError: { message: 'Email already registered' } })
     vi.mocked(createClient).mockResolvedValue(supabase as never)
 
-    await expect(signup(formData({ email: 'a@b.com', password: 'secret' })))
+    await expect(signup(formData({ name: 'name', email: 'a@b.com', password: 'secret' })))
       .rejects.toThrow('REDIRECT:/signup?error=Email%20already%20registered')
   })
 })
