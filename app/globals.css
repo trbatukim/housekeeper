@@ -172,6 +172,20 @@ body {
   transition: background 0.15s ease, color 0.15s ease;
 }
 
+.negativeButton {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 138, 128, 0.4);
+  background: rgba(255, 138, 128, 0.1);
+  color: #ff8a80;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.negativeButton:hover {
+  background: rgba(255, 138, 128, 0.25);
+}
+
 .logo {
   margin: 0;
 

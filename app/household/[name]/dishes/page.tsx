@@ -84,7 +84,7 @@ export default async function DishesPage({
                             <input type="hidden" name="householdName" value={decodedName} />
                             <input type="hidden" name="dishwasherId" value={load.id} />
                             <input type="hidden" name="notificationId" value={load.ntfy_seq_id ?? ''} />
-                            <button type="submit" className={styles.deleteButton}>Delete</button>
+                            <button type="submit" className="negativeButton">Delete</button>
                         </form>
                     </li>
                 ))}
