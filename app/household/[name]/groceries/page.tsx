@@ -72,7 +72,7 @@ export default async function Groceries({
                             <input type="hidden" name="householdId" value={household.id} />
                             <input type="hidden" name="householdName" value={decodedName} />
                             <input type="hidden" name="itemId" value={item.id} />
-                            <button type="submit" className={styles.deleteButton}>Delete</button>
+                            <button type="submit" className="negativeButton">Delete</button>
                         </form>
                     </li>
                 ))}

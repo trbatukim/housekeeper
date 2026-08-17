@@ -190,7 +190,7 @@ CREATE TABLE IF NOT EXISTS "public"."households" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "name" "text" NOT NULL,
-    "primary_color" "text" DEFAULT '''#f5fbf9''::text'::"text"
+    "primary_color" "text" DEFAULT '#a98bff'::text
 );
 
 
