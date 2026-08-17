@@ -1,5 +1,6 @@
 import { signup } from './actions'
 import styles from '../login/login.module.css'
+import Link from 'next/link'
 
 export default async function SignupPage({
   searchParams,
@@ -16,6 +17,7 @@ export default async function SignupPage({
         <input type="email" name="email" placeholder="Email" required className="input" />
         <input type="password" name="password" placeholder="Password" required className="input" />
         <button type="submit" className={styles.loginButton}>Sign up</button>
+        <Link href="/login" className={styles.linkText}>Login instead</Link>
         {params.error && <p className="error">{params.error}</p>}
         {params.message && <p>{params.message}</p>}
       </form>

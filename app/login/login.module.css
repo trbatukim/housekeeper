@@ -51,3 +51,13 @@
   background: #7650BF;
   transform: translateY(1px);
 }
+
+.linkText {
+  color: #8B63D9;
+  text-decoration: underline;
+  font-size: small;
+}
+
+.linkText:hover {
+  color: #49356e
+}
