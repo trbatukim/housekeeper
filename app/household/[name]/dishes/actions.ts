@@ -36,7 +36,7 @@ export async function addDishwasher(formData: FormData) {
     const dishesPath = `/household/${encodeURIComponent(householdName)}/dishes`
 
     if (!isValidDuration(durationSeconds)) {
-        redirect(`${dishesPath}?error=${encodeURIComponent('Set an end time for the load')}`)
+        redirect(`${dishesPath}?error=${encodeURIComponent('Set an end time for the load.')}`)
     }
 
     const endsAt = new Date(Date.now() + durationSeconds * 1000).toISOString()
@@ -93,7 +93,7 @@ export async function deleteDishwasher(formData: FormData) {
     }
 
     if (!data || data.length === 0) {
-        redirect(`${dishesPath}?error=${encodeURIComponent('Delete was blocked (check RLS delete policy on dishwasher_loads)')}`)
+        redirect(`${dishesPath}?error=${encodeURIComponent('Delete was blocked (check RLS delete policy on dishwasher_loads).')}`)
     }
 
     if (notificationId) {

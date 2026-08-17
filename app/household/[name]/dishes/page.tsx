@@ -73,6 +73,8 @@ export default async function DishesPage({
                 <button type="submit" className={styles.button}>Add</button>
             </form>
 
+            {errorMessage && <p className="error">{errorMessage}</p>}
+
             <ul className={styles.list}>
                 {dishwasherLoads?.map((load) => (
                     <li key={load.id} className={styles.item}>

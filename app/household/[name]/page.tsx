@@ -30,11 +30,14 @@ function gradientEndColor(primaryColor: string): string {
 
 export default async function HouseholdPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ name: string }>
+  searchParams: Promise<{ error?: string }>
 }) {
   const { name } = await params
   const decodedName = decodeURIComponent(name)
+  const { error: errorMessage } = await searchParams
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -109,6 +112,7 @@ export default async function HouseholdPage({
           </Link>
         </nav>
         <ColorPicker householdId={household.id} householdName={household.name} color={primaryColor} />
+        {errorMessage && <p className="error">{errorMessage}</p>}
       </div>
     </div>
   )
