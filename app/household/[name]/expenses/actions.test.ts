@@ -230,17 +230,16 @@ describe('deleteExpense', () => {
         expect(revalidatePath).not.toHaveBeenCalled()
     })
 
-    it('does not revalidate when the delete fails', async () => {
+    it('redirects with an error when the delete fails', async () => {
         const expenses = mockQueryBuilder(queryResult(null, { message: 'boom' }))
         const supabase = mockSupabaseClient({ user: { id: 'u1' }, from: { expenses: expenses } })
         vi.mocked(createClient).mockResolvedValue(supabase as never)
-        vi.spyOn(console, 'error').mockImplementation(() => {})
 
-        await deleteExpense(formData({ 
+        await expect(deleteExpense(formData({
             householdId: 'h1',
             householdName: 'name',
-            expenseId: 'e1' 
-        }))
+            expenseId: 'e1'
+        }))).rejects.toThrow('NEXT_REDIRECT')
 
         expect(revalidatePath).not.toHaveBeenCalled()
     })
