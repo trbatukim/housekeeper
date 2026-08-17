@@ -12,6 +12,7 @@ export default async function SignupPage({
     <div className="container">
       <h1 className={styles.logo}>HouseKeeper</h1>
       <form action={signup} className={styles.loginForm}>
+        <input type="text" name="name" placeholder='Name' required className='input'></input>
         <input type="email" name="email" placeholder="Email" required className="input" />
         <input type="password" name="password" placeholder="Password" required className="input" />
         <button type="submit" className={styles.loginButton}>Sign up</button>
