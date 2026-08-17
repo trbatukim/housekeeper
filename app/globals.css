@@ -56,6 +56,27 @@ body {
   backdrop-filter: blur(8px);
 }
 
+.buttonRow {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  gap: 1rem;
+}
+
+.buttonRow .link {
+  width: auto;
+  flex: 1;
+}
+
+.titleRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.5em;
+  margin: 0;
+}
+
 .title {
   background: rgb(174, 161, 205);
   background-clip: text;
@@ -151,4 +172,16 @@ body {
   transition: background 0.15s ease, color 0.15s ease;
 }
 
+.logo {
+  margin: 0;
 
+  font-family: "Comic Sans MS", var(--font-comic-neue);
+  font-size: 31px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+
+  color: #C9B6FF;
+
+  text-shadow:
+    0 0 20px rgba(169, 139, 255, 0.35);
+}
