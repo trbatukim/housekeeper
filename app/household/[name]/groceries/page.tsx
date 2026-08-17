@@ -49,20 +49,22 @@ export default async function Groceries({
             <Link href={`/household/${decodedName}`} className={styles.themedBackButton}>&larr; Back</Link>
             <h1 className={styles.pageTitle}>Groceries</h1>
             <div className={styles.card}>
-                <form action={addGroceryItem} className={styles.form}>
-                    <input type="hidden" name="householdId" value={household.id} />
-                    <input type="hidden" name="householdName" value={decodedName} />
-                    <input type="text" name="name" placeholder="Add an item" required className={styles.input} />
-                    <button type="submit" className={styles.button}>Add</button>
-                </form>
+                <div className={styles.toolbar}>
+                    <form action={addGroceryItem} className={styles.toolbarFormGroup}>
+                        <input type="hidden" name="householdId" value={household.id} />
+                        <input type="hidden" name="householdName" value={decodedName} />
+                        <input type="text" name="name" placeholder="Add an item" required className={styles.input} />
+                        <button type="submit" className={styles.button}>Add</button>
+                    </form>
+
+                    <form action={clearGroceryList} className={styles.toolbarFormGroup}>
+                        <input type="hidden" name="householdId" value={household.id} />
+                        <input type="hidden" name="householdName" value={decodedName} />
+                        <button type="submit" className={styles.button}>Clear list</button>
+                    </form>
+                </div>
 
                 {errorMessage && <p className="error">{errorMessage}</p>}
-
-                <form action={clearGroceryList}>
-                    <input type="hidden" name="householdId" value={household.id} />
-                    <input type="hidden" name="householdName" value={decodedName} />
-                    <button type="submit" className={styles.button}>Clear list</button>
-                </form>
 
                 <ul className={styles.list}>
                     {groceries?.map((item) => (

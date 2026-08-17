@@ -276,9 +276,9 @@
 
 .pageTitle {
   color: var(--primary, #a98bff);
-  font-size: 22px;
+  font-size: 30px;
   font-weight: 600;
-  margin: 0;
+  margin-top: 1rem;
 }
 
 .note {
@@ -296,6 +296,30 @@
   max-width: 560px;
 }
 
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 560px;
+}
+
+.toolbarFormGroup {
+  display: contents;
+}
+
+.toolbar .input {
+  flex: 1 1 220px;
+  min-width: 150px;
+}
+
+@media (max-width: 480px) {
+  .toolbar .input {
+    flex-basis: 100%;
+  }
+}
+
 .input,
 .select {
   padding: 8px 12px;
@@ -305,6 +329,15 @@
   color: #f5f1ff;
 }
 
+.input:focus,
+.select:focus {
+  border-color: var(--primary, #a98bff);
+  outline: none;
+
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--primary, #a98bff) 12%, transparent);
+}
+
 .button {
   padding: 8px 16px;
   border-radius: 8px;
@@ -312,11 +345,12 @@
   background: color-mix(in srgb, var(--primary, #a98bff) 30%, transparent);
   color: #f5f1ff;
   cursor: pointer;
-  transition: background 0.15s ease;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
 .button:hover {
-  background: color-mix(in srgb, var(--primary, #a98bff) 45%, transparent);
+  background: rgba(30, 25, 40, 0.4);
+  color: color-mix(in srgb, var(--primary, #a98bff) 40%, rgb(177, 177, 177));
 }
 
 .list {
