@@ -36,7 +36,7 @@ export async function addExpense(formData: FormData) {
         .maybeSingle()
 
     if (existing) {
-        redirect(`${expensesPath}?error=${encodeURIComponent(`"${description}" is already logged for that date`)}`)
+        redirect(`${expensesPath}?error=${encodeURIComponent(`"${description}" is already logged for that date.`)}`)
     }
 
     const { error } = await supabase

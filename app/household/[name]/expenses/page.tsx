@@ -4,6 +4,8 @@ import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import type { CSSProperties } from 'react'
 import ExpenseItem from './ExpenseItem'
+import AmountInput from './AmountInput'
+import CategorySelect from './CategorySelect'
 import styles from '../theme.module.css'
 
 const DEFAULT_COLOR = '#a98bff'
@@ -55,11 +57,8 @@ export default async function ExpensesPage({
                     <input type="hidden" name="householdId" value={household.id} />
                     <input type="hidden" name="householdName" value={decodedName} />
                     <input type="text" name="description" placeholder="Description" required className={styles.input} />
-                    <input type="number" name="amount" placeholder="Amount" step="0.01" min="0.01" required className={styles.input} />
-                    <select name="category" required className={styles.select}>
-                        <option value="one-time">One-time</option>
-                        <option value="recurring">Recurring</option>
-                    </select>
+                    <AmountInput />
+                    <CategorySelect />
                     <input type="date" name="paidOn" className={styles.input} />
                     <button type="submit" className={styles.button}>Add</button>
                 </form>
