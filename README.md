@@ -1,36 +1,73 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# HouseKeeper
 
-## Getting Started
+A shared household management app. Create or join a household with your roommates and keep track of groceries, expenses, laundry, and dishes together, with optional push notifications when a laundry or dishwasher cycle finishes.
 
-First, run the development server:
+## Features
+
+- **Accounts & households** — sign up, log in, create a household or join one with its ID, and manage members from a shared sidebar.
+- **Household themes** — pick a primary color per household to personalize its pages.
+- **Groceries** — add, check off, and clear a shared shopping list.
+- **Expenses** — log one-time or recurring costs with an amount, category, and paid-on date; recurring expenses roll over automatically.
+- **Laundry** — start a load with an expected end time and track its status.
+- **Dishes** — track sink/dishwasher status and run a dishwasher cycle with an end time.
+- **Notifications** — subscribe to a household's [ntfy.sh](https://ntfy.sh) topic to get notified when laundry or dishwasher cycles finish.
+
+## Tech stack
+
+- [Next.js](https://nextjs.org) (App Router) with React 19 and TypeScript
+- [Supabase](https://supabase.com) for auth and Postgres data
+- [Tailwind CSS](https://tailwindcss.com) v4
+- [Vitest](https://vitest.dev) + Testing Library for tests
+
+## Getting started
+
+### Prerequisites
+
+- Node.js
+- A [Supabase](https://supabase.com) project
+
+### Setup
+
+1. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+2. Create a `.env.local` file in the project root with your Supabase project credentials:
+
+   ```bash
+   NEXT_PUBLIC_SUPABASE_URL=
+   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+   ```
+
+3. Apply the database schema to your Supabase project by running [`supabase/schema.sql`](supabase/schema.sql) in the SQL Editor (or via `supabase db push` if you're using the [Supabase CLI](https://supabase.com/docs/guides/local-development/cli/getting-started)). It sets up all tables, row-level security policies, and functions the app depends on.
+
+4. Start the dev server:
+
+   ```bash
+   npm run dev
+   ```
+
+   Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## Database
+
+The Postgres schema (tables, RLS policies, functions, grants) lives in [`supabase/schema.sql`](supabase/schema.sql). It's a schema-only dump from the linked Supabase project, generated with:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npx supabase db dump -f supabase/schema.sql
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Re-run that command after making schema changes to keep the file in sync.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Command | Description |
+| --- | --- |
+| `npm run dev` | Start the development server |
+| `npm run build` | Build for production |
+| `npm run start` | Run the production build |
+| `npm run lint` | Lint the codebase |
+| `npm run test` | Run the test suite once |
+| `npm run test:watch` | Run tests in watch mode |
