@@ -31,8 +31,8 @@
 }
 
 .themedBackButton:hover {
-  background: rgba(20, 16, 31, 0.5);
-  color: var(--primary, #a98bff);
+  background: rgba(30, 25, 40, 0.4);
+  color: color-mix(in srgb, var(--primary, #a98bff) 40%, rgb(177, 177, 177));
 }
 
 .card {
@@ -75,7 +75,7 @@
 }
 
 .idBadge {
-  color: #9187a3;
+  color: #b1b0b3;
   font-size: 12px;
   letter-spacing: 0.03em;
   padding-right: 0.5rem;
@@ -159,9 +159,8 @@
 }
 
 .navLink:hover {
-  background: color-mix(in srgb, var(--primary, #a98bff) 22%, transparent);
-  border-color: color-mix(in srgb, var(--primary, #a98bff) 35%, transparent);
-  transform: translateY(-2px);
+  background: color-mix(in srgb, var(--primary, #a98bff) 7%, black 30%);
+  border-color: color-mix(in srgb, var(--primary, #a98bff) 30%, black 70%);
 }
 
 .colorPickerForm {
@@ -180,7 +179,7 @@
 }
 
 .colorPickerLabelText {
-  color: #9187a3;
+  color: #b1b0b3;
   font-size: 13px;
 }
 
@@ -364,8 +363,8 @@
 }
 
 .membersToggle:hover {
-  background: rgba(20, 16, 31, 0.5);
-  color: var(--primary, #a98bff);
+  background: rgba(30, 25, 40, 0.4);
+  color: color-mix(in srgb, var(--primary, #a98bff) 40%, rgb(177, 177, 177));
 }
 
 .membersOverlay {
