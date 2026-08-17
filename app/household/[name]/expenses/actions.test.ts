@@ -12,6 +12,12 @@ vi.mock('next/cache', () => ({
     revalidatePath: vi.fn(),
 }))
 
+const FUTURE_PAID_ON = (() => {
+    const date = new Date()
+    date.setDate(date.getDate() + 1)
+    return date.toISOString().split('T')[0]
+})()
+
 describe('addExpense', () => {
     beforeEach(() => {
         vi.clearAllMocks()
@@ -27,7 +33,7 @@ describe('addExpense', () => {
             description: 'description',
             amount: '0.01',
             category: 'one-time',
-            paidOn: '2026-07-29'
+            paidOn: FUTURE_PAID_ON
         }))
 
         expect(supabase.from).not.toHaveBeenCalled()
@@ -45,7 +51,7 @@ describe('addExpense', () => {
             description: 'description',
             amount: '0.01',
             category: 'one-time',
-            paidOn: '2026-07-29'
+            paidOn: FUTURE_PAID_ON
         }))).rejects.toThrow('NEXT_REDIRECT')
 
         expect(expenses.insert).not.toHaveBeenCalled()
@@ -64,7 +70,7 @@ describe('addExpense', () => {
             description: 'description',
             amount: '0.01',
             category: 'one-time',
-            paidOn: '2026-07-29'
+            paidOn: FUTURE_PAID_ON
         }))).rejects.toThrow('NEXT_REDIRECT')
 
         expect(revalidatePath).not.toHaveBeenCalled()
@@ -81,7 +87,7 @@ describe('addExpense', () => {
             description: 'description',
             amount: '0.01',
             category: 'one-time',
-            paidOn: '2026-07-29'
+            paidOn: FUTURE_PAID_ON
         }))
 
         expect(expenses.eq).toHaveBeenCalledWith('household_id', 'h1')
@@ -91,7 +97,7 @@ describe('addExpense', () => {
             description: 'description',
             amount: 0.01,
             category: 'one-time',
-            paid_on: '2026-07-29' 
+            paid_on: FUTURE_PAID_ON 
         })
         expect(revalidatePath).toHaveBeenCalledWith('/household/name/expenses')
     })
@@ -107,7 +113,7 @@ describe('addExpense', () => {
             description: '    description    ',
             amount: '0.01',
             category: 'one-time',
-            paidOn: '2026-07-29'
+            paidOn: FUTURE_PAID_ON
         }))
 
         expect(expenses.insert).toHaveBeenCalledWith({
@@ -115,7 +121,7 @@ describe('addExpense', () => {
             description: 'description',
             amount: 0.01,
             category: 'one-time',
-            paid_on: '2026-07-29'
+            paid_on: FUTURE_PAID_ON
         })
     })
 
@@ -129,7 +135,7 @@ describe('addExpense', () => {
             description: '    ',
             amount: '0.01',
             category: 'one-time',
-            paidOn: '2026-07-29'
+            paidOn: FUTURE_PAID_ON
         }))).rejects.toThrow('NEXT_REDIRECT')
 
         expect(supabase.from).not.toHaveBeenCalled()
@@ -145,7 +151,7 @@ describe('addExpense', () => {
             description: 'description',
             amount: 'not a number',
             category: 'one-time',
-            paidOn: '2026-07-29'
+            paidOn: FUTURE_PAID_ON
         }))).rejects.toThrow('NEXT_REDIRECT')
 
         expect(supabase.from).not.toHaveBeenCalled()
@@ -161,7 +167,7 @@ describe('addExpense', () => {
             description: 'description',
             amount: '0',
             category: 'one-time',
-            paidOn: '2026-07-29'
+            paidOn: FUTURE_PAID_ON
         }))).rejects.toThrow('NEXT_REDIRECT')
 
         expect(supabase.from).not.toHaveBeenCalled()
@@ -177,7 +183,7 @@ describe('addExpense', () => {
             description: 'description',
             amount: '0.01',
             category: 'not-a-category',
-            paidOn: '2026-07-29'
+            paidOn: FUTURE_PAID_ON
         }))).rejects.toThrow('NEXT_REDIRECT')
 
         expect(supabase.from).not.toHaveBeenCalled()
