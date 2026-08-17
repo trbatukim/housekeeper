@@ -11,11 +11,15 @@ export default async function LoginPage({
 
   return (
     <div className="container">
-      <h1 className={styles.logo}>HouseKeeper</h1>
+      <h1 className="logo">HouseKeeper</h1>
       <form action={login} className={styles.loginForm}>
         <input type="email" name="email" placeholder="Email" required className="input" />
         <input type="password" name="password" placeholder="Password" required className="input" />
         <button type="submit" className={styles.loginButton}>Log in</button>
+        <label className={styles.rememberMe}>
+          <input type="checkbox" name="rememberMe" />
+          Remember me
+        </label>
         <Link href="/signup" className={styles.linkText}>Sign up instead</Link>
         {params.error && <p className="error">{params.error}</p>}
       </form>
