@@ -48,35 +48,36 @@ export default async function Groceries({
         <div className={styles.page} style={{ '--primary': primaryColor } as CSSProperties}>
             <Link href={`/household/${decodedName}`} className={styles.themedBackButton}>&larr; Back</Link>
             <h1 className={styles.pageTitle}>Groceries</h1>
+            <div className={styles.card}>
+                <form action={addGroceryItem} className={styles.form}>
+                    <input type="hidden" name="householdId" value={household.id} />
+                    <input type="hidden" name="householdName" value={decodedName} />
+                    <input type="text" name="name" placeholder="Add an item" required className={styles.input} />
+                    <button type="submit" className={styles.button}>Add</button>
+                </form>
 
-            <form action={addGroceryItem} className={styles.form}>
-                <input type="hidden" name="householdId" value={household.id} />
-                <input type="hidden" name="householdName" value={decodedName} />
-                <input type="text" name="name" placeholder="Add an item" required className={styles.input} />
-                <button type="submit" className={styles.button}>Add</button>
-            </form>
+                {errorMessage && <p className="error">{errorMessage}</p>}
 
-            {errorMessage && <p className="error">{errorMessage}</p>}
+                <form action={clearGroceryList}>
+                    <input type="hidden" name="householdId" value={household.id} />
+                    <input type="hidden" name="householdName" value={decodedName} />
+                    <button type="submit" className={styles.button}>Clear list</button>
+                </form>
 
-            <form action={clearGroceryList}>
-                <input type="hidden" name="householdId" value={household.id} />
-                <input type="hidden" name="householdName" value={decodedName} />
-                <button type="submit" className={styles.button}>Clear list</button>
-            </form>
-
-            <ul className={styles.list}>
-                {groceries?.map((item) => (
-                    <li key={item.id} className={styles.item}>
-                        <GroceryItem item={item} householdName={decodedName} />
-                        <form action={deleteGrocery}>
-                            <input type="hidden" name="householdId" value={household.id} />
-                            <input type="hidden" name="householdName" value={decodedName} />
-                            <input type="hidden" name="itemId" value={item.id} />
-                            <button type="submit" className={styles.deleteButton}>Delete</button>
-                        </form>
-                    </li>
-                ))}
-            </ul>
+                <ul className={styles.list}>
+                    {groceries?.map((item) => (
+                        <li key={item.id} className={styles.item}>
+                            <GroceryItem item={item} householdName={decodedName} />
+                            <form action={deleteGrocery}>
+                                <input type="hidden" name="householdId" value={household.id} />
+                                <input type="hidden" name="householdName" value={decodedName} />
+                                <input type="hidden" name="itemId" value={item.id} />
+                                <button type="submit" className={styles.deleteButton}>Delete</button>
+                            </form>
+                        </li>
+                    ))}
+                </ul>
+            </div>
         </div>
     )
 }

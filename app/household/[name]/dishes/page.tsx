@@ -57,36 +57,37 @@ export default async function DishesPage({
             <Link href={`/household/${decodedName}`} className={styles.themedBackButton}>&larr; Back</Link>
             <h1 className={styles.themedTitle}>Dishes</h1>
             <p className={styles.note}>To get notifications, subscribe to the ntfy topic: ntfy.sh/{household.id}</p>
+            <div className={styles.card}> 
+                <ul className={styles.list}>
+                    {dishesStatus?.map((dishes, index) => (
+                        <li className={styles.item} key={index}>
+                            <DishesItem householdId={household.id} status={dishes.status} householdName={decodedName} locked={isDishwasherRunning} />
+                        </li>
+                    ))}
+                </ul>
+            
+                <form action={addDishwasher} className={styles.form}>
+                    <input type="hidden" name="householdId" value={household.id} />
+                    <input type="hidden" name="householdName" value={decodedName} />
+                    <EndTimePicker />
+                    <button type="submit" className={styles.button}>Add</button>
+                </form>
 
-            <ul className={styles.list}>
-                {dishesStatus?.map((dishes, index) => (
-                    <li className={styles.item} key={index}>
-                        <DishesItem householdId={household.id} status={dishes.status} householdName={decodedName} locked={isDishwasherRunning} />
-                    </li>
-                ))}
-            </ul>
-
-            <form action={addDishwasher} className={styles.form}>
-                <input type="hidden" name="householdId" value={household.id} />
-                <input type="hidden" name="householdName" value={decodedName} />
-                <EndTimePicker />
-                <button type="submit" className={styles.button}>Add</button>
-            </form>
-
-            <ul className={styles.list}>
-                {dishwasherLoads?.map((load) => (
-                    <li key={load.id} className={styles.item}>
-                        <DishwasherItem item={load} householdName={decodedName} />
-                        <form action={deleteDishwasher}>
-                            <input type="hidden" name="householdId" value={household.id} />
-                            <input type="hidden" name="householdName" value={decodedName} />
-                            <input type="hidden" name="dishwasherId" value={load.id} />
-                            <input type="hidden" name="notificationId" value={load.ntfy_seq_id ?? ''} />
-                            <button type="submit" className={styles.deleteButton}>Delete</button>
-                        </form>
-                    </li>
-                ))}
-            </ul>
+                <ul className={styles.list}>
+                    {dishwasherLoads?.map((load) => (
+                        <li key={load.id} className={styles.item}>
+                            <DishwasherItem item={load} householdName={decodedName} />
+                            <form action={deleteDishwasher}>
+                                <input type="hidden" name="householdId" value={household.id} />
+                                <input type="hidden" name="householdName" value={decodedName} />
+                                <input type="hidden" name="dishwasherId" value={load.id} />
+                                <input type="hidden" name="notificationId" value={load.ntfy_seq_id ?? ''} />
+                                <button type="submit" className={styles.deleteButton}>Delete</button>
+                            </form>
+                        </li>
+                    ))}
+                </ul>
+            </div>
         </div>
     )
 } 

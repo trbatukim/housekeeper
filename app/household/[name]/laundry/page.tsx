@@ -50,30 +50,31 @@ export default async function LaundryPage({
             <Link href={`/household/${decodedName}`} className={styles.themedBackButton}>&larr; Back</Link>
             <h1 className={styles.pageTitle}>Laundry</h1>
             <p className={styles.note}>To get notifications, subscribe to the ntfy topic: ntfy.sh/{household.id}</p>
+            <div className={styles.card}>
+                <form action={addLaundry} className={styles.form}>
+                    <input type="hidden" name="householdId" value={household.id} />
+                    <input type="hidden" name="householdName" value={decodedName} />
+                    <EndTimePicker />
+                    <button type="submit" className={styles.button}>Add</button>
+                </form>
 
-            <form action={addLaundry} className={styles.form}>
-                <input type="hidden" name="householdId" value={household.id} />
-                <input type="hidden" name="householdName" value={decodedName} />
-                <EndTimePicker />
-                <button type="submit" className={styles.button}>Add</button>
-            </form>
+                {errorMessage && <p className="error">{errorMessage}</p>}
 
-            {errorMessage && <p className="error">{errorMessage}</p>}
-
-            <ul className={styles.list}>
-                {laundryLoads?.map((load) => (
-                    <li key={load.id} className={styles.item}>
-                        <LaundryItem item={load} householdName={decodedName} />
-                        <form action={deleteLaundry}>
-                            <input type="hidden" name="householdId" value={household.id} />
-                            <input type="hidden" name="householdName" value={decodedName} />
-                            <input type="hidden" name="laundryId" value={load.id} />
-                            <input type="hidden" name="notificationId" value={load.ntfy_seq_id ?? ''} />
-                            <button type="submit" className={styles.deleteButton}>Delete</button>
-                        </form>
-                    </li>
-                ))}
-            </ul>
+                <ul className={styles.list}>
+                    {laundryLoads?.map((load) => (
+                        <li key={load.id} className={styles.item}>
+                            <LaundryItem item={load} householdName={decodedName} />
+                            <form action={deleteLaundry}>
+                                <input type="hidden" name="householdId" value={household.id} />
+                                <input type="hidden" name="householdName" value={decodedName} />
+                                <input type="hidden" name="laundryId" value={load.id} />
+                                <input type="hidden" name="notificationId" value={load.ntfy_seq_id ?? ''} />
+                                <button type="submit" className={styles.deleteButton}>Delete</button>
+                            </form>
+                        </li>
+                    ))}
+                </ul>
+            </div>
         </div>
     )
 }

@@ -6,10 +6,24 @@
   min-height: 100vh;
   padding: 24px;
 
+  /* At the default theme these resolve to exactly #14101f and #1c1330. */
+  --bg-start: rgb(
+    from var(--primary, #a98bff)
+    calc(20 + 0.12 * (r - 169))
+    calc(16 + 0.12 * (g - 139))
+    calc(31 + 0.12 * (b - 255))
+  );
+  --bg-end: rgb(
+    from var(--primary, #a98bff)
+    calc(28 + 0.18 * (r - 169))
+    calc(19 + 0.18 * (g - 139))
+    calc(48 + 0.18 * (b - 255))
+  );
+
   background: linear-gradient(
     170deg,
-    #14101f 0%,
-    var(--bg-end, #1c1330) 100%
+    var(--bg-start) 0%,
+    var(--bg-end) 100%
   );
 }
 
