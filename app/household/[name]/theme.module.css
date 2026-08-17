@@ -66,14 +66,73 @@
   margin: 0;
 }
 
+.idBadgeContainer {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--primary, #a98bff) 15%, transparent);
+
+  display: flex;
+}
+
 .idBadge {
   color: #9187a3;
   font-size: 12px;
   letter-spacing: 0.03em;
+  padding-right: 0.5rem;
+}
 
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--primary, #a98bff) 15%, transparent);
+.copyButtonWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.copyButton {
+  display: flex;
+  align-items: center;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #9187a3;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.copyButton:hover {
+  color: var(--primary, #a98bff);
+}
+
+.copiedTooltip {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: var(--bg-end, #1c1330);
+  border: 1px solid color-mix(in srgb, var(--primary, #a98bff) 25%, transparent);
+  color: #f5f1ff;
+  font-size: 11px;
+  white-space: nowrap;
+  pointer-events: none;
+  animation: copiedFade 1.5s ease forwards;
+}
+
+@keyframes copiedFade {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(2px);
+  }
+  10% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 
 .nav {

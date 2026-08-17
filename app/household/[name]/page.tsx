@@ -4,6 +4,7 @@ import Link from 'next/link'
 import type { CSSProperties } from 'react'
 import styles from './theme.module.css'
 import ColorPicker from './ColorPicker'
+import CopyButton from './CopyButton'
 import MembersSidebar from './MembersSidebar'
 
 const DEFAULT_COLOR = '#a98bff'
@@ -86,7 +87,12 @@ export default async function HouseholdPage({
       >
         <div className={styles.header}>
           <h1 className={styles.themedTitle}>{household.name}</h1>
-          <span className={styles.idBadge}>ID: {household.id}</span>
+
+          <div className={styles.idBadgeContainer}>
+            <span className={styles.idBadge}>ID: {household.id}</span>
+            <CopyButton text={household.id} />
+          </div>
+
         </div>
         <nav className={styles.nav}>
           <Link href={`/household/${household.name}/groceries`} className={styles.navLink}>
