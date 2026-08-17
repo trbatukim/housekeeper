@@ -37,13 +37,13 @@ describe('updatePrimaryColor', () => {
     expect(revalidatePath).not.toHaveBeenCalled()
   })
 
-  it('does nothing when the update fails', async () => {
+  it('redirects with an error when the update fails', async () => {
     const households = mockQueryBuilder(queryResult(null, { message: 'boom' }))
     const supabase = mockSupabaseClient({ user: { id: 'u1' }, from: { households } })
     vi.mocked(createClient).mockResolvedValue(supabase as never)
-    vi.spyOn(console, 'error').mockImplementation(() => {})
 
-    await updatePrimaryColor(formData({ householdId: '1', householdName: 'name', color: '#abcdef' }))
+    await expect(updatePrimaryColor(formData({ householdId: '1', householdName: 'name', color: '#abcdef' })))
+      .rejects.toThrow('NEXT_REDIRECT')
 
     expect(revalidatePath).not.toHaveBeenCalled()
   })
