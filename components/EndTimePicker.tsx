@@ -1,5 +1,6 @@
 'use client'
 import { useState, type ChangeEvent } from 'react'
+import styles from '@/app/household/[name]/theme.module.css'
 
 function clamp(value: number, max: number) {
     if (Number.isNaN(value)) return 0
@@ -11,8 +12,8 @@ export default function EndTimePicker({
 }: {
     label?: string
 }) {
-    const [hours, setHours] = useState('00')
-    const [minutes, setMinutes] = useState('00')
+    const [hours, setHours] = useState('')
+    const [minutes, setMinutes] = useState('')
 
     function handleChange(setter: (value: string) => void, max: number) {
         return (e: ChangeEvent<HTMLInputElement>) => {
@@ -22,11 +23,14 @@ export default function EndTimePicker({
     }
 
     function handleBlur(value: string, setter: (value: string) => void) {
-        return () => setter((value === '' ? 0 : Number(value)).toString().padStart(2, '0'))
+        return () => {
+            if (value === '') return
+            setter(Number(value).toString().padStart(2, '0'))
+        }
     }
 
     return (
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
             {label && <span>{label}</span>}
             <input
                 type="text"
@@ -35,10 +39,11 @@ export default function EndTimePicker({
                 value={hours}
                 onChange={handleChange(setHours, 99)}
                 onBlur={handleBlur(hours, setHours)}
+                placeholder="HH"
                 aria-label="Hours"
                 maxLength={2}
-                style={{ width: '2.5em', textAlign: 'center' }}
-            />
+                className={styles.input}
+                style={{ width: '2.5em', padding: '8px 3px', textAlign: 'center' }}            />
             <span>:</span>
             <input
                 type="text"
@@ -47,9 +52,11 @@ export default function EndTimePicker({
                 value={minutes}
                 onChange={handleChange(setMinutes, 59)}
                 onBlur={handleBlur(minutes, setMinutes)}
+                placeholder="MM"
                 aria-label="Minutes"
                 maxLength={2}
-                style={{ width: '2.5em', textAlign: 'center' }}
+                className={styles.input}
+                style={{ width: '2.5em', padding: '8px 3px', textAlign: 'center' }}
             />
         </span>
     )
