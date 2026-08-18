@@ -15,7 +15,6 @@ const PRESET_COLORS = [
     '#64b5f6', // blue
     '#f48fb1', // pink
     '#8d6e63', // brown
-    '#000000', // black
     '#ffffff', // white
 ]
 

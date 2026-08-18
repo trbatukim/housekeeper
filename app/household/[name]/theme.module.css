@@ -6,10 +6,24 @@
   min-height: 100vh;
   padding: 24px;
 
+  /* At the default theme these resolve to exactly #14101f and #1c1330. */
+  --bg-start: rgb(
+    from var(--primary, #a98bff)
+    calc(20 + 0.12 * (r - 169))
+    calc(16 + 0.12 * (g - 139))
+    calc(31 + 0.12 * (b - 255))
+  );
+  --bg-end: rgb(
+    from var(--primary, #a98bff)
+    calc(28 + 0.18 * (r - 169))
+    calc(19 + 0.18 * (g - 139))
+    calc(48 + 0.18 * (b - 255))
+  );
+
   background: linear-gradient(
     170deg,
-    #14101f 0%,
-    var(--bg-end, #1c1330) 100%
+    var(--bg-start) 0%,
+    var(--bg-end) 100%
   );
 }
 
@@ -31,8 +45,8 @@
 }
 
 .themedBackButton:hover {
-  background: rgba(20, 16, 31, 0.5);
-  color: var(--primary, #a98bff);
+  background: rgba(30, 25, 40, 0.4);
+  color: color-mix(in srgb, var(--primary, #a98bff) 40%, rgb(177, 177, 177));
 }
 
 .card {
@@ -75,7 +89,7 @@
 }
 
 .idBadge {
-  color: #9187a3;
+  color: #b1b0b3;
   font-size: 12px;
   letter-spacing: 0.03em;
   padding-right: 0.5rem;
@@ -159,9 +173,8 @@
 }
 
 .navLink:hover {
-  background: color-mix(in srgb, var(--primary, #a98bff) 22%, transparent);
-  border-color: color-mix(in srgb, var(--primary, #a98bff) 35%, transparent);
-  transform: translateY(-2px);
+  background: color-mix(in srgb, var(--primary, #a98bff) 7%, black 30%);
+  border-color: color-mix(in srgb, var(--primary, #a98bff) 30%, black 70%);
 }
 
 .colorPickerForm {
@@ -180,7 +193,7 @@
 }
 
 .colorPickerLabelText {
-  color: #9187a3;
+  color: #b1b0b3;
   font-size: 13px;
 }
 
@@ -263,15 +276,15 @@
 
 .pageTitle {
   color: var(--primary, #a98bff);
-  font-size: 22px;
+  font-size: 30px;
   font-weight: 600;
-  margin: 0;
+  margin-top: 1rem;
 }
 
 .note {
-  color: #9187a3;
+  color: #b1b0b3;
   font-size: 13px;
-  margin: 0;
+  margin: -0.45rem;
 }
 
 .form {
@@ -283,13 +296,181 @@
   max-width: 560px;
 }
 
-.input,
-.select {
+.emptyState {
+  width: 100%;
+  max-width: 560px;
+  padding: 22px 14px;
+  border-radius: 10px;
+  border: 1px dashed color-mix(in srgb, var(--primary, #a98bff) 22%, transparent);
+  color: #b1b0b3;
+  font-size: 14px;
+  text-align: center;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 560px;
+}
+
+.toolbarFormGroup {
+  display: contents;
+}
+
+.toolbar .input {
+  flex: 1 1 220px;
+  min-width: 150px;
+}
+
+@media (max-width: 480px) {
+  .toolbar .input {
+    flex-basis: 100%;
+  }
+}
+
+.input {
   padding: 8px 12px;
   border-radius: 8px;
   border: 1px solid color-mix(in srgb, var(--primary, #a98bff) 25%, transparent);
   background: rgba(230, 220, 255, 0.06);
   color: #f5f1ff;
+  color-scheme: dark;
+}
+
+.input:focus {
+  border-color: var(--primary, #a98bff);
+  outline: none;
+
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--primary, #a98bff) 12%, transparent);
+}
+
+.amountField {
+  position: relative;
+  display: inline-flex;
+}
+
+.amountInput {
+  width: 110px;
+  padding: 8px 26px 8px 12px;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--primary, #a98bff) 25%, transparent);
+  background: rgba(230, 220, 255, 0.06);
+  color: #f5f1ff;
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.amountInput::-webkit-inner-spin-button,
+.amountInput::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.amountInput:focus {
+  border-color: var(--primary, #a98bff);
+  outline: none;
+
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--primary, #a98bff) 12%, transparent);
+}
+
+.stepButtons {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  bottom: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 18px;
+}
+
+.stepButton {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--primary, #a98bff) 35%, transparent);
+  color: #f5f1ff;
+  font-size: 8px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.stepButton:hover {
+  background: color-mix(in srgb, var(--primary, #a98bff) 18%, transparent);
+}
+
+.categoryField {
+  position: relative;
+}
+
+.categoryButton {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 130px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--primary, #a98bff) 25%, transparent);
+  background: rgba(230, 220, 255, 0.06);
+  color: #f5f1ff;
+  cursor: pointer;
+  text-align: left;
+}
+
+.categoryButton:focus {
+  border-color: var(--primary, #a98bff);
+  outline: none;
+
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--primary, #a98bff) 12%, transparent);
+}
+
+.categoryArrow {
+  margin-left: auto;
+  font-size: 1rem;
+  color: #9187a3;
+  transition: transform 0.15s ease;
+}
+
+.categoryArrow[data-open='true'] {
+  transform: rotate(180deg);
+}
+
+.categoryPopup {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 10;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--primary, #a98bff) 20%, transparent);
+  background: var(--bg-end, #1c1330);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.categoryOption {
+  padding: 8px 10px;
+  border-radius: 6px;
+  color: #f5f1ff;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.categoryOption:hover {
+  background: color-mix(in srgb, var(--primary, #a98bff) 20%, transparent);
 }
 
 .button {
@@ -299,11 +480,12 @@
   background: color-mix(in srgb, var(--primary, #a98bff) 30%, transparent);
   color: #f5f1ff;
   cursor: pointer;
-  transition: background 0.15s ease;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
 .button:hover {
-  background: color-mix(in srgb, var(--primary, #a98bff) 45%, transparent);
+  background: rgba(30, 25, 40, 0.4);
+  color: color-mix(in srgb, var(--primary, #a98bff) 40%, rgb(177, 177, 177));
 }
 
 .list {
@@ -348,7 +530,6 @@
   border: none;
   border-radius: 8px;
   background: color-mix(in srgb, var(--primary, #a98bff) 25%, transparent);
-
   font-size: 14px;
   cursor: pointer;
 
@@ -356,8 +537,8 @@
 }
 
 .membersToggle:hover {
-  background: rgba(20, 16, 31, 0.5);
-  color: var(--primary, #a98bff);
+  background: rgba(30, 25, 40, 0.4);
+  color: color-mix(in srgb, var(--primary, #a98bff) 40%, rgb(177, 177, 177));
 }
 
 .membersOverlay {
