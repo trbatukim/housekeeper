@@ -61,37 +61,40 @@ export default async function Groceries({
         <div className={styles.page} style={{ '--primary': primaryColor } as CSSProperties}>
             <Link href={`/household/${decodedName}`} className={styles.themedBackButton}>&larr; Back</Link>
             <h1 className={styles.pageTitle}>Groceries</h1>
-
-            <form action={addGroceryItem} className={styles.form}>
-                <input type="hidden" name="householdId" value={household.id} />
-                <input type="hidden" name="householdName" value={decodedName} />
-                <input type="text" name="name" placeholder="Add an item" required className={styles.input} />
+            <div className={styles.card}>
+                <div className={styles.toolbar}>
+                    <form action={addGroceryItem} className={styles.toolbarFormGroup}>
+                        <input type="hidden" name="householdId" value={household.id} />
+                        <input type="hidden" name="householdName" value={decodedName} />
+                        <input type="text" name="name" placeholder="Add an item" required className={styles.input} />
                 <input type="number" step="0.01" name="amount" placeholder="Amount" required className={styles.input} />
                 <AmountTypeField />
-                <button type="submit" className={styles.button}>Add</button>
-            </form>
+                        <button type="submit" className={styles.button}>Add</button>
+                    </form>
 
-            {errorMessage && <p className="error">{errorMessage}</p>}
+                    <form action={clearGroceryList} className={styles.toolbarFormGroup}>
+                        <input type="hidden" name="householdId" value={household.id} />
+                        <input type="hidden" name="householdName" value={decodedName} />
+                        <button type="submit" className={styles.button}>Clear list</button>
+                    </form>
+                </div>
 
-            <form action={clearGroceryList}>
-                <input type="hidden" name="householdId" value={household.id} />
-                <input type="hidden" name="householdName" value={decodedName} />
-                <button type="submit" className={styles.button}>Clear list</button>
-            </form>
+                {errorMessage && <p className="error">{errorMessage}</p>}
 
-            <ul className={styles.list}>
-                {groceries?.map((item) => (
-                    <li key={item.id} className={styles.item}>
-                        <GroceryItem item={item} householdName={decodedName} />
-                        <form action={deleteGrocery}>
-                            <input type="hidden" name="householdId" value={household.id} />
-                            <input type="hidden" name="householdName" value={decodedName} />
-                            <input type="hidden" name="itemId" value={item.id} />
-                            <button type="submit" className="negativeButton">Delete</button>
-                        </form>
-                    </li>
-                ))}
-            </ul>
+                <ul className={styles.list}>
+                    {groceries?.map((item) => (
+                        <li key={item.id} className={styles.item}>
+                            <GroceryItem item={item} householdName={decodedName} />
+                            <form action={deleteGrocery}>
+                                <input type="hidden" name="householdId" value={household.id} />
+                                <input type="hidden" name="householdName" value={decodedName} />
+                                <input type="hidden" name="itemId" value={item.id} />
+                                <button type="submit" className="negativeButton">Delete</button>
+                            </form>
+                        </li>
+                    ))}
+                </ul>
+            </div>
         </div>
     )
 }

@@ -4,7 +4,11 @@ import { toggleExpense } from './actions'
 
 function formatDate(dateString: string) {
     const [year, month, day] = dateString.split('-')
-    return `${day}-${month}-${year}`
+    return `${day}/${month}/${year}`
+}
+
+function formatCategory(category: string) {
+    return category.charAt(0).toUpperCase() + category.slice(1)
 }
 
 export default function ExpenseItem({
@@ -41,8 +45,8 @@ export default function ExpenseItem({
                 autoComplete="off"
                 style={{ accentColor: 'var(--primary)' }}
             />
-            <span style={{ textDecoration: isPaid ? 'line-through' : 'none' }}>
-                {formatDate(expense.paid_on)} — {expense.description} — €{expense.amount} ({expense.category})
+            <span style={{ textDecoration: isPaid ? 'line-through' : 'none' }}> 
+                {expense.description}: €{expense.amount} - Due: {formatDate(expense.paid_on)} ({formatCategory(expense.category)})
             </span>
         </>
     )

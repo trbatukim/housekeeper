@@ -10,11 +10,6 @@ import type { Metadata } from "next";
 
 const DEFAULT_COLOR = '#a98bff'
 
-// Background end-color for the page gradient. At DEFAULT_COLOR this
-// resolves to exactly #1c1330, matching the default gradient.
-const GRADIENT_BASE: [number, number, number] = [28, 19, 48] // #1c1330
-const TINT_WEIGHT = 0.18
-
 export async function generateMetadata({
   params,
 }: {
@@ -24,20 +19,6 @@ export async function generateMetadata({
   return {
     title: decodeURIComponent(name),
   }
-}
-
-function hexToRgb(hex: string): [number, number, number] {
-  const n = parseInt(hex.slice(1), 16)
-  return [(n >> 16) & 255, (n >> 8) & 255, n & 255]
-}
-
-function gradientEndColor(primaryColor: string): string {
-  const defaultRgb = hexToRgb(DEFAULT_COLOR)
-  const primaryRgb = hexToRgb(primaryColor)
-  const [r, g, b] = GRADIENT_BASE.map((base, i) =>
-    Math.min(255, Math.max(0, Math.round(base + TINT_WEIGHT * (primaryRgb[i] - defaultRgb[i]))))
-  )
-  return `rgb(${r}, ${g}, ${b})`
 }
 
 export default async function HouseholdPage({
@@ -88,7 +69,7 @@ export default async function HouseholdPage({
   return (
     <div
       className={styles.page}
-      style={{ '--primary': primaryColor, '--bg-end': gradientEndColor(primaryColor) } as CSSProperties}
+      style={{ '--primary': primaryColor } as CSSProperties}
     >
       <Link href="/household" className={styles.themedBackButton}>&larr; Back</Link>
       <div className={styles.topRightButtons}>

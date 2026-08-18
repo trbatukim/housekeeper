@@ -4,6 +4,8 @@ import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import type { CSSProperties } from 'react'
 import ExpenseItem from './ExpenseItem'
+import AmountInput from './AmountInput'
+import CategorySelect from './CategorySelect'
 import styles from '../theme.module.css'
 import type { Metadata } from "next";
 
@@ -62,35 +64,33 @@ export default async function ExpensesPage({
         <div className={styles.page} style={{ '--primary': primaryColor } as CSSProperties}>
             <Link href={`/household/${decodedName}`} className={styles.themedBackButton}>&larr; Back</Link>
             <h1 className={styles.pageTitle}>Expenses</h1>
+            <div className={styles.card}>
+                <form action={addExpense} className={styles.form}>
+                    <input type="hidden" name="householdId" value={household.id} />
+                    <input type="hidden" name="householdName" value={decodedName} />
+                    <input type="text" name="description" placeholder="Description" required className={styles.input} />
+                    <AmountInput />
+                    <CategorySelect />
+                    <input type="date" name="paidOn" className={styles.input} />
+                    <button type="submit" className={styles.button}>Add</button>
+                </form>
 
-            <form action={addExpense} className={styles.form}>
-                <input type="hidden" name="householdId" value={household.id} />
-                <input type="hidden" name="householdName" value={decodedName} />
-                <input type="text" name="description" placeholder="Description" required className={styles.input} />
-                <input type="number" name="amount" placeholder="Amount" step="0.01" min="0.01" required className={styles.input} />
-                <select name="category" required className={styles.select}>
-                    <option value="one-time">One-time</option>
-                    <option value="recurring">Recurring</option>
-                </select>
-                <input type="date" name="paidOn" className={styles.input} />
-                <button type="submit" className={styles.button}>Add</button>
-            </form>
+                {errorMessage && <p className="error">{errorMessage}</p>}
 
-            {errorMessage && <p className="error">{errorMessage}</p>}
-
-            <ul className={styles.list}>
-                {expenses?.map((expense) => (
-                    <li key={expense.id} className={styles.item}>
-                        <ExpenseItem expense={expense} householdName={decodedName} />
-                        <form action={deleteExpense}>
-                            <input type="hidden" name="householdId" value={household.id} />
-                            <input type="hidden" name="householdName" value={decodedName} />
-                            <input type="hidden" name="expenseId" value={expense.id} />
-                            <button type="submit" className="negativeButton">Delete</button>
-                        </form>
-                    </li>
-                ))}
-            </ul>
+                <ul className={styles.list}>
+                    {expenses?.map((expense) => (
+                        <li key={expense.id} className={styles.item}>
+                            <ExpenseItem expense={expense} householdName={decodedName} />
+                            <form action={deleteExpense}>
+                                <input type="hidden" name="householdId" value={household.id} />
+                                <input type="hidden" name="householdName" value={decodedName} />
+                                <input type="hidden" name="expenseId" value={expense.id} />
+                                <button type="submit" className="negativeButton">Delete</button>
+                            </form>
+                        </li>
+                    ))}
+                </ul>
+            </div>
         </div>
     )
 }
