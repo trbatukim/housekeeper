@@ -183,6 +183,31 @@ body {
   transition: background 0.15s ease, color 0.15s ease;
 }
 
+.feedbackButton {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 50;
+
+  display: inline-block;
+  color: #F5F1FF;
+
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: rgba(169, 139, 255, 0.25);
+
+  font-size: 14px;
+
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.feedbackButton:hover {
+  background: rgba(30, 25, 40, 0.4);
+  color: rgb(174, 161, 205);
+
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
 .link {
   display: block;
   width: 100%;

@@ -39,17 +39,25 @@ export default async function FeedbackPage({
                 <form action={submitFeedback} className={styles.form}>
                     <input type="hidden" name="pagePath" value={page} />
 
-                    <label>Email (optional)</label>
-                    <input type="email" name="email" className="input" placeholder="Email" defaultValue={user?.email ?? ''} />
+                    <div className={styles.field}>
+                        <label className={styles.label}>Email (optional)</label>
+                        <input type="email" name="email" className="input" placeholder="Email" defaultValue={user?.email ?? ''} />
+                    </div>
 
-                    <label>Category</label>
-                    <select name="category" className="select">
-                        <option value="bug">Bug</option>
-                        <option value="idea">Idea</option>
-                        <option value="other">Other</option>
-                    </select>
-                    <label>Message</label>
-                    <input type="text" name="message" required className="input" placeholder="Leave your message here..." />
+                    <div className={styles.field}>
+                        <label className={styles.label}>Category</label>
+                        <select name="category" className="select">
+                            <option value="bug">Bug</option>
+                            <option value="idea">Idea</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <div className={styles.field}>
+                        <label className={styles.label}>Message</label>
+                        <textarea name="message" required className={`input ${styles.messageInput}`} placeholder="Leave your message here..." />
+                    </div>
+
                     <button className="button">Submit</button>
                 </form>
                 {errorMessage && <p className="error">{errorMessage}</p>}
