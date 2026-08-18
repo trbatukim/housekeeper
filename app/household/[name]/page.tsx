@@ -91,7 +91,10 @@ export default async function HouseholdPage({
       style={{ '--primary': primaryColor, '--bg-end': gradientEndColor(primaryColor) } as CSSProperties}
     >
       <Link href="/household" className={styles.themedBackButton}>&larr; Back</Link>
-      <MembersSidebar members={members} />
+      <div className={styles.topRightButtons}>
+        <Link href="/household" className={styles.themedFeedbackButton}>Feedback</Link>
+        <MembersSidebar members={members} />
+      </div>
       <div
         className={styles.card}
         style={

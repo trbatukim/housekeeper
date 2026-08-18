@@ -329,12 +329,18 @@
   color: #f5f1ff;
 }
 
-.membersToggle {
+.topRightButtons {
   position: fixed;
   top: 24px;
   right: 24px;
   z-index: 20;
 
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.membersToggle {
   display: inline-block;
   color: #f5f1ff;
 
@@ -350,6 +356,24 @@
 }
 
 .membersToggle:hover {
+  background: rgba(20, 16, 31, 0.5);
+  color: var(--primary, #a98bff);
+}
+
+.themedFeedbackButton {
+  display: inline-block;
+  color: #f5f1ff;
+
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--primary, #a98bff) 25%, transparent);
+
+  font-size: 14px;
+
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.themedFeedbackButton:hover {
   background: rgba(20, 16, 31, 0.5);
   color: var(--primary, #a98bff);
 }
