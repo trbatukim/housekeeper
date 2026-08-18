@@ -64,13 +64,14 @@ describe('joinHousehold', () => {
     })
 
     it('redirects with an error when no household exists with that id', async () => {
-        const message = 'insert or update on table "profiles_to_households" violates foreign key constraint "profiles_to_households_household_id_fkey"'
-        const profilesToHouseholds = mockQueryBuilder(queryResult(null, { message, code: '23503' }))
+        const rawMessage = 'insert or update on table "profiles_to_households" violates foreign key constraint "profiles_to_households_household_id_fkey"'
+        const userMessage = 'No household with that ID exists. Please double-check and try again.'
+        const profilesToHouseholds = mockQueryBuilder(queryResult(null, { message: rawMessage, code: '23503' }))
         const supabase = mockSupabaseClient({ user: { id: 'u1' }, from: { profiles_to_households: profilesToHouseholds } })
         vi.mocked(createClient).mockResolvedValue(supabase as never)
 
         const error: { digest?: string } = await joinHousehold(formData({ householdId: 'nonexistent' })).catch(e => e)
 
-        expect(error.digest).toContain(`/household/setup?error=${encodeURIComponent(message)}`)
+        expect(error.digest).toContain(`/household/setup?error=${encodeURIComponent(userMessage)}`)
     })
 })

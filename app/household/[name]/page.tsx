@@ -6,16 +6,50 @@ import styles from './theme.module.css'
 import ColorPicker from './ColorPicker'
 import CopyButton from './CopyButton'
 import MembersSidebar from './MembersSidebar'
+import type { Metadata } from "next";
 
 const DEFAULT_COLOR = '#a98bff'
 
-export default async function HouseholdPage({
+// Background end-color for the page gradient. At DEFAULT_COLOR this
+// resolves to exactly #1c1330, matching the default gradient.
+const GRADIENT_BASE: [number, number, number] = [28, 19, 48] // #1c1330
+const TINT_WEIGHT = 0.18
+
+export async function generateMetadata({
   params,
 }: {
   params: Promise<{ name: string }>
+}): Promise<Metadata> {
+  const { name } = await params
+  return {
+    title: decodeURIComponent(name),
+  }
+}
+
+function hexToRgb(hex: string): [number, number, number] {
+  const n = parseInt(hex.slice(1), 16)
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255]
+}
+
+function gradientEndColor(primaryColor: string): string {
+  const defaultRgb = hexToRgb(DEFAULT_COLOR)
+  const primaryRgb = hexToRgb(primaryColor)
+  const [r, g, b] = GRADIENT_BASE.map((base, i) =>
+    Math.min(255, Math.max(0, Math.round(base + TINT_WEIGHT * (primaryRgb[i] - defaultRgb[i]))))
+  )
+  return `rgb(${r}, ${g}, ${b})`
+}
+
+export default async function HouseholdPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ name: string }>
+  searchParams: Promise<{ error?: string }>
 }) {
   const { name } = await params
   const decodedName = decodeURIComponent(name)
+  const { error: errorMessage } = await searchParams
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -57,7 +91,10 @@ export default async function HouseholdPage({
       style={{ '--primary': primaryColor } as CSSProperties}
     >
       <Link href="/household" className={styles.themedBackButton}>&larr; Back</Link>
-      <MembersSidebar members={members} />
+      <div className={styles.topRightButtons}>
+        <Link href="/household" className={styles.themedFeedbackButton}>Feedback</Link>
+        <MembersSidebar members={members} />
+      </div>
       <div
         className={styles.card}
         style={
@@ -90,6 +127,7 @@ export default async function HouseholdPage({
           </Link>
         </nav>
         <ColorPicker householdId={household.id} householdName={household.name} color={primaryColor} />
+        {errorMessage && <p className="error">{errorMessage}</p>}
       </div>
     </div>
   )

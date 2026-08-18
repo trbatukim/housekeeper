@@ -21,7 +21,7 @@ export async function addLaundry(formData: FormData) {
     const laundryPath = `/household/${encodeURIComponent(householdName)}/laundry`
 
     if (!isValidDuration(durationSeconds)) {
-        redirect(`${laundryPath}?error=${encodeURIComponent('Set an end time for the load')}`)
+        redirect(`${laundryPath}?error=${encodeURIComponent('Set an end time for the load.')}`)
     }
 
     const endsAt = new Date(Date.now() + durationSeconds * 1000).toISOString()
@@ -73,7 +73,7 @@ export async function deleteLaundry(formData: FormData) {
     }
 
     if (!data || data.length === 0) {
-        redirect(`${laundryPath}?error=${encodeURIComponent('Delete was blocked (check RLS delete policy on laundry_loads)')}`)
+        redirect(`${laundryPath}?error=${encodeURIComponent('Delete was blocked (check RLS delete policy on laundry_loads).')}`)
     }
 
     if (notificationId) {

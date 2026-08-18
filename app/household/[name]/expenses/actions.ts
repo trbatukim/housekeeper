@@ -18,20 +18,25 @@ export async function addExpense(formData: FormData) {
     const category = formData.get('category') as string
     const paidOn = formData.get('paidOn') as string
     const expensesPath = `/household/${encodeURIComponent(householdName)}/expenses`
+    const todayStr = new Date().toISOString().split('T')[0]
 
     if (!description || Number.isNaN(amount) || amount <= 0) {
-        redirect(`${expensesPath}?error=${encodeURIComponent('Enter a valid description and amount')}`)
+        redirect(`${expensesPath}?error=${encodeURIComponent('Please enter a valid description and amount.')}`)
     }
 
     if (category !== 'recurring' && category !== 'one-time') {
-        redirect(`${expensesPath}?error=${encodeURIComponent('Invalid category')}`)
+        redirect(`${expensesPath}?error=${encodeURIComponent('Invalid category.')}`)
+    }
+
+    if (paidOn && paidOn < todayStr) {
+        redirect(`${expensesPath}?error=${encodeURIComponent('Due date cannot be in the past.')}`)
     }
 
     const { data: existing } = await supabase
         .from('expenses')
         .select('id')
         .eq('household_id', householdId)
-        .eq('paid_on', paidOn || new Date().toISOString().split('T')[0])
+        .eq('paid_on', paidOn || todayStr)
         .ilike('description', description)
         .maybeSingle()
 
@@ -67,6 +72,7 @@ export async function deleteExpense(formData: FormData) {
     const householdId = formData.get('householdId') as string
     const householdName = formData.get('householdName') as string
     const expenseId = formData.get('expenseId') as string
+    const expensesPath = `/household/${encodeURIComponent(householdName)}/expenses`
 
     const { error } = await supabase
         .from('expenses')
@@ -75,11 +81,10 @@ export async function deleteExpense(formData: FormData) {
         .eq('id', expenseId)
 
     if (error) {
-        console.error(error)
-        return
+        redirect(`${expensesPath}?error=${encodeURIComponent(error.message)}`)
     }
 
-    revalidatePath(`/household/${encodeURIComponent(householdName)}/expenses`)
+    revalidatePath(expensesPath)
 }
 
 function addOneMonth(dateStr: string): string {

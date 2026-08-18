@@ -7,8 +7,20 @@ import ExpenseItem from './ExpenseItem'
 import AmountInput from './AmountInput'
 import CategorySelect from './CategorySelect'
 import styles from '../theme.module.css'
+import type { Metadata } from "next";
 
 const DEFAULT_COLOR = '#a98bff'
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ name: string }>
+}): Promise<Metadata> {
+  const { name } = await params
+  return {
+    title: `Expenses - ${decodeURIComponent(name)}`,
+  }
+}
 
 export default async function ExpensesPage({
     params,
@@ -73,7 +85,7 @@ export default async function ExpensesPage({
                                 <input type="hidden" name="householdId" value={household.id} />
                                 <input type="hidden" name="householdName" value={decodedName} />
                                 <input type="hidden" name="expenseId" value={expense.id} />
-                                <button type="submit" className={styles.deleteButton}>Delete</button>
+                                <button type="submit" className="negativeButton">Delete</button>
                             </form>
                         </li>
                     ))}

@@ -6,8 +6,20 @@ import { addLaundry, deleteLaundry } from './actions'
 import EndTimePicker from '@/components/EndTimePicker'
 import LaundryItem from './LaundryItem'
 import styles from '../theme.module.css'
+import type { Metadata } from "next";
 
 const DEFAULT_COLOR = '#a98bff'
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ name: string }>
+}): Promise<Metadata> {
+  const { name } = await params
+  return {
+    title: `Laundry - ${decodeURIComponent(name)}`,
+  }
+}
 
 export default async function LaundryPage({
     params,
@@ -70,7 +82,7 @@ export default async function LaundryPage({
                                     <input type="hidden" name="householdName" value={decodedName} />
                                     <input type="hidden" name="laundryId" value={load.id} />
                                     <input type="hidden" name="notificationId" value={load.ntfy_seq_id ?? ''} />
-                                    <button type="submit" className={styles.deleteButton}>Delete</button>
+                                    <button type="submit" className="negativeButton">Delete</button>
                                 </form>
                             </li>
                         ))}

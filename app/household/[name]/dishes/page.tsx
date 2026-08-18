@@ -7,8 +7,20 @@ import DishesItem from './DishesItem'
 import DishwasherItem from './DishwasherItem'
 import { deleteDishwasher, addDishwasher } from './actions'
 import EndTimePicker from '@/components/EndTimePicker'
+import type { Metadata } from "next";
 
 const DEFAULT_COLOR = '#a98bff'
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ name: string }>
+}): Promise<Metadata> {
+  const { name } = await params
+  return {
+    title: `Dishes - ${decodeURIComponent(name)}`,
+  }
+}
 
 export default async function DishesPage({
     params,
@@ -73,6 +85,8 @@ export default async function DishesPage({
                     <button type="submit" className={styles.button}>Add</button>
                 </form>
 
+            {errorMessage && <p className="error">{errorMessage}</p>}
+
                 {dishwasherLoads && dishwasherLoads.length > 0 ? (
                     <ul className={styles.list}>
                         {dishwasherLoads.map((load) => (
@@ -83,7 +97,7 @@ export default async function DishesPage({
                                     <input type="hidden" name="householdName" value={decodedName} />
                                     <input type="hidden" name="dishwasherId" value={load.id} />
                                     <input type="hidden" name="notificationId" value={load.ntfy_seq_id ?? ''} />
-                                    <button type="submit" className={styles.deleteButton}>Delete</button>
+                                    <button type="submit" className="negativeButton">Delete</button>
                                 </form>
                             </li>
                         ))}

@@ -1,6 +1,7 @@
 'use server'
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
 
 export async function updatePrimaryColor(formData: FormData) {
     const supabase = await createClient()
@@ -13,6 +14,7 @@ export async function updatePrimaryColor(formData: FormData) {
     const householdId = formData.get('householdId') as string
     const householdName = formData.get('householdName') as string
     const color = formData.get('color') as string
+    const path = `/household/${encodeURIComponent(householdName)}`
 
     if (!/^#[0-9a-fA-F]{6}$/.test(color)) {
         return
@@ -24,11 +26,9 @@ export async function updatePrimaryColor(formData: FormData) {
         .eq('id', householdId)
 
     if (error) {
-        console.error(error)
-        return
+        redirect(`${path}?error=${encodeURIComponent(error.message)}`)
     }
 
-    const path = `/household/${encodeURIComponent(householdName)}`
     revalidatePath(path)
     revalidatePath(`${path}/groceries`)
     revalidatePath(`${path}/expenses`)
