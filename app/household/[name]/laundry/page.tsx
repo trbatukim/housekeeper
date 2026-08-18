@@ -6,8 +6,20 @@ import { addLaundry, deleteLaundry } from './actions'
 import EndTimePicker from '@/components/EndTimePicker'
 import LaundryItem from './LaundryItem'
 import styles from '../theme.module.css'
+import type { Metadata } from "next";
 
 const DEFAULT_COLOR = '#a98bff'
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ name: string }>
+}): Promise<Metadata> {
+  const { name } = await params
+  return {
+    title: `Laundry - ${decodeURIComponent(name)}`,
+  }
+}
 
 export default async function LaundryPage({
     params,

@@ -1,6 +1,11 @@
 import { login } from './actions'
 import styles from './login.module.css'
 import Link from 'next/link'
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Login"
+}
 
 export default async function LoginPage({
   searchParams,

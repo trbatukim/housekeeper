@@ -31,6 +31,55 @@ describe('addGroceryItem', () => {
         expect(revalidatePath).not.toHaveBeenCalled()
     })
 
+    it('redirects with an error when amount or unit is missing', async () => {
+        const groceryItems = mockQueryBuilder(queryResult(null))
+        const supabase = mockSupabaseClient({ user: { id: 'u1' }, from: { grocery_items: groceryItems } })
+        vi.mocked(createClient).mockResolvedValue(supabase as never)
+
+        await expect(addGroceryItem(formData({
+            householdId: 'h1',
+            householdName: 'name',
+            name: 'Milk'
+        }))).rejects.toThrow('NEXT_REDIRECT')
+
+        expect(groceryItems.insert).not.toHaveBeenCalled()
+        expect(revalidatePath).not.toHaveBeenCalled()
+    })
+
+    it('redirects with an error when amount is not a number', async () => {
+        const groceryItems = mockQueryBuilder(queryResult(null))
+        const supabase = mockSupabaseClient({ user: { id: 'u1' }, from: { grocery_items: groceryItems } })
+        vi.mocked(createClient).mockResolvedValue(supabase as never)
+
+        await expect(addGroceryItem(formData({
+            householdId: 'h1',
+            householdName: 'name',
+            name: 'Milk',
+            amount: 'not-a-number',
+            amountType: 'kg'
+        }))).rejects.toThrow('NEXT_REDIRECT')
+
+        expect(groceryItems.insert).not.toHaveBeenCalled()
+        expect(revalidatePath).not.toHaveBeenCalled()
+    })
+
+    it('redirects with an error when a custom unit is selected but left blank', async () => {
+        const groceryItems = mockQueryBuilder(queryResult(null))
+        const supabase = mockSupabaseClient({ user: { id: 'u1' }, from: { grocery_items: groceryItems } })
+        vi.mocked(createClient).mockResolvedValue(supabase as never)
+
+        await expect(addGroceryItem(formData({
+            householdId: 'h1',
+            householdName: 'name',
+            name: 'Milk',
+            amount: '2',
+            amountType: '__custom'
+        }))).rejects.toThrow('NEXT_REDIRECT')
+
+        expect(groceryItems.insert).not.toHaveBeenCalled()
+        expect(revalidatePath).not.toHaveBeenCalled()
+    })
+
     it('redirects with an error when the item is already on the list', async () => {
         const groceryItems = mockQueryBuilder(queryResult({ id: 'existing' }))
         const supabase = mockSupabaseClient({ user: { id: 'u1' }, from: { grocery_items: groceryItems } })
@@ -39,7 +88,9 @@ describe('addGroceryItem', () => {
         await expect(addGroceryItem(formData({
             householdId: 'h1',
             householdName: 'name',
-            name: 'Milk'
+            name: 'Milk',
+            amount: '2',
+            amountType: 'kg'
         }))).rejects.toThrow('NEXT_REDIRECT')
 
         expect(groceryItems.insert).not.toHaveBeenCalled()
@@ -54,7 +105,9 @@ describe('addGroceryItem', () => {
         await expect(addGroceryItem(formData({
             householdId: 'h1',
             householdName: 'name',
-            name: 'Milk'
+            name: 'Milk',
+            amount: '2',
+            amountType: 'kg'
         }))).rejects.toThrow('NEXT_REDIRECT')
 
         expect(revalidatePath).not.toHaveBeenCalled()
@@ -68,13 +121,32 @@ describe('addGroceryItem', () => {
         await addGroceryItem(formData({
             householdId: 'h1',
             householdName: 'name',
-            name: 'Milk'
+            name: 'Milk',
+            amount: '2',
+            amountType: 'kg'
         }))
 
         expect(groceryItems.eq).toHaveBeenCalledWith('household_id', 'h1')
         expect(groceryItems.ilike).toHaveBeenCalledWith('name', 'Milk')
-        expect(groceryItems.insert).toHaveBeenCalledWith({ household_id: 'h1', name: 'Milk', added_by: 'u1' })
+        expect(groceryItems.insert).toHaveBeenCalledWith({ household_id: 'h1', name: 'Milk', added_by: 'u1', amount: 2, amount_type: 'kg' })
         expect(revalidatePath).toHaveBeenCalledWith('/household/name/groceries')
+    })
+
+    it('uses the custom unit when "Other" is selected', async () => {
+        const groceryItems = mockQueryBuilder(queryResult(null))
+        const supabase = mockSupabaseClient({ user: { id: 'u1' }, from: { grocery_items: groceryItems } })
+        vi.mocked(createClient).mockResolvedValue(supabase as never)
+
+        await addGroceryItem(formData({
+            householdId: 'h1',
+            householdName: 'name',
+            name: 'Milk',
+            amount: '2',
+            amountType: '__custom',
+            customAmountType: 'bottles'
+        }))
+
+        expect(groceryItems.insert).toHaveBeenCalledWith({ household_id: 'h1', name: 'Milk', added_by: 'u1', amount: 2, amount_type: 'bottles' })
     })
 
     it('trims whitespace from the item name', async () => {
@@ -85,10 +157,12 @@ describe('addGroceryItem', () => {
         await addGroceryItem(formData({
             householdId: 'h1',
             householdName: 'name',
-            name: '  Milk  '
+            name: '  Milk  ',
+            amount: '2',
+            amountType: 'kg'
         }))
 
-        expect(groceryItems.insert).toHaveBeenCalledWith({ household_id: 'h1', name: 'Milk', added_by: 'u1' })
+        expect(groceryItems.insert).toHaveBeenCalledWith({ household_id: 'h1', name: 'Milk', added_by: 'u1', amount: 2, amount_type: 'kg' })
     })
 })
 

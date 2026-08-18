@@ -5,8 +5,20 @@ import Link from 'next/link'
 import type { CSSProperties } from 'react'
 import ExpenseItem from './ExpenseItem'
 import styles from '../theme.module.css'
+import type { Metadata } from "next";
 
 const DEFAULT_COLOR = '#a98bff'
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ name: string }>
+}): Promise<Metadata> {
+  const { name } = await params
+  return {
+    title: `Expenses - ${decodeURIComponent(name)}`,
+  }
+}
 
 export default async function ExpensesPage({
     params,

@@ -1,6 +1,11 @@
 import { signup } from './actions'
 import styles from '../login/login.module.css'
 import Link from 'next/link'
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Sign Up"
+}
 
 export default async function SignupPage({
   searchParams,

@@ -3,6 +3,11 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import styles from './household.module.css'
 import LeaveHouseholdButton from './LeaveHouseholdButton'
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Households"
+}
 
 export default async function Households() {
   const supabase = await createClient()

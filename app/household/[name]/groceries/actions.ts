@@ -2,6 +2,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { CUSTOM_AMOUNT_TYPE } from './constants'
 
 export async function addGroceryItem(formData: FormData) {
     const supabase = await createClient()
@@ -14,10 +15,24 @@ export async function addGroceryItem(formData: FormData) {
     const householdId = formData.get('householdId') as string
     const householdName = formData.get('householdName') as string
     const name = (formData.get('name') as string).trim()
+    const amountRaw = formData.get('amount') as string | null
+    const selectedAmountType = formData.get('amountType') as string | null
+    const customAmountType = (formData.get('customAmountType') as string | null)?.trim()
+    const amountType = selectedAmountType === CUSTOM_AMOUNT_TYPE ? customAmountType : selectedAmountType
     const groceriesPath = `/household/${encodeURIComponent(householdName)}/groceries`
 
     if (!name) {
         redirect(`${groceriesPath}?error=${encodeURIComponent('Item name cannot be empty.')}`)
+    }
+
+    if (!amountRaw || !amountType) {
+        redirect(`${groceriesPath}?error=${encodeURIComponent('Amount and unit are required.')}`)
+    }
+
+    const amount = Number(amountRaw)
+
+    if (Number.isNaN(amount)) {
+        redirect(`${groceriesPath}?error=${encodeURIComponent('Amount must be a number.')}`)
     }
 
     const { data: existing } = await supabase
@@ -33,7 +48,7 @@ export async function addGroceryItem(formData: FormData) {
 
     const { error } = await supabase
         .from('grocery_items')
-        .insert({ household_id: householdId, name, added_by: user.id })
+        .insert({ household_id: householdId, name, added_by: user.id, amount, amount_type: amountType })
 
     if (error) {
         redirect(`${groceriesPath}?error=${encodeURIComponent(error.message)}`)
