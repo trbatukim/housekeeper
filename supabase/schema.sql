@@ -179,7 +179,9 @@ CREATE TABLE IF NOT EXISTS "public"."grocery_items" (
     "name" "text" NOT NULL,
     "added_by" "uuid",
     "is_purchased" boolean DEFAULT false NOT NULL,
-    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "amount" numeric(10,2),
+    "amount_type" "text"
 );
 
 
@@ -190,7 +192,7 @@ CREATE TABLE IF NOT EXISTS "public"."households" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "name" "text" NOT NULL,
-    "primary_color" "text" DEFAULT '#a98bff'::text
+    "primary_color" "text" DEFAULT '#a98bff'::"text"
 );
 
 

@@ -4,6 +4,7 @@ import Link from 'next/link'
 import type { CSSProperties } from 'react'
 import { addGroceryItem, clearGroceryList, deleteGrocery } from './actions'
 import GroceryItem from './GroceryItem'
+import AmountTypeField from './AmountTypeField'
 import styles from '../theme.module.css'
 
 const DEFAULT_COLOR = '#a98bff'
@@ -38,7 +39,7 @@ export default async function Groceries({
 
     const { data: groceries, error } = await supabase
         .from('grocery_items')
-        .select('id, name, is_purchased')
+        .select('id, name, is_purchased, amount, amount_type')
         .eq('household_id', household.id)
         .order('created_at')
 
@@ -53,6 +54,8 @@ export default async function Groceries({
                 <input type="hidden" name="householdId" value={household.id} />
                 <input type="hidden" name="householdName" value={decodedName} />
                 <input type="text" name="name" placeholder="Add an item" required className={styles.input} />
+                <input type="number" step="0.01" name="amount" placeholder="Amount" required className={styles.input} />
+                <AmountTypeField />
                 <button type="submit" className={styles.button}>Add</button>
             </form>
 
