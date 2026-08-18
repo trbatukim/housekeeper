@@ -10,11 +10,6 @@ import type { Metadata } from "next";
 
 const DEFAULT_COLOR = '#a98bff'
 
-// Background end-color for the page gradient. At DEFAULT_COLOR this
-// resolves to exactly #1c1330, matching the default gradient.
-const GRADIENT_BASE: [number, number, number] = [28, 19, 48] // #1c1330
-const TINT_WEIGHT = 0.18
-
 export async function generateMetadata({
   params,
 }: {
@@ -24,11 +19,6 @@ export async function generateMetadata({
   return {
     title: decodeURIComponent(name),
   }
-}
-
-function hexToRgb(hex: string): [number, number, number] {
-  const n = parseInt(hex.slice(1), 16)
-  return [(n >> 16) & 255, (n >> 8) & 255, n & 255]
 }
 
 export default async function HouseholdPage({
