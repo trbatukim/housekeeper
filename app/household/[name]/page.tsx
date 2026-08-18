@@ -6,6 +6,7 @@ import styles from './theme.module.css'
 import ColorPicker from './ColorPicker'
 import CopyButton from './CopyButton'
 import MembersSidebar from './MembersSidebar'
+import type { Metadata } from "next";
 
 const DEFAULT_COLOR = '#a98bff'
 
@@ -13,6 +14,17 @@ const DEFAULT_COLOR = '#a98bff'
 // resolves to exactly #1c1330, matching the default gradient.
 const GRADIENT_BASE: [number, number, number] = [28, 19, 48] // #1c1330
 const TINT_WEIGHT = 0.18
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ name: string }>
+}): Promise<Metadata> {
+  const { name } = await params
+  return {
+    title: decodeURIComponent(name),
+  }
+}
 
 function hexToRgb(hex: string): [number, number, number] {
   const n = parseInt(hex.slice(1), 16)

@@ -3,6 +3,11 @@ import { redirect } from 'next/navigation'
 import { signOut } from './actions'
 import Link from 'next/link'
 import styles from './homepage.module.css'
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Home"
+}
 
 export default async function Home() {
   const supabase = await createClient()

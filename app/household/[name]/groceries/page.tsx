@@ -6,8 +6,20 @@ import { addGroceryItem, clearGroceryList, deleteGrocery } from './actions'
 import GroceryItem from './GroceryItem'
 import AmountTypeField from './AmountTypeField'
 import styles from '../theme.module.css'
+import type { Metadata } from "next";
 
 const DEFAULT_COLOR = '#a98bff'
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ name: string }>
+}): Promise<Metadata> {
+  const { name } = await params
+  return {
+    title: `Groceries - ${decodeURIComponent(name)}`,
+  }
+}
 
 export default async function Groceries({
     params,

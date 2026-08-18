@@ -1,6 +1,11 @@
 import { createHousehold, joinHousehold } from './actions'
 import styles from './setup.module.css'
 import Link from 'next/link'
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Household Setup"
+}
 
 export default async function HouseholdSetupPage({
   searchParams,

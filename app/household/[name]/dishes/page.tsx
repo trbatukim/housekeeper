@@ -7,8 +7,20 @@ import DishesItem from './DishesItem'
 import DishwasherItem from './DishwasherItem'
 import { deleteDishwasher, addDishwasher } from './actions'
 import EndTimePicker from '@/components/EndTimePicker'
+import type { Metadata } from "next";
 
 const DEFAULT_COLOR = '#a98bff'
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ name: string }>
+}): Promise<Metadata> {
+  const { name } = await params
+  return {
+    title: `Dishes - ${decodeURIComponent(name)}`,
+  }
+}
 
 export default async function DishesPage({
     params,
