@@ -31,15 +31,6 @@ function hexToRgb(hex: string): [number, number, number] {
   return [(n >> 16) & 255, (n >> 8) & 255, n & 255]
 }
 
-function gradientEndColor(primaryColor: string): string {
-  const defaultRgb = hexToRgb(DEFAULT_COLOR)
-  const primaryRgb = hexToRgb(primaryColor)
-  const [r, g, b] = GRADIENT_BASE.map((base, i) =>
-    Math.min(255, Math.max(0, Math.round(base + TINT_WEIGHT * (primaryRgb[i] - defaultRgb[i]))))
-  )
-  return `rgb(${r}, ${g}, ${b})`
-}
-
 export default async function HouseholdPage({
   params,
   searchParams,
