@@ -118,6 +118,41 @@ body {
     0 0 0 3px rgba(169, 139, 255, 0.12);
 }
 
+.select {
+  padding: 11px 13px;
+
+  border: 1px solid #403653;
+  border-radius: 8px;
+
+  background: #21192F;
+  color: #F5F1FF;
+
+  font-size: 14px;
+
+  outline: none;
+
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.select:focus {
+  border-color: #A98BFF;
+
+  box-shadow:
+    0 0 0 3px rgba(169, 139, 255, 0.12);
+}
+
+.button {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  background: color-mix(in srgb, #a98bff 30%, transparent);
+  color: #f5f1ff;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
 .error {
   color: #FF8A80;
   font-size: 14px;

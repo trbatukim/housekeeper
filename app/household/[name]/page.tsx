@@ -92,7 +92,7 @@ export default async function HouseholdPage({
     >
       <Link href="/household" className={styles.themedBackButton}>&larr; Back</Link>
       <div className={styles.topRightButtons}>
-        <Link href="/household" className={styles.themedFeedbackButton}>Feedback</Link>
+        <Link href="/feedback" className={styles.themedFeedbackButton}>Feedback</Link>
         <MembersSidebar members={members} />
       </div>
       <div
