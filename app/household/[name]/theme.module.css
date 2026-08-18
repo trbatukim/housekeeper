@@ -284,7 +284,7 @@
 .note {
   color: #b1b0b3;
   font-size: 13px;
-  margin: 0;
+  margin: -0.45rem;
 }
 
 .form {
@@ -294,6 +294,17 @@
   gap: 8px;
   width: 100%;
   max-width: 560px;
+}
+
+.emptyState {
+  width: 100%;
+  max-width: 560px;
+  padding: 22px 14px;
+  border-radius: 10px;
+  border: 1px dashed color-mix(in srgb, var(--primary, #a98bff) 22%, transparent);
+  color: #b1b0b3;
+  font-size: 14px;
+  text-align: center;
 }
 
 .toolbar {

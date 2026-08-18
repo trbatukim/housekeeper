@@ -55,7 +55,7 @@ export default async function DishesPage({
     return (
         <div className={styles.page} style={{ '--primary': primaryColor } as CSSProperties}>
             <Link href={`/household/${decodedName}`} className={styles.themedBackButton}>&larr; Back</Link>
-            <h1 className={styles.themedTitle}>Dishes</h1>
+            <h1 className={styles.pageTitle}>Dishes</h1>
             <p className={styles.note}>To get notifications, subscribe to the ntfy topic: ntfy.sh/{household.id}</p>
             <div className={styles.card}> 
                 <ul className={styles.list}>
@@ -73,20 +73,24 @@ export default async function DishesPage({
                     <button type="submit" className={styles.button}>Add</button>
                 </form>
 
-                <ul className={styles.list}>
-                    {dishwasherLoads?.map((load) => (
-                        <li key={load.id} className={styles.item}>
-                            <DishwasherItem item={load} householdName={decodedName} />
-                            <form action={deleteDishwasher}>
-                                <input type="hidden" name="householdId" value={household.id} />
-                                <input type="hidden" name="householdName" value={decodedName} />
-                                <input type="hidden" name="dishwasherId" value={load.id} />
-                                <input type="hidden" name="notificationId" value={load.ntfy_seq_id ?? ''} />
-                                <button type="submit" className={styles.deleteButton}>Delete</button>
-                            </form>
-                        </li>
-                    ))}
-                </ul>
+                {dishwasherLoads && dishwasherLoads.length > 0 ? (
+                    <ul className={styles.list}>
+                        {dishwasherLoads.map((load) => (
+                            <li key={load.id} className={styles.item}>
+                                <DishwasherItem item={load} householdName={decodedName} />
+                                <form action={deleteDishwasher}>
+                                    <input type="hidden" name="householdId" value={household.id} />
+                                    <input type="hidden" name="householdName" value={decodedName} />
+                                    <input type="hidden" name="dishwasherId" value={load.id} />
+                                    <input type="hidden" name="notificationId" value={load.ntfy_seq_id ?? ''} />
+                                    <button type="submit" className={styles.deleteButton}>Delete</button>
+                                </form>
+                            </li>
+                        ))}
+                    </ul>
+                ) : (
+                    <p className={styles.emptyState}>No active dishwasher loads.</p>
+                )}
             </div>
         </div>
     )

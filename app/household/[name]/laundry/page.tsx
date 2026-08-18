@@ -60,20 +60,24 @@ export default async function LaundryPage({
 
                 {errorMessage && <p className="error">{errorMessage}</p>}
 
-                <ul className={styles.list}>
-                    {laundryLoads?.map((load) => (
-                        <li key={load.id} className={styles.item}>
-                            <LaundryItem item={load} householdName={decodedName} />
-                            <form action={deleteLaundry}>
-                                <input type="hidden" name="householdId" value={household.id} />
-                                <input type="hidden" name="householdName" value={decodedName} />
-                                <input type="hidden" name="laundryId" value={load.id} />
-                                <input type="hidden" name="notificationId" value={load.ntfy_seq_id ?? ''} />
-                                <button type="submit" className={styles.deleteButton}>Delete</button>
-                            </form>
-                        </li>
-                    ))}
-                </ul>
+                {laundryLoads && laundryLoads.length > 0 ? (
+                    <ul className={styles.list}>
+                        {laundryLoads.map((load) => (
+                            <li key={load.id} className={styles.item}>
+                                <LaundryItem item={load} householdName={decodedName} />
+                                <form action={deleteLaundry}>
+                                    <input type="hidden" name="householdId" value={household.id} />
+                                    <input type="hidden" name="householdName" value={decodedName} />
+                                    <input type="hidden" name="laundryId" value={load.id} />
+                                    <input type="hidden" name="notificationId" value={load.ntfy_seq_id ?? ''} />
+                                    <button type="submit" className={styles.deleteButton}>Delete</button>
+                                </form>
+                            </li>
+                        ))}
+                    </ul>
+                ) : (
+                    <p className={styles.emptyState}>No active laundry loads.</p>
+                )}
             </div>
         </div>
     )
