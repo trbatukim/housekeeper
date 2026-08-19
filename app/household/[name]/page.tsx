@@ -77,14 +77,7 @@ export default async function HouseholdPage({
       <div className={styles.topRightButtons}>
         <MembersSidebar members={members} />
       </div>
-      <div
-        className={styles.card}
-        style={
-          isBlackTheme
-            ? { background: 'rgba(255, 255, 255, 0.08)', borderColor: 'rgba(255, 255, 255, 0.18)' }
-            : undefined
-        }
-      >
+      <div className={styles.card}>
         <div className={styles.header}>
           <h1 className={styles.themedTitle}>{household.name}</h1>
 

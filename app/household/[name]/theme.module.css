@@ -4,7 +4,7 @@
   align-items: center;
   gap: 12px;
   min-height: 100vh;
-  padding: 24px;
+  padding: 80px 24px 24px;
 
   /* At the default theme these resolve to exactly #14101f and #1c1330. */
   --bg-start: rgb(
@@ -33,7 +33,6 @@
   left: 24px;
 
   display: inline-block;
-  color: #f5f1ff;
 
   padding: 8px 14px;
   border-radius: 8px;
@@ -50,7 +49,6 @@
 }
 
 .card {
-  color: #f5f1ff;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -285,6 +283,7 @@
   color: #b1b0b3;
   font-size: 13px;
   margin: -0.45rem;
+  text-align: center;
 }
 
 .form {
