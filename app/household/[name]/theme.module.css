@@ -348,6 +348,43 @@
     0 0 0 3px color-mix(in srgb, var(--primary, #a98bff) 12%, transparent);
 }
 
+:global(input[type=number]::-webkit-inner-spin-button),
+:global(input[type=number]::-webkit-outer-spin-button) {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+:global(input[type="number"]) {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+:global(input[type=number]) {
+  width: 75px;
+}
+
+.select {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--primary, #a98bff) 25%, transparent);
+  background: var(--bg-end, #1c1330);
+  color: #f5f1ff;
+  color-scheme: dark;
+}
+
+.select option {
+  background: var(--bg-end, #1c1330);
+  color: #f5f1ff;
+}
+
+.select:focus {
+  border-color: var(--primary, #a98bff);
+  outline: none;
+
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--primary, #a98bff) 12%, transparent);
+}
+
 .amountField {
   position: relative;
   display: inline-flex;

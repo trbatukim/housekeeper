@@ -4,8 +4,6 @@ import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import type { CSSProperties } from 'react'
 import ExpenseItem from './ExpenseItem'
-import AmountInput from './AmountInput'
-import CategorySelect from './CategorySelect'
 import styles from '../theme.module.css'
 import HouseholdThemeSync from '../../../HouseholdThemeSync'
 import type { Metadata } from "next";
@@ -55,7 +53,7 @@ export default async function ExpensesPage({
 
     const { data: expenses } = await supabase
         .from('expenses')
-        .select('id, description, amount, category, paid_on, is_paid')
+        .select('id, description, amount, currency, category, paid_on, is_paid')
         .eq('household_id', household.id)
         .order('paid_on', { ascending: false })
 
@@ -70,9 +68,22 @@ export default async function ExpensesPage({
                 <form action={addExpense} className={styles.form}>
                     <input type="hidden" name="householdId" value={household.id} />
                     <input type="hidden" name="householdName" value={decodedName} />
+                    
                     <input type="text" name="description" placeholder="Description" required className={styles.input} />
-                    <AmountInput />
-                    <CategorySelect />
+                    
+                    <input type="number" step="0.01" name="amount" required placeholder="Price" className={styles.input}></input>
+                    <select name="currency" className={styles.select}>
+                        <option value="euro">Euro €</option>
+                        <option value="dollar">Dollar $</option>
+                        <option value="tl">Turkish Lira ₺</option>
+                        <option value="pound">Pound £</option>
+                    </select>
+
+                    <select name="category" className={styles.select}>
+                        <option value='one-time'>One-time</option>
+                        <option value='recurring'>Recurring</option>
+                    </select>
+
                     <input type="date" name="paidOn" className={styles.input} />
                     <button type="submit" className={styles.button}>Add</button>
                 </form>

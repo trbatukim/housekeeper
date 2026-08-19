@@ -19,6 +19,7 @@ export default function ExpenseItem({
         id: string
         description: string
         amount: number
+        currency: string
         category: string
         paid_on: string
         is_paid: boolean
@@ -27,6 +28,13 @@ export default function ExpenseItem({
 }) {
     const [isPaid, setIsPaid] = useState(expense.is_paid)
     const [, startTransition] = useTransition()
+
+    const currencyMap = new Map<string, string>([
+        ['euro', '€'], 
+        ['tl', '₺'],
+        ['dollar', '$'],
+        ['pound', '£']
+    ]);
 
     function handleToggle() {
         const next = !isPaid
@@ -46,7 +54,7 @@ export default function ExpenseItem({
                 style={{ accentColor: 'var(--primary)' }}
             />
             <span style={{ textDecoration: isPaid ? 'line-through' : 'none' }}> 
-                {expense.description}: €{expense.amount} - Due: {formatDate(expense.paid_on)} ({formatCategory(expense.category)})
+                {expense.description}: {currencyMap.get(expense.currency)}{expense.amount} - Due: {formatDate(expense.paid_on)} ({formatCategory(expense.category)})
             </span>
         </>
     )
