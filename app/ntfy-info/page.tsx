@@ -52,8 +52,8 @@ export default async function NtfyInfoPage() {
                 </ol>
 
                 <p className={styles.muted}>
-                    Anyone who knows your household&apos;s ID can subscribe to its notifications — ntfy topics
-                    aren&apos;t private or password-protected. Don&apos;t share your household ID outside your household.
+                    Anyone who knows your household&apos;s ID can subscribe to its notifications ntfy topics
+                    aren&apos;t private or password-protected. Don&apos;t share your household ID outside your household if you don&apos;t want other people to get notifications about your household.
                 </p>
             </div>
         </div>
