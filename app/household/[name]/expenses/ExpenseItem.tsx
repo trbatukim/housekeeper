@@ -53,7 +53,7 @@ export default function ExpenseItem({
                 autoComplete="off"
                 style={{ accentColor: 'var(--primary)' }}
             />
-            <span style={{ textDecoration: isPaid ? 'line-through' : 'none' }}> 
+            <span style={{ textDecoration: isPaid ? 'line-through' : 'none', fontStyle: isPaid ? 'italic' : 'normal' }}> 
                 {expense.description}: {currencyMap.get(expense.currency)}{expense.amount} - Due: {formatDate(expense.paid_on)} ({formatCategory(expense.category)})
             </span>
         </>
