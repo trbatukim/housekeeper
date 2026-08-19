@@ -606,12 +606,25 @@
   animation: slideIn 0.18s ease-out;
 }
 
+.membersPanelClosing {
+  animation: slideOut 0.18s ease-in forwards;
+}
+
 @keyframes slideIn {
   from {
     transform: translateX(100%);
   }
   to {
     transform: translateX(0);
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
   }
 }
 
