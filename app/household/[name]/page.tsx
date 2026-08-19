@@ -6,6 +6,7 @@ import styles from './theme.module.css'
 import ColorPicker from './ColorPicker'
 import CopyButton from './CopyButton'
 import MembersSidebar from './MembersSidebar'
+import HouseholdThemeSync from '../../HouseholdThemeSync'
 import type { Metadata } from "next";
 
 const DEFAULT_COLOR = '#a98bff'
@@ -71,6 +72,7 @@ export default async function HouseholdPage({
       className={styles.page}
       style={{ '--primary': primaryColor } as CSSProperties}
     >
+      <HouseholdThemeSync color={primaryColor} />
       <Link href="/household" className={styles.themedBackButton}>&larr; Back</Link>
       <div className={styles.topRightButtons}>
         <MembersSidebar members={members} />

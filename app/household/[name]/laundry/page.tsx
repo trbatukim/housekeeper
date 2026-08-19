@@ -6,6 +6,7 @@ import { addLaundry, deleteLaundry } from './actions'
 import EndTimePicker from '@/components/EndTimePicker'
 import LaundryItem from './LaundryItem'
 import styles from '../theme.module.css'
+import HouseholdThemeSync from '../../../HouseholdThemeSync'
 import type { Metadata } from "next";
 
 const DEFAULT_COLOR = '#a98bff'
@@ -59,6 +60,7 @@ export default async function LaundryPage({
 
     return (
         <div className={styles.page} style={{ '--primary': primaryColor } as CSSProperties}>
+            <HouseholdThemeSync color={primaryColor} />
             <Link href={`/household/${decodedName}`} className={styles.themedBackButton}>&larr; Back</Link>
             <h1 className={styles.pageTitle}>Laundry</h1>
             <p className={styles.note}>To get notifications, subscribe to the ntfy topic: ntfy.sh/{household.id}</p>

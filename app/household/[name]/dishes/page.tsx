@@ -1,4 +1,5 @@
 import styles from '../theme.module.css'
+import HouseholdThemeSync from '../../../HouseholdThemeSync'
 import { createClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
@@ -66,6 +67,7 @@ export default async function DishesPage({
 
     return (
         <div className={styles.page} style={{ '--primary': primaryColor } as CSSProperties}>
+            <HouseholdThemeSync color={primaryColor} />
             <Link href={`/household/${decodedName}`} className={styles.themedBackButton}>&larr; Back</Link>
             <h1 className={styles.pageTitle}>Dishes</h1>
             <p className={styles.note}>To get notifications, subscribe to the ntfy topic: ntfy.sh/{household.id}</p>

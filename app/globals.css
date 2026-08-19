@@ -194,7 +194,7 @@ body {
 
   padding: 8px 14px;
   border-radius: 8px;
-  background: rgba(169, 139, 255, 0.25);
+  background: color-mix(in srgb, var(--primary, #a98bff) 25%, transparent);
 
   font-size: 14px;
 
@@ -203,7 +203,7 @@ body {
 
 .feedbackButton:hover {
   background: rgba(30, 25, 40, 0.4);
-  color: rgb(174, 161, 205);
+  color: color-mix(in srgb, var(--primary, #a98bff) 40%, rgb(177, 177, 177));
 
   transition: background 0.15s ease, color 0.15s ease;
 }

@@ -7,6 +7,7 @@ import ExpenseItem from './ExpenseItem'
 import AmountInput from './AmountInput'
 import CategorySelect from './CategorySelect'
 import styles from '../theme.module.css'
+import HouseholdThemeSync from '../../../HouseholdThemeSync'
 import type { Metadata } from "next";
 
 const DEFAULT_COLOR = '#a98bff'
@@ -62,6 +63,7 @@ export default async function ExpensesPage({
 
     return (
         <div className={styles.page} style={{ '--primary': primaryColor } as CSSProperties}>
+            <HouseholdThemeSync color={primaryColor} />
             <Link href={`/household/${decodedName}`} className={styles.themedBackButton}>&larr; Back</Link>
             <h1 className={styles.pageTitle}>Expenses</h1>
             <div className={styles.card}>
