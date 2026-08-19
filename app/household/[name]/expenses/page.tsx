@@ -71,7 +71,7 @@ export default async function ExpensesPage({
                     
                     <input type="text" name="description" placeholder="Description" required className={styles.input} />
                     
-                    <input type="number" step="0.01" name="amount" required placeholder="Price" className={styles.input}></input>
+                    <input type="number" step="0.01" name="amount" required placeholder="Price" className={styles.input} />
                     <select name="currency" className={styles.select}>
                         <option value="euro">Euro €</option>
                         <option value="dollar">Dollar $</option>

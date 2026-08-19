@@ -60,26 +60,17 @@ export default async function Groceries({
 
     return (
         <div className={styles.page} style={{ '--primary': primaryColor } as CSSProperties}>
-            <HouseholdThemeSync color={primaryColor} />
             <Link href={`/household/${decodedName}`} className={styles.themedBackButton}>&larr; Back</Link>
             <h1 className={styles.pageTitle}>Groceries</h1>
             <div className={styles.card}>
-                <div className={styles.toolbar}>
-                    <form action={addGroceryItem} className={styles.toolbarFormGroup}>
-                        <input type="hidden" name="householdId" value={household.id} />
-                        <input type="hidden" name="householdName" value={decodedName} />
-                        <input type="text" name="name" placeholder="Add an item" required className={styles.input} />
-                <input type="number" step="0.01" name="amount" placeholder="Amount" required className={styles.input} />
-                <AmountTypeField />
-                        <button type="submit" className={styles.button}>Add</button>
-                    </form>
-
-                    <form action={clearGroceryList} className={styles.toolbarFormGroup}>
-                        <input type="hidden" name="householdId" value={household.id} />
-                        <input type="hidden" name="householdName" value={decodedName} />
-                        <button type="submit" className={styles.button}>Clear list</button>
-                    </form>
-                </div>
+                <form action={addGroceryItem} className={styles.form}>
+                    <input type="hidden" name="householdId" value={household.id} />
+                    <input type="hidden" name="householdName" value={decodedName} />
+                    <input type="text" name="name" placeholder="Add an item" required className={styles.input} />
+                    <input type="number" step="0.01" name="amount" placeholder="Amount" required className={styles.input} />
+                    <AmountTypeField />
+                    <button type="submit" className={styles.button}>Add</button>
+                </form> 
 
                 {errorMessage && <p className="error">{errorMessage}</p>}
 
@@ -96,6 +87,12 @@ export default async function Groceries({
                         </li>
                     ))}
                 </ul>
+
+                <form action={clearGroceryList} className={styles.form}>
+                    <input type="hidden" name="householdId" value={household.id} />
+                    <input type="hidden" name="householdName" value={decodedName} />
+                    <button type="submit" className={styles.button}>Clear list</button>
+                </form>
             </div>
         </div>
     )
