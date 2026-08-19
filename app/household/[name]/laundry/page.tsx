@@ -63,7 +63,7 @@ export default async function LaundryPage({
             <HouseholdThemeSync color={primaryColor} />
             <Link href={`/household/${decodedName}`} className={styles.themedBackButton}>&larr; Back</Link>
             <h1 className={styles.pageTitle}>Laundry</h1>
-            <p className={styles.note}>To get notifications, subscribe to the ntfy topic: ntfy.sh/{household.id}</p>
+            <p className={styles.note}>To get notifications, subscribe to the ntfy topic: ntfy.sh/{household.id} <Link href="../../ntfy-info">More info</Link></p>
             <div className={styles.card}>
                 <form action={addLaundry} className={styles.form}>
                     <input type="hidden" name="householdId" value={household.id} />

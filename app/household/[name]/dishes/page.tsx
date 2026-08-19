@@ -70,7 +70,7 @@ export default async function DishesPage({
             <HouseholdThemeSync color={primaryColor} />
             <Link href={`/household/${decodedName}`} className={styles.themedBackButton}>&larr; Back</Link>
             <h1 className={styles.pageTitle}>Dishes</h1>
-            <p className={styles.note}>To get notifications, subscribe to the ntfy topic: ntfy.sh/{household.id}</p>
+            <p className={styles.note}>To get notifications, subscribe to the ntfy topic: ntfy.sh/{household.id} <Link href="../../ntfy-info">More info</Link></p>
             <div className={styles.card}> 
                 <ul className={styles.list}>
                     {dishesStatus?.map((dishes, index) => (
