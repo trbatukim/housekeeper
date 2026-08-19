@@ -28,7 +28,7 @@ export default async function NtfyInfoPage() {
             <div className="contentBox" style={{ marginBottom: 60 }}>
                 <p>
                     Housekeeper sends laundry and dishwasher notifications through{' '}
-                    <a href="https://ntfy.sh" target="_blank" rel="noopener noreferrer">ntfy.sh</a>,
+                    <Link className='linkText' href="https://ntfy.sh" target="_blank" rel="noopener noreferrer">ntfy.sh</Link>,
                     a free push notification service. To get notified when a load finishes, subscribe
                     to your household&apos;s topic.
                 </p>
@@ -36,11 +36,11 @@ export default async function NtfyInfoPage() {
                 <ol className={styles.steps}>
                     <li>
                         1. Install the ntfy app: {' '}
-                        <Link href="https://apps.apple.com/us/app/ntfy/id1625396347" target="_blank" rel="noopener noreferrer">iOS</Link>
+                        <Link className='linkText' href="https://apps.apple.com/us/app/ntfy/id1625396347" target="_blank" rel="noopener noreferrer">iOS</Link>
                         {', '}
-                        <Link href="https://play.google.com/store/apps/details?id=io.heckel.ntfy" target="_blank" rel="noopener noreferrer">Android</Link>,
+                        <Link className='linkText' href="https://play.google.com/store/apps/details?id=io.heckel.ntfy" target="_blank" rel="noopener noreferrer">Android</Link>,
                         {' or the '}
-                        <Link href="https://ntfy.sh/app" target="_blank" rel="noopener noreferrer">web app</Link>
+                        <Link className='linkText' href="https://ntfy.sh/app" target="_blank" rel="noopener noreferrer">web app</Link>
                         {' on the desktop.'}
                     </li>
                     <li>2. Open the app and tap <strong>Subscribe to topic</strong> (the + button).</li>
