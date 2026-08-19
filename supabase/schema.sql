@@ -173,6 +173,22 @@ CREATE TABLE IF NOT EXISTS "public"."expenses" (
 ALTER TABLE "public"."expenses" OWNER TO "postgres";
 
 
+CREATE TABLE IF NOT EXISTS "public"."feedback" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "profile_id" "uuid",
+    "household_id" "uuid",
+    "email" "text",
+    "message" "text" NOT NULL,
+    "category" "text" NOT NULL,
+    "page_path" "text",
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    CONSTRAINT "feedback_category_check" CHECK (("category" = ANY (ARRAY['bug'::"text", 'idea'::"text", 'other'::"text"])))
+);
+
+
+ALTER TABLE "public"."feedback" OWNER TO "postgres";
+
+
 CREATE TABLE IF NOT EXISTS "public"."grocery_items" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
     "household_id" "uuid" NOT NULL,
@@ -250,6 +266,11 @@ ALTER TABLE ONLY "public"."expenses"
 
 
 
+ALTER TABLE ONLY "public"."feedback"
+    ADD CONSTRAINT "feedback_pkey" PRIMARY KEY ("id");
+
+
+
 ALTER TABLE ONLY "public"."grocery_items"
     ADD CONSTRAINT "grocery_items_pkey" PRIMARY KEY ("id");
 
@@ -292,6 +313,16 @@ ALTER TABLE ONLY "public"."dishwasher_loads"
 
 ALTER TABLE ONLY "public"."expenses"
     ADD CONSTRAINT "expenses_household_id_fkey" FOREIGN KEY ("household_id") REFERENCES "public"."households"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."feedback"
+    ADD CONSTRAINT "feedback_household_id_fkey" FOREIGN KEY ("household_id") REFERENCES "public"."households"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."feedback"
+    ADD CONSTRAINT "feedback_profile_id_fkey" FOREIGN KEY ("profile_id") REFERENCES "public"."profiles"("id") ON DELETE SET NULL;
 
 
 
@@ -338,6 +369,10 @@ CREATE POLICY "Add household groceries" ON "public"."grocery_items" FOR INSERT T
 
 
 CREATE POLICY "Add household laundry" ON "public"."laundry_loads" FOR INSERT TO "authenticated" WITH CHECK ("public"."is_household_member"("household_id"));
+
+
+
+CREATE POLICY "Anyone can submit feedback" ON "public"."feedback" FOR INSERT TO "authenticated", "anon" WITH CHECK ((("profile_id" IS NULL) OR ("profile_id" = "auth"."uid"())));
 
 
 
@@ -444,6 +479,9 @@ ALTER TABLE "public"."dishwasher_loads" ENABLE ROW LEVEL SECURITY;
 
 
 ALTER TABLE "public"."expenses" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."feedback" ENABLE ROW LEVEL SECURITY;
 
 
 ALTER TABLE "public"."grocery_items" ENABLE ROW LEVEL SECURITY;
@@ -674,6 +712,12 @@ GRANT ALL ON TABLE "public"."dishwasher_loads" TO "service_role";
 GRANT ALL ON TABLE "public"."expenses" TO "anon";
 GRANT ALL ON TABLE "public"."expenses" TO "authenticated";
 GRANT ALL ON TABLE "public"."expenses" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."feedback" TO "anon";
+GRANT ALL ON TABLE "public"."feedback" TO "authenticated";
+GRANT ALL ON TABLE "public"."feedback" TO "service_role";
 
 
 

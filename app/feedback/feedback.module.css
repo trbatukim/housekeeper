@@ -1,0 +1,23 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  width: 100%;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: small;
+}
+
+.messageInput {
+  min-height: 140px;
+  resize: vertical;
+  font-family: inherit;
+}

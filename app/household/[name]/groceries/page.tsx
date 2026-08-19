@@ -6,6 +6,7 @@ import { addGroceryItem, clearGroceryList, deleteGrocery } from './actions'
 import GroceryItem from './GroceryItem'
 import AmountTypeField from './AmountTypeField'
 import styles from '../theme.module.css'
+import HouseholdThemeSync from '../../../HouseholdThemeSync'
 import type { Metadata } from "next";
 
 const DEFAULT_COLOR = '#a98bff'
@@ -59,6 +60,7 @@ export default async function Groceries({
 
     return (
         <div className={styles.page} style={{ '--primary': primaryColor } as CSSProperties}>
+            <HouseholdThemeSync color={primaryColor} />
             <Link href={`/household/${decodedName}`} className={styles.themedBackButton}>&larr; Back</Link>
             <h1 className={styles.pageTitle}>Groceries</h1>
             <div className={styles.card}>

@@ -541,24 +541,6 @@
   color: color-mix(in srgb, var(--primary, #a98bff) 40%, rgb(177, 177, 177));
 }
 
-.themedFeedbackButton {
-  display: inline-block;
-  color: #f5f1ff;
-
-  padding: 8px 14px;
-  border-radius: 8px;
-  background: color-mix(in srgb, var(--primary, #a98bff) 25%, transparent);
-
-  font-size: 14px;
-
-  transition: background 0.15s ease, color 0.15s ease;
-}
-
-.themedFeedbackButton:hover {
-  background: rgba(20, 16, 31, 0.5);
-  color: var(--primary, #a98bff);
-}
-
 .membersOverlay {
   position: fixed;
   inset: 0;
