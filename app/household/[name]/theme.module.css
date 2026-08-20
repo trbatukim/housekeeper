@@ -28,7 +28,7 @@
   );
 }
 
-@media (max-width: 748px) {
+@media (max-width: 925px) {
   .page {
     padding-top: 80px;
   }
