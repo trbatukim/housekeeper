@@ -29,9 +29,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${comicNeue.variable}`}
+      className={`${geistSans.variable} ${geistMono.variable} ${comicNeue.variable} h-full antialiased`}
     >
-      <body>
+      <body className="min-h-full flex flex-col">
         <HouseholdThemeProvider>
           {children}
           <FeedbackButton />
