@@ -16,7 +16,6 @@ A shared household management app. Create or join a household with your roommate
 
 - [Next.js](https://nextjs.org) (App Router) with React 19 and TypeScript
 - [Supabase](https://supabase.com) for auth and Postgres data
-- [Tailwind CSS](https://tailwindcss.com) v4
 - [Vitest](https://vitest.dev) + Testing Library for tests
 
 ## Getting started
