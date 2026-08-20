@@ -8,6 +8,9 @@ export default function MembersSidebar({
   members: { id: string; name: string }[]
 }) {
   const [open, setOpen] = useState(false)
+  const [closing, setClosing] = useState(false)
+
+  const close = () => setClosing(true)
 
   return (
     <>
@@ -19,15 +22,28 @@ export default function MembersSidebar({
       >
         Members
       </button>
-      {open && (
-        <div className={styles.membersOverlay} onClick={() => setOpen(false)}>
-          <aside className={styles.membersPanel} onClick={(e) => e.stopPropagation()}>
+      {(open || closing) && (
+        <div className={styles.membersOverlay} onClick={close}>
+          <aside
+            className={
+              closing
+                ? `${styles.membersPanel} ${styles.membersPanelClosing}`
+                : styles.membersPanel
+            }
+            onClick={(e) => e.stopPropagation()}
+            onAnimationEnd={() => {
+              if (closing) {
+                setOpen(false)
+                setClosing(false)
+              }
+            }}
+          >
             <div className={styles.membersHeader}>
               <h2 className={styles.membersTitle}>Members</h2>
               <button
                 type="button"
                 className={styles.membersClose}
-                onClick={() => setOpen(false)}
+                onClick={close}
                 aria-label="Close members list"
               >
                 &times;

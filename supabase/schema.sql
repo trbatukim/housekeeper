@@ -166,6 +166,7 @@ CREATE TABLE IF NOT EXISTS "public"."expenses" (
     "paid_on" "date" DEFAULT CURRENT_DATE NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "is_paid" boolean DEFAULT false NOT NULL,
+    "currency" "text",
     CONSTRAINT "expenses_category_check" CHECK (("category" = ANY (ARRAY['recurring'::"text", 'one-time'::"text"])))
 );
 

@@ -7,6 +7,8 @@ export async function addExpense(formData: FormData) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
+    const validCurrencies: string[] = ['tl', 'euro', 'dollar', 'pound']
+
     if (!user) {
         return
     }
@@ -15,6 +17,7 @@ export async function addExpense(formData: FormData) {
     const householdName = formData.get('householdName') as string
     const description = (formData.get('description') as string).trim()
     const amount = Number(formData.get('amount') as string)
+    const currency = formData.get('currency') as string
     const category = formData.get('category') as string
     const paidOn = formData.get('paidOn') as string
     const expensesPath = `/household/${encodeURIComponent(householdName)}/expenses`
@@ -28,6 +31,10 @@ export async function addExpense(formData: FormData) {
         redirect(`${expensesPath}?error=${encodeURIComponent('Invalid category.')}`)
     }
 
+    if (!validCurrencies.includes(currency)) {
+        redirect(`${expensesPath}?error=${encodeURIComponent('Invalid category.')}`)
+    }
+
     if (paidOn && paidOn < todayStr) {
         redirect(`${expensesPath}?error=${encodeURIComponent('Due date cannot be in the past.')}`)
     }
@@ -37,6 +44,7 @@ export async function addExpense(formData: FormData) {
         .select('id')
         .eq('household_id', householdId)
         .eq('paid_on', paidOn || todayStr)
+        .eq('currency', currency)
         .ilike('description', description)
         .maybeSingle()
 
@@ -51,6 +59,7 @@ export async function addExpense(formData: FormData) {
             description,
             amount,
             category,
+            currency,
             ...(paidOn ? { paid_on: paidOn } : {}),
         })
 

@@ -1,10 +1,11 @@
 .page {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 12px;
   min-height: 100vh;
-  padding: 24px;
+  padding: 24px 24px 24px;
 
   /* At the default theme these resolve to exactly #14101f and #1c1330. */
   --bg-start: rgb(
@@ -27,13 +28,19 @@
   );
 }
 
+@media (max-width: 925px) {
+  .page {
+    padding-top: 80px;
+  }
+}
+
+
 .themedBackButton {
-  position: fixed;
+  position: absolute;
   top: 24px;
   left: 24px;
 
   display: inline-block;
-  color: #f5f1ff;
 
   padding: 8px 14px;
   border-radius: 8px;
@@ -50,7 +57,7 @@
 }
 
 .card {
-  color: #f5f1ff;
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -275,6 +282,7 @@
 }
 
 .pageTitle {
+  position: relative;
   color: var(--primary, #a98bff);
   font-size: 30px;
   font-weight: 600;
@@ -285,12 +293,18 @@
   color: #b1b0b3;
   font-size: 13px;
   margin: -0.45rem;
+  text-align: center;
+}
+
+.note a {
+  text-decoration: underline;
 }
 
 .form {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   width: 100%;
   max-width: 560px;
@@ -341,6 +355,43 @@
 }
 
 .input:focus {
+  border-color: var(--primary, #a98bff);
+  outline: none;
+
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--primary, #a98bff) 12%, transparent);
+}
+
+:global(input[type=number]::-webkit-inner-spin-button),
+:global(input[type=number]::-webkit-outer-spin-button) {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+:global(input[type=number]) {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+:global(input[type=number]) {
+  width: 80px;
+}
+
+.select {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--primary, #a98bff) 25%, transparent);
+  background: var(--bg-end, #1c1330);
+  color: #f5f1ff;
+  color-scheme: dark;
+}
+
+.select option {
+  background: var(--bg-end, #1c1330);
+  color: #f5f1ff;
+}
+
+.select:focus {
   border-color: var(--primary, #a98bff);
   outline: none;
 
@@ -512,7 +563,7 @@
 }
 
 .topRightButtons {
-  position: fixed;
+  position: absolute;
   top: 24px;
   right: 24px;
   z-index: 20;
@@ -568,12 +619,25 @@
   animation: slideIn 0.18s ease-out;
 }
 
+.membersPanelClosing {
+  animation: slideOut 0.18s ease-in forwards;
+}
+
 @keyframes slideIn {
   from {
     transform: translateX(100%);
   }
   to {
     transform: translateX(0);
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
   }
 }
 

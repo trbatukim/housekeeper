@@ -32,6 +32,7 @@ describe('addExpense', () => {
             householdName: 'name',
             description: 'description',
             amount: '0.01',
+            currency: 'euro',
             category: 'one-time',
             paidOn: FUTURE_PAID_ON
         }))
@@ -50,6 +51,7 @@ describe('addExpense', () => {
             householdName: 'name',
             description: 'description',
             amount: '0.01',
+            currency: 'euro',
             category: 'one-time',
             paidOn: FUTURE_PAID_ON
         }))).rejects.toThrow('NEXT_REDIRECT')
@@ -69,6 +71,7 @@ describe('addExpense', () => {
             householdName: 'name',
             description: 'description',
             amount: '0.01',
+            currency: 'euro',
             category: 'one-time',
             paidOn: FUTURE_PAID_ON
         }))).rejects.toThrow('NEXT_REDIRECT')
@@ -86,6 +89,7 @@ describe('addExpense', () => {
             householdName: 'name',
             description: 'description',
             amount: '0.01',
+            currency: 'euro',
             category: 'one-time',
             paidOn: FUTURE_PAID_ON
         }))
@@ -96,6 +100,7 @@ describe('addExpense', () => {
             household_id: 'h1',
             description: 'description',
             amount: 0.01,
+            currency: 'euro',
             category: 'one-time',
             paid_on: FUTURE_PAID_ON 
         })
@@ -112,6 +117,7 @@ describe('addExpense', () => {
             householdName: 'name',
             description: '    description    ',
             amount: '0.01',
+            currency: 'euro',
             category: 'one-time',
             paidOn: FUTURE_PAID_ON
         }))
@@ -120,6 +126,7 @@ describe('addExpense', () => {
             household_id: 'h1',
             description: 'description',
             amount: 0.01,
+            currency: 'euro',
             category: 'one-time',
             paid_on: FUTURE_PAID_ON
         })
@@ -134,6 +141,7 @@ describe('addExpense', () => {
             householdName: 'name',
             description: '    ',
             amount: '0.01',
+            currency: 'euro',
             category: 'one-time',
             paidOn: FUTURE_PAID_ON
         }))).rejects.toThrow('NEXT_REDIRECT')
@@ -150,6 +158,7 @@ describe('addExpense', () => {
             householdName: 'name',
             description: 'description',
             amount: 'not a number',
+            currency: 'euro',
             category: 'one-time',
             paidOn: FUTURE_PAID_ON
         }))).rejects.toThrow('NEXT_REDIRECT')
@@ -166,6 +175,7 @@ describe('addExpense', () => {
             householdName: 'name',
             description: 'description',
             amount: '0',
+            currency: 'euro',
             category: 'one-time',
             paidOn: FUTURE_PAID_ON
         }))).rejects.toThrow('NEXT_REDIRECT')
@@ -182,7 +192,25 @@ describe('addExpense', () => {
             householdName: 'name',
             description: 'description',
             amount: '0.01',
+            currency: 'euro',
             category: 'not-a-category',
+            paidOn: FUTURE_PAID_ON
+        }))).rejects.toThrow('NEXT_REDIRECT')
+
+        expect(supabase.from).not.toHaveBeenCalled()
+    })
+
+    it('redirects with an error when the currency is invalid', async () => {
+        const supabase = mockSupabaseClient({ user: { id: 'u1' } })
+        vi.mocked(createClient).mockResolvedValue(supabase as never)
+
+        await expect(addExpense(formData({
+            householdId: 'h1',
+            householdName: 'name',
+            description: 'description',
+            amount: '0.01',
+            currency: 'rupees',
+            category: 'one-time',
             paidOn: FUTURE_PAID_ON
         }))).rejects.toThrow('NEXT_REDIRECT')
 
@@ -202,6 +230,7 @@ describe('addExpense', () => {
             householdName: 'name',
             description: 'description',
             amount: '0.01',
+            currency: 'euro',
             category: 'one-time'
         }))
 
@@ -210,6 +239,7 @@ describe('addExpense', () => {
             household_id: 'h1',
             description: 'description',
             amount: 0.01,
+            currency: 'euro',
             category: 'one-time',
         })
 

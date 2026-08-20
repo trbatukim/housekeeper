@@ -29,7 +29,7 @@ export default function GroceryItem({
         autoComplete="off"
         style={{ accentColor: 'var(--primary)' }}
       />
-      <span style={{ textDecoration: isPurchased ? 'line-through' : 'none' }}>
+      <span style={{ textDecoration: isPurchased ? 'line-through' : 'none', fontStyle: isPurchased ? 'italic' : 'normal' }}>
         {item.name}
         {item.amount != null && item.amount_type && ` (${item.amount} ${item.amount_type})`}
       </span>
