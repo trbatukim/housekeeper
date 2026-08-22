@@ -1,8 +1,8 @@
 .setupBox {
-  flex-direction: row;
+  flex-direction: column;
   justify-content: center;
   --content-box-align: stretch;
-  --content-box-padding: 4rem 2rem;
+  --content-box-padding: 2.5rem 1.5rem;
 }
 
 .formSection {
@@ -11,6 +11,7 @@
   align-items: center;
   justify-content: center;
   flex: 1;
+  min-width: 0;
   gap: 0.5rem;
   text-align: center;
 }
@@ -30,8 +31,9 @@
 
 .divider {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
+  width: 100%;
   gap: 0.5rem;
   color: #9187A3;
   font-size: 0.85rem;
@@ -41,7 +43,19 @@
 .divider::after {
   content: '';
   flex: 1;
-  width: 1px;
+  min-width: 1px;
+  min-height: 1px;
   background: rgba(245, 241, 255, 0.15);
 }
 
+@media (min-width: 601px) {
+  .setupBox {
+    flex-direction: row;
+    --content-box-padding: 4rem 2rem;
+  }
+
+  .divider {
+    flex-direction: column;
+    width: auto;
+  }
+}
