@@ -4,6 +4,7 @@ import { submitFeedback } from './actions'
 import styles from './feedback.module.css'
 import type { Metadata } from "next";
 import Link from 'next/link'
+import { TEXT_MAX_LENGTH } from '@/lib/textLimits'
 
 export const metadata: Metadata = {
     title: "Feedback"
@@ -55,7 +56,7 @@ export default async function FeedbackPage({
 
                     <div className={styles.field}>
                         <label className={styles.label}>Message</label>
-                        <textarea name="message" required className={`input ${styles.messageInput}`} placeholder="Leave your message here..." />
+                        <textarea name="message" required maxLength={TEXT_MAX_LENGTH} className={`input ${styles.messageInput}`} placeholder="Leave your message here..." />
                     </div>
 
                     <button className="button">Submit</button>

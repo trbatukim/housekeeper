@@ -1,6 +1,7 @@
 'use server'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { NAME_MAX_LENGTH } from '@/lib/textLimits'
 
 export async function createHousehold(formData: FormData) {
   const supabase = await createClient()
@@ -10,9 +11,14 @@ export async function createHousehold(formData: FormData) {
     redirect(`/household/setup?error=${encodeURIComponent('Household name cannot be empty.')}`)
   }
 
+  if (name.length > NAME_MAX_LENGTH) {
+    redirect(`/household/setup?error=${encodeURIComponent(`Household name cannot exceed ${NAME_MAX_LENGTH} characters.`)}`)
+  }
+
   const { error } = await supabase.rpc('create_household_and_join', { household_name: name })
   if (error) redirect(`/household/setup?error=${encodeURIComponent(error.message)}`)
-  redirect('/')
+
+  redirect(`/household/${encodeURIComponent(name)}`)
 }
 
 export async function joinHousehold(formData: FormData) {
@@ -44,5 +50,27 @@ export async function joinHousehold(formData: FormData) {
     
     redirect(`/household/setup?error=${encodeURIComponent(message)}`)
   }
-  redirect('/')
+
+  const { data, error: nameError } = await supabase
+    .from('households')
+    .select('name')
+    .eq('id', householdId)
+    .single()
+
+  if (nameError) {
+    let message = 'You joined the household, but we couldn\'t load its details. Please refresh and try again.'
+
+    switch (nameError.code) {
+      case 'PGRST116':
+        message = 'You joined the household, but it could not be found. Please refresh and try again.'
+        break
+      case '42501':
+        message = 'You joined the household, but do not have permission to view its details.'
+        break
+    }
+
+    redirect(`/household/setup?error=${encodeURIComponent(message)}`)
+  }
+
+  redirect(`/household/${encodeURIComponent(data.name)}`)
 }

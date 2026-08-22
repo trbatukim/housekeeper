@@ -1,6 +1,7 @@
 'use server'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { TEXT_MAX_LENGTH } from '@/lib/textLimits'
 
 const CATEGORIES = ['bug', 'idea', 'other']
 const HOUSEHOLD_PATH_RE = /^\/household\/([^/]+)/
@@ -16,6 +17,10 @@ export async function submitFeedback(formData: FormData) {
 
     if (!message) {
         redirect(`/feedback?error=${encodeURIComponent('Please enter a message.')}`)
+    }
+
+    if (message.length > TEXT_MAX_LENGTH) {
+        redirect(`/feedback?error=${encodeURIComponent(`Message cannot exceed ${TEXT_MAX_LENGTH} characters.`)}`)
     }
 
     if (!CATEGORIES.includes(category)) {

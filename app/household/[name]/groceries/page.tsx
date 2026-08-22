@@ -8,6 +8,7 @@ import AmountTypeField from './AmountTypeField'
 import styles from '../theme.module.css'
 import HouseholdThemeSync from '../../../HouseholdThemeSync'
 import type { Metadata } from "next";
+import { NAME_MAX_LENGTH } from '@/lib/textLimits'
 
 const DEFAULT_COLOR = '#a98bff'
 
@@ -60,13 +61,14 @@ export default async function Groceries({
 
     return (
         <div className={styles.page} style={{ '--primary': primaryColor } as CSSProperties}>
+            <HouseholdThemeSync color={primaryColor} />
             <Link href={`/household/${decodedName}`} className={styles.themedBackButton}>&larr; Back</Link>
             <h1 className={styles.pageTitle}>Groceries</h1>
             <div className={styles.card}>
                 <form action={addGroceryItem} className={styles.form}>
                     <input type="hidden" name="householdId" value={household.id} />
                     <input type="hidden" name="householdName" value={decodedName} />
-                    <input type="text" name="name" placeholder="Add an item" required className={styles.input} />
+                    <input type="text" name="name" placeholder="Add an item" required maxLength={NAME_MAX_LENGTH} className={styles.input} />
                     <input type="number" step="0.01" name="amount" placeholder="Amount" required className={styles.input} />
                     <AmountTypeField />
                     <button type="submit" className={styles.button}>Add</button>
