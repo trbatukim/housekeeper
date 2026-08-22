@@ -54,13 +54,15 @@ describe('joinHousehold', () => {
 
     it('joins new household on valid id', async () => {
         const profilesToHouseholds = mockQueryBuilder(queryResult(null))
-        const supabase = mockSupabaseClient({ user: { id: 'u1' }, from: { profiles_to_households: profilesToHouseholds } })
+        const households = mockQueryBuilder(queryResult({ name: 'house' }))
+        const supabase = mockSupabaseClient({ user: { id: 'u1' }, from: { profiles_to_households: profilesToHouseholds, households } })
         vi.mocked(createClient).mockResolvedValue(supabase as never)
 
         await expect(joinHousehold(formData({ householdId: 'h1' })))
             .rejects.toThrow('NEXT_REDIRECT')
 
         expect(supabase.from).toHaveBeenCalledWith('profiles_to_households')
+        expect(supabase.from).toHaveBeenCalledWith('households')
     })
 
     it('redirects with an error when no household exists with that id', async () => {
