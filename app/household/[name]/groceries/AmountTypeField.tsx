@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import styles from '../theme.module.css'
 import { CUSTOM_AMOUNT_TYPE } from './constants'
+import { NAME_MAX_LENGTH } from '@/lib/textLimits'
 
 export default function AmountTypeField() {
     const [isCustom, setIsCustom] = useState(false)
@@ -35,6 +36,7 @@ export default function AmountTypeField() {
                     name="customAmountType"
                     placeholder="Custom unit"
                     required
+                    maxLength={NAME_MAX_LENGTH}
                     className={styles.input}
                 />
             )}

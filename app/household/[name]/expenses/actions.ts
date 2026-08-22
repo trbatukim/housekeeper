@@ -2,6 +2,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { TEXT_MAX_LENGTH } from '@/lib/textLimits'
 
 export async function addExpense(formData: FormData) {
     const supabase = await createClient()
@@ -25,6 +26,10 @@ export async function addExpense(formData: FormData) {
 
     if (!description || Number.isNaN(amount) || amount <= 0) {
         redirect(`${expensesPath}?error=${encodeURIComponent('Please enter a valid description and amount.')}`)
+    }
+
+    if (description.length > TEXT_MAX_LENGTH) {
+        redirect(`${expensesPath}?error=${encodeURIComponent(`Description cannot exceed ${TEXT_MAX_LENGTH} characters.`)}`)
     }
 
     if (category !== 'recurring' && category !== 'one-time') {

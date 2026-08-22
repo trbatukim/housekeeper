@@ -1,6 +1,7 @@
 'use server'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { NAME_MAX_LENGTH } from '@/lib/textLimits'
 
 export async function createHousehold(formData: FormData) {
   const supabase = await createClient()
@@ -8,6 +9,10 @@ export async function createHousehold(formData: FormData) {
 
   if (!name) {
     redirect(`/household/setup?error=${encodeURIComponent('Household name cannot be empty.')}`)
+  }
+
+  if (name.length > NAME_MAX_LENGTH) {
+    redirect(`/household/setup?error=${encodeURIComponent(`Household name cannot exceed ${NAME_MAX_LENGTH} characters.`)}`)
   }
 
   const { error } = await supabase.rpc('create_household_and_join', { household_name: name })

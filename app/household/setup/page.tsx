@@ -2,6 +2,7 @@ import { createHousehold, joinHousehold } from './actions'
 import styles from './setup.module.css'
 import Link from 'next/link'
 import type { Metadata } from "next";
+import { NAME_MAX_LENGTH } from '@/lib/textLimits'
 
 export const metadata: Metadata = {
   title: "Household Setup"
@@ -24,7 +25,7 @@ export default async function HouseholdSetupPage({
         <section className={styles.formSection}>
           <h2>Create new household</h2>
           <form className={styles.form} action={createHousehold}>
-            <input type="text" name="name" placeholder="Household name" className="input" required />
+            <input type="text" name="name" placeholder="Household name" className="input" required maxLength={NAME_MAX_LENGTH} />
             <button type="submit" className="link">Create</button>
           </form>
         </section>

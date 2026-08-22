@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { CUSTOM_AMOUNT_TYPE } from './constants'
+import { NAME_MAX_LENGTH } from '@/lib/textLimits'
 
 export async function addGroceryItem(formData: FormData) {
     const supabase = await createClient()
@@ -23,6 +24,14 @@ export async function addGroceryItem(formData: FormData) {
 
     if (!name) {
         redirect(`${groceriesPath}?error=${encodeURIComponent('Item name cannot be empty.')}`)
+    }
+
+    if (name.length > NAME_MAX_LENGTH) {
+        redirect(`${groceriesPath}?error=${encodeURIComponent(`Item name cannot exceed ${NAME_MAX_LENGTH} characters.`)}`)
+    }
+
+    if (customAmountType && customAmountType.length > NAME_MAX_LENGTH) {
+        redirect(`${groceriesPath}?error=${encodeURIComponent(`Custom unit cannot exceed ${NAME_MAX_LENGTH} characters.`)}`)
     }
 
     if (!amountRaw || !amountType) {

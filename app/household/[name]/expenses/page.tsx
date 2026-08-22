@@ -7,6 +7,7 @@ import ExpenseItem from './ExpenseItem'
 import styles from '../theme.module.css'
 import HouseholdThemeSync from '../../../HouseholdThemeSync'
 import type { Metadata } from "next";
+import { TEXT_MAX_LENGTH } from '@/lib/textLimits'
 
 const DEFAULT_COLOR = '#a98bff'
 
@@ -69,7 +70,7 @@ export default async function ExpensesPage({
                     <input type="hidden" name="householdId" value={household.id} />
                     <input type="hidden" name="householdName" value={decodedName} />
                     
-                    <input type="text" name="description" placeholder="Description" required className={styles.input} />
+                    <input type="text" name="description" placeholder="Description" required maxLength={TEXT_MAX_LENGTH} className={styles.input} />
                     
                     <input type="number" step="0.01" name="amount" required placeholder="Price" className={styles.input} />
                     <select name="currency" className={styles.select}>
