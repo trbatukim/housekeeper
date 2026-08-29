@@ -19,11 +19,28 @@
   }
 }
 
+html {
+  background: #14101F;
+  overscroll-behavior-y: none;
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
   position: relative;
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+
+  overscroll-behavior-y: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@supports (-webkit-touch-callout: none) {
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
 }
 
 .linkText {
@@ -42,9 +59,10 @@ body {
   align-items: center;
   justify-content: center;
   gap: 12px;
-  min-height: 100vh;
+  min-height: 100dvh;
   max-width: 100%;
-  padding: 24px;
+  padding: max(24px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right))
+    max(24px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left));
 
   background: linear-gradient(
     170deg,
@@ -173,8 +191,8 @@ body {
 
 .backButton {
   position: absolute;
-  top: 24px;
-  left: 24px;
+  top: calc(24px + env(safe-area-inset-top));
+  left: calc(24px + env(safe-area-inset-left));
 
   display: inline-block;
   color: #F5F1FF;
@@ -197,8 +215,8 @@ body {
 
 .feedbackButton {
   position: absolute;
-  bottom: 24px;
-  right: 24px;
+  bottom: calc(24px + env(safe-area-inset-bottom));
+  right: calc(24px + env(safe-area-inset-right));
   z-index: 50;
 
   display: inline-block;
