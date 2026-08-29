@@ -31,8 +31,8 @@
 
 @media (max-width: 925px) {
   .page {
-    padding-top: 80px;
-    padding-bottom: 80px;
+    padding-top: calc(80px + env(safe-area-inset-top));
+    padding-bottom: calc(80px + env(safe-area-inset-bottom));
   }
 }
 
@@ -41,6 +41,7 @@
   position: absolute;
   top: calc(24px + env(safe-area-inset-top));
   left: calc(24px + env(safe-area-inset-left));
+  z-index: 20;
 
   display: inline-block;
 
@@ -566,8 +567,8 @@
 
 .topRightButtons {
   position: absolute;
-  top: 24px;
-  right: 24px;
+  top: calc(24px + env(safe-area-inset-top));
+  right: calc(24px + env(safe-area-inset-right));
   z-index: 20;
 
   display: flex;
