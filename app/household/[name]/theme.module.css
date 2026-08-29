@@ -554,6 +554,7 @@
 
 .item {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
@@ -562,6 +563,17 @@
   background: color-mix(in srgb, var(--primary, #a98bff) 8%, rgba(230, 220, 255, 0.05));
   border: 1px solid color-mix(in srgb, var(--primary, #a98bff) 12%, transparent);
   color: #f5f1ff;
+}
+
+.item > span {
+  flex: 1;
+}
+
+.itemButton {
+  flex: 0 0 auto;
+  padding: 6px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
 }
 
 .topRightButtons {

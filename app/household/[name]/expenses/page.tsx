@@ -100,7 +100,7 @@ export default async function ExpensesPage({
                                 <input type="hidden" name="householdName" value={decodedName} />
                                 <input type="hidden" name="expenseDesc" value={expense.description} />
                                 <input type="hidden" name="dueDate" value={expense.paid_on} />
-                                <button type="submit" className={styles.button}>Send Reminder</button>
+                                <button type="submit" className={`${styles.button} ${styles.itemButton}`} title="Send reminder">Remind</button>
                             </form>
                             <form action={deleteExpense}>
                                 <input type="hidden" name="householdId" value={household.id} />
