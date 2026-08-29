@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import type { CSSProperties } from 'react'
-import { addGroceryItem, clearGroceryList, deleteGrocery } from './actions'
+import { addGroceryItem, clearGroceryList, deleteGrocery, sendReminder } from './actions'
 import GroceryItem from './GroceryItem'
 import AmountTypeField from './AmountTypeField'
 import styles from '../theme.module.css'
@@ -64,6 +64,7 @@ export default async function Groceries({
             <HouseholdThemeSync color={primaryColor} />
             <Link href={`/household/${decodedName}`} className={styles.themedBackButton}>&larr; Back</Link>
             <h1 className={styles.pageTitle}>Groceries</h1>
+            <p className={styles.note}>To get notifications, subscribe to the ntfy topic: ntfy.sh/{household.id} <Link href="../../ntfy-info">More info</Link></p>
             <div className={styles.card}>
                 <form action={addGroceryItem} className={styles.form}>
                     <input type="hidden" name="householdId" value={household.id} />
@@ -89,12 +90,19 @@ export default async function Groceries({
                         </li>
                     ))}
                 </ul>
-
-                <form action={clearGroceryList} className={styles.form}>
-                    <input type="hidden" name="householdId" value={household.id} />
-                    <input type="hidden" name="householdName" value={decodedName} />
-                    <button type="submit" className={styles.button}>Clear list</button>
-                </form>
+                
+                <div className={styles.toolbar}>
+                    <form action={clearGroceryList} className={styles.toolbarFormGroup}>
+                        <input type="hidden" name="householdId" value={household.id} />
+                        <input type="hidden" name="householdName" value={decodedName} />
+                        <button type="submit" className={styles.button}>Clear list</button>
+                    </form>
+                    <form action={sendReminder} className={styles.toolbarFormGroup}>
+                        <input type="hidden" name="householdId" value={household.id} />
+                        <input type="hidden" name="householdName" value={decodedName} />
+                        <button type="submit" className={styles.button}>Send Reminder</button>
+                    </form>
+                </div>
             </div>
         </div>
     )
