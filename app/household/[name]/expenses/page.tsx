@@ -65,6 +65,7 @@ export default async function ExpensesPage({
             <HouseholdThemeSync color={primaryColor} />
             <Link href={`/household/${decodedName}`} className={styles.themedBackButton}>&larr; Back</Link>
             <h1 className={styles.pageTitle}>Expenses</h1>
+            <p className={styles.note}>To get notifications, subscribe to the ntfy topic: ntfy.sh/{household.id} <Link href="../../ntfy-info">More info</Link></p>
             <div className={styles.card}>
                 <form action={addExpense} className={styles.form}>
                     <input type="hidden" name="householdId" value={household.id} />
