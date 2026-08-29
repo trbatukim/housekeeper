@@ -8,7 +8,11 @@ export default function HouseholdThemeSync({ color }: { color: string }) {
 
     useEffect(() => {
         setColor(color)
-        return () => setColor(null)
+        document.documentElement.style.setProperty('--app-primary', color)
+        return () => {
+            setColor(null)
+            document.documentElement.style.removeProperty('--app-primary')
+        }
     }, [color, setColor])
 
     return null

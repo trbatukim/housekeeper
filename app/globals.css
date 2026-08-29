@@ -20,14 +20,27 @@
 }
 
 html {
-  background: #14101F;
+  --app-bg-start: rgb(
+    from var(--app-primary, #a98bff)
+    calc(20 + 0.12 * (r - 169))
+    calc(16 + 0.12 * (g - 139))
+    calc(31 + 0.12 * (b - 255))
+  );
+  --app-bg-end: rgb(
+    from var(--app-primary, #a98bff)
+    calc(28 + 0.18 * (r - 169))
+    calc(19 + 0.18 * (g - 139))
+    calc(48 + 0.18 * (b - 255))
+  );
+
+  background: var(--app-bg-end);
   overscroll-behavior-y: none;
   -webkit-text-size-adjust: 100%;
 }
 
 body {
   position: relative;
-  background: var(--background);
+  background: transparent;
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 
