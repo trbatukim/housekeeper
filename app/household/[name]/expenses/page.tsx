@@ -1,4 +1,4 @@
-import { addExpense, deleteExpense, rolloverRecurringExpenses } from './actions'
+import { addExpense, deleteExpense, rolloverRecurringExpenses, sendReminder } from './actions'
 import { createClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
@@ -95,6 +95,13 @@ export default async function ExpensesPage({
                     {expenses?.map((expense) => (
                         <li key={expense.id} className={styles.item}>
                             <ExpenseItem expense={expense} householdName={decodedName} />
+                            <form action={sendReminder} className={styles.toolbarFormGroup}>
+                                <input type="hidden" name="householdId" value={household.id} />
+                                <input type="hidden" name="householdName" value={decodedName} />
+                                <input type="hidden" name="expenseDesc" value={expense.description} />
+                                <input type="hidden" name="dueDate" value={expense.paid_on} />
+                                <button type="submit" className={styles.button}>Send Reminder</button>
+                            </form>
                             <form action={deleteExpense}>
                                 <input type="hidden" name="householdId" value={household.id} />
                                 <input type="hidden" name="householdName" value={decodedName} />
