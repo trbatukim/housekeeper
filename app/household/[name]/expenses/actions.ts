@@ -3,6 +3,8 @@ import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { TEXT_MAX_LENGTH } from '@/lib/textLimits'
+import { sendNtfyReqWithoutDelay } from '@/lib/ntfy'
+import { formatDate } from '@/lib/dates'
 
 export async function addExpense(formData: FormData) {
     const supabase = await createClient()
@@ -152,4 +154,34 @@ export async function toggleExpense(
 
     if (error) console.error(error)
     revalidatePath(`/household/${encodeURIComponent(householdName)}/expenses`)
+}
+
+export async function sendReminder(formData: FormData) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+        return
+    }
+
+    const householdId = formData.get('householdId') as string
+    const householdName = formData.get('householdName') as string
+    const expenseDesc = formData.get('expenseDesc') as string
+    const dueDate = formData.get('dueDate') as string
+    const expensesPath = `/household/${encodeURIComponent(householdName)}/expenses`
+
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('name')
+        .eq('id', user.id)
+        .maybeSingle()
+
+    const sentBy = profile?.name ?? 'Someone'
+    const notificationId = await sendNtfyReqWithoutDelay(`${sentBy} reminded you about ${expenseDesc}!\nDue: ${formatDate(dueDate)}`, householdName, householdId)
+
+    if (!notificationId) {
+        redirect(`${expensesPath}?error=${encodeURIComponent('Could not send the reminder. Please try again.')}`)
+    }
+
+    revalidatePath(expensesPath)
 }

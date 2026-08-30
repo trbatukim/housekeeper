@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { CUSTOM_AMOUNT_TYPE } from './constants'
 import { NAME_MAX_LENGTH } from '@/lib/textLimits'
+import { sendNtfyReqWithoutDelay } from '@/lib/ntfy'
 
 export async function addGroceryItem(formData: FormData) {
     const supabase = await createClient()
@@ -129,4 +130,32 @@ export async function toggleGrocery(
 
   if (error) console.error(error)
   revalidatePath(`/household/${encodeURIComponent(householdName)}/groceries`)
+}
+
+export async function sendReminder(formData: FormData) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+        return
+    }
+
+    const householdId = formData.get('householdId') as string
+    const householdName = formData.get('householdName') as string
+    const groceriesPath = `/household/${encodeURIComponent(householdName)}/groceries`
+
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('name')
+        .eq('id', user.id)
+        .maybeSingle()
+
+    const sentBy = profile?.name ?? 'Someone'
+    const notificationId = await sendNtfyReqWithoutDelay(`${sentBy} reminded you about groceries!`, householdName, householdId)
+
+    if (!notificationId) {
+        redirect(`${groceriesPath}?error=${encodeURIComponent('Could not send the reminder. Please try again.')}`)
+    }
+
+    revalidatePath(groceriesPath)
 }

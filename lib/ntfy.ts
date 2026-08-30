@@ -41,3 +41,27 @@ export async function cancelNtfyReq(notificationId: string, householdId: string)
         console.error('Request failed:', error)
     }
 }
+
+export async function sendNtfyReqWithoutDelay(textBody: string, householdName: string, householdId: string) {
+    const url = 'https://ntfy.sh/' + householdId
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'text/plain',
+                'title': householdName
+            },
+            body: textBody
+        })
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`)
+        }
+
+        const result = await response.json() as { id: string }
+        return result.id
+    } catch (error) {
+        console.error('Request failed:', error)
+    }
+}

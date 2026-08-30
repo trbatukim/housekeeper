@@ -1,11 +1,7 @@
 'use client'
 import { useState, useTransition } from 'react'
 import { toggleExpense } from './actions'
-
-function formatDate(dateString: string) {
-    const [year, month, day] = dateString.split('-')
-    return `${day}/${month}/${year}`
-}
+import { formatDate } from '@/lib/dates'
 
 function formatCategory(category: string) {
     return category.charAt(0).toUpperCase() + category.slice(1)
