@@ -4,8 +4,9 @@
   flex-direction: column;
   align-items: center;
   gap: 12px;
-  min-height: 100vh;
-  padding: 24px 24px 24px;
+  min-height: 100dvh;
+  padding: max(24px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right))
+    max(24px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left));
 
   /* At the default theme these resolve to exactly #14101f and #1c1330. */
   --bg-start: rgb(
@@ -30,16 +31,17 @@
 
 @media (max-width: 925px) {
   .page {
-    padding-top: 80px;
-    padding-bottom: 80px;
+    padding-top: calc(80px + env(safe-area-inset-top));
+    padding-bottom: calc(80px + env(safe-area-inset-bottom));
   }
 }
 
 
 .themedBackButton {
   position: absolute;
-  top: 24px;
-  left: 24px;
+  top: calc(24px + env(safe-area-inset-top));
+  left: calc(24px + env(safe-area-inset-left));
+  z-index: 20;
 
   display: inline-block;
 
@@ -565,8 +567,8 @@
 
 .topRightButtons {
   position: absolute;
-  top: 24px;
-  right: 24px;
+  top: calc(24px + env(safe-area-inset-top));
+  right: calc(24px + env(safe-area-inset-right));
   z-index: 20;
 
   display: flex;
@@ -611,7 +613,9 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 24px 20px;
+  padding: max(24px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right))
+    max(24px, env(safe-area-inset-bottom)) 20px;
+  overflow-y: auto;
 
   background: var(--bg-end, #1c1330);
   border-left: 1px solid color-mix(in srgb, var(--primary, #a98bff) 20%, transparent);
