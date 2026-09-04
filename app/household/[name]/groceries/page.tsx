@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import type { CSSProperties } from 'react'
-import { addGroceryItem, clearGroceryList, deleteGrocery, sendReminder } from './actions'
+import { addGroceryItem, clearGroceryList, clearCheckedGroceries, deleteGrocery, sendReminder } from './actions'
 import GroceryItem from './GroceryItem'
 import AmountTypeField from './AmountTypeField'
 import styles from '../theme.module.css'
@@ -96,6 +96,11 @@ export default async function Groceries({
                         <input type="hidden" name="householdId" value={household.id} />
                         <input type="hidden" name="householdName" value={decodedName} />
                         <button type="submit" className={styles.button}>Clear list</button>
+                    </form>
+                    <form action={clearCheckedGroceries} className={styles.toolbarFormGroup}>
+                        <input type="hidden" name="householdId" value={household.id} />
+                        <input type="hidden" name="householdName" value={decodedName} />
+                        <button type="submit" className={styles.button}>Clear bought groceries</button>
                     </form>
                     <form action={sendReminder} className={styles.toolbarFormGroup}>
                         <input type="hidden" name="householdId" value={household.id} />
