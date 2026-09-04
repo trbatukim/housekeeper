@@ -77,19 +77,23 @@ export default async function Groceries({
 
                 {errorMessage && <p className="error">{errorMessage}</p>}
 
-                <ul className={styles.list}>
-                    {groceries?.map((item) => (
-                        <li key={item.id} className={styles.item}>
-                            <GroceryItem item={item} householdName={decodedName} />
-                            <form action={deleteGrocery}>
-                                <input type="hidden" name="householdId" value={household.id} />
-                                <input type="hidden" name="householdName" value={decodedName} />
-                                <input type="hidden" name="itemId" value={item.id} />
-                                <button type="submit" className="negativeButton">Delete</button>
-                            </form>
-                        </li>
-                    ))}
-                </ul>
+                {groceries && groceries.length > 0 ? (
+                    <ul className={styles.list}>
+                        {groceries?.map((item) => (
+                            <li key={item.id} className={styles.item}>
+                                <GroceryItem item={item} householdName={decodedName} />
+                                <form action={deleteGrocery}>
+                                    <input type="hidden" name="householdId" value={household.id} />
+                                    <input type="hidden" name="householdName" value={decodedName} />
+                                    <input type="hidden" name="itemId" value={item.id} />
+                                    <button type="submit" className="negativeButton">Delete</button>
+                                </form>
+                            </li>
+                        ))}
+                    </ul>
+                ) : (
+                    <p className={styles.emptyState}>Groceries list is empty.</p>
+                )} 
                 
                 <div className={styles.toolbar}>
                     <form action={clearGroceryList} className={styles.toolbarFormGroup}>
