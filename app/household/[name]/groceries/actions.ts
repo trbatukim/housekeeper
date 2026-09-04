@@ -91,6 +91,31 @@ export async function clearGroceryList(formData: FormData) {
     revalidatePath(groceriesPath)
 }
 
+export async function clearCheckedGroceries(formData: FormData) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+        return
+    }
+
+    const householdId = formData.get('householdId') as string
+    const householdName = formData.get('householdName') as string
+    const groceriesPath = `/household/${encodeURIComponent(householdName)}/groceries`
+
+    const { error } = await supabase
+        .from('grocery_items')
+        .delete()
+        .eq('household_id', householdId)
+        .eq('is_purchased', true)
+
+    if (error) {
+        redirect(`${groceriesPath}?error=${encodeURIComponent(error.message)}`)
+    }
+
+    revalidatePath(groceriesPath)
+}
+
 export async function deleteGrocery(formData: FormData) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()

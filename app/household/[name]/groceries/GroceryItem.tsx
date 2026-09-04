@@ -21,7 +21,7 @@ export default function GroceryItem({
   }
 
   return (
-    <>
+    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
       <input
         type="checkbox"
         checked={isPurchased}
@@ -33,6 +33,6 @@ export default function GroceryItem({
         {item.name}
         {item.amount != null && item.amount_type && ` (${item.amount} ${item.amount_type})`}
       </span>
-    </>
+    </label>
   )
 }

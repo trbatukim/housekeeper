@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import type { CSSProperties } from 'react'
-import { addGroceryItem, clearGroceryList, deleteGrocery, sendReminder } from './actions'
+import { addGroceryItem, clearGroceryList, clearCheckedGroceries, deleteGrocery, sendReminder } from './actions'
 import GroceryItem from './GroceryItem'
 import AmountTypeField from './AmountTypeField'
 import styles from '../theme.module.css'
@@ -77,25 +77,34 @@ export default async function Groceries({
 
                 {errorMessage && <p className="error">{errorMessage}</p>}
 
-                <ul className={styles.list}>
-                    {groceries?.map((item) => (
-                        <li key={item.id} className={styles.item}>
-                            <GroceryItem item={item} householdName={decodedName} />
-                            <form action={deleteGrocery}>
-                                <input type="hidden" name="householdId" value={household.id} />
-                                <input type="hidden" name="householdName" value={decodedName} />
-                                <input type="hidden" name="itemId" value={item.id} />
-                                <button type="submit" className="negativeButton">Delete</button>
-                            </form>
-                        </li>
-                    ))}
-                </ul>
+                {groceries && groceries.length > 0 ? (
+                    <ul className={styles.list}>
+                        {groceries?.map((item) => (
+                            <li key={item.id} className={styles.item}>
+                                <GroceryItem item={item} householdName={decodedName} />
+                                <form action={deleteGrocery}>
+                                    <input type="hidden" name="householdId" value={household.id} />
+                                    <input type="hidden" name="householdName" value={decodedName} />
+                                    <input type="hidden" name="itemId" value={item.id} />
+                                    <button type="submit" className="negativeButton">Delete</button>
+                                </form>
+                            </li>
+                        ))}
+                    </ul>
+                ) : (
+                    <p className={styles.emptyState}>Groceries list is empty.</p>
+                )} 
                 
                 <div className={styles.toolbar}>
                     <form action={clearGroceryList} className={styles.toolbarFormGroup}>
                         <input type="hidden" name="householdId" value={household.id} />
                         <input type="hidden" name="householdName" value={decodedName} />
                         <button type="submit" className={styles.button}>Clear list</button>
+                    </form>
+                    <form action={clearCheckedGroceries} className={styles.toolbarFormGroup}>
+                        <input type="hidden" name="householdId" value={household.id} />
+                        <input type="hidden" name="householdName" value={decodedName} />
+                        <button type="submit" className={styles.button}>Clear bought groceries</button>
                     </form>
                     <form action={sendReminder} className={styles.toolbarFormGroup}>
                         <input type="hidden" name="householdId" value={household.id} />
