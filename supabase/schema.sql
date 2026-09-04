@@ -66,6 +66,25 @@ end;$$;
 ALTER FUNCTION "public"."create_household_and_join"("household_name" "text") OWNER TO "postgres";
 
 
+CREATE OR REPLACE FUNCTION "public"."delete_empty_household"() RETURNS "trigger"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+begin
+  if not exists (
+    select 1 from public.profiles_to_households
+    where household_id = old.household_id
+  ) then
+    delete from public.households where id = old.household_id;
+  end if;
+  return old;
+end;
+$$;
+
+
+ALTER FUNCTION "public"."delete_empty_household"() OWNER TO "postgres";
+
+
 CREATE OR REPLACE FUNCTION "public"."handle_new_user"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     AS $$BEGIN
@@ -294,6 +313,10 @@ ALTER TABLE ONLY "public"."profiles"
 
 ALTER TABLE ONLY "public"."profiles_to_households"
     ADD CONSTRAINT "profiles_to_households_pkey" PRIMARY KEY ("profile_id", "household_id");
+
+
+
+CREATE OR REPLACE TRIGGER "on_household_member_removed" AFTER DELETE ON "public"."profiles_to_households" FOR EACH ROW EXECUTE FUNCTION "public"."delete_empty_household"();
 
 
 
@@ -662,6 +685,12 @@ GRANT USAGE ON SCHEMA "public" TO "service_role";
 GRANT ALL ON FUNCTION "public"."create_household_and_join"("household_name" "text") TO "anon";
 GRANT ALL ON FUNCTION "public"."create_household_and_join"("household_name" "text") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."create_household_and_join"("household_name" "text") TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "public"."delete_empty_household"() TO "anon";
+GRANT ALL ON FUNCTION "public"."delete_empty_household"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."delete_empty_household"() TO "service_role";
 
 
 
