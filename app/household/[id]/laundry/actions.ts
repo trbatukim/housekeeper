@@ -18,7 +18,7 @@ export async function addLaundry(formData: FormData) {
     const hours = Number(formData.get('hours')) || 0
     const minutes = Number(formData.get('minutes')) || 0
     const durationSeconds = computeDurationSeconds(hours, minutes)
-    const laundryPath = `/household/${encodeURIComponent(householdName)}/laundry`
+    const laundryPath = `/household/${householdId}/laundry`
 
     if (!isValidDuration(durationSeconds)) {
         redirect(`${laundryPath}?error=${encodeURIComponent('Set an end time for the load.')}`)
@@ -56,10 +56,9 @@ export async function deleteLaundry(formData: FormData) {
     }
 
     const householdId = formData.get('householdId') as string
-    const householdName = formData.get('householdName') as string
     const laundryId = formData.get('laundryId') as string
     const notificationId = formData.get('notificationId') as string
-    const laundryPath = `/household/${encodeURIComponent(householdName)}/laundry`
+    const laundryPath = `/household/${householdId}/laundry`
 
     const { data, error } = await supabase
         .from('laundry_loads')

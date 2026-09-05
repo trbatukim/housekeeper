@@ -12,9 +12,8 @@ export async function updatePrimaryColor(formData: FormData) {
     }
 
     const householdId = formData.get('householdId') as string
-    const householdName = formData.get('householdName') as string
     const color = formData.get('color') as string
-    const path = `/household/${encodeURIComponent(householdName)}`
+    const path = `/household/${householdId}`
 
     if (!/^#[0-9a-fA-F]{6}$/.test(color)) {
         return

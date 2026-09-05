@@ -5,12 +5,10 @@ import { toggleDishesStatus } from './actions'
 export default function DishesItem({
   householdId,
   status,
-  householdName,
   locked = false,
 }: {
   householdId: string
   status: string
-  householdName: string
   locked?: boolean
 }) {
   const [currentStatus, setCurrentStatus] = useState(status)
@@ -21,7 +19,7 @@ export default function DishesItem({
   function handleChange(newStatus: string) {
     setCurrentStatus(newStatus) // updates instantly, before the server responds
     startTransition(() => {
-      toggleDishesStatus(householdId, newStatus, householdName)
+      toggleDishesStatus(householdId, newStatus)
     })
   }
 

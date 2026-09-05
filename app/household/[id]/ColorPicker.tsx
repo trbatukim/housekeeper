@@ -20,11 +20,9 @@ const PRESET_COLORS = [
 
 export default function ColorPicker({
     householdId,
-    householdName,
     color,
 }: {
     householdId: string
-    householdName: string
     color: string
 }) {
     const formRef = useRef<HTMLFormElement>(null)
@@ -45,7 +43,6 @@ export default function ColorPicker({
     return (
         <form ref={formRef} action={updatePrimaryColor} className={styles.colorPickerForm}>
             <input type="hidden" name="householdId" value={householdId} />
-            <input type="hidden" name="householdName" value={householdName} />
             <input type="hidden" name="color" value={color} />
             <div className={styles.colorPickerRow}>
                 <span className={styles.colorPickerLabelText}>Theme color</span>

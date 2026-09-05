@@ -1,6 +1,6 @@
 'use client'
 import { useState, type ChangeEvent } from 'react'
-import styles from '@/app/household/[name]/theme.module.css'
+import styles from '@/app/household/[id]/theme.module.css'
 
 function clamp(value: number, max: number) {
     if (Number.isNaN(value)) return 0

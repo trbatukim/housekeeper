@@ -21,7 +21,7 @@ describe('updatePrimaryColor', () => {
     const supabase = mockSupabaseClient({ user: null })
     vi.mocked(createClient).mockResolvedValue(supabase as never)
 
-    await updatePrimaryColor(formData({ householdId: '1', householdName: 'name', color: '#abcdef' }))
+    await updatePrimaryColor(formData({ householdId: '1', color: '#abcdef' }))
 
     expect(supabase.from).not.toHaveBeenCalled()
     expect(revalidatePath).not.toHaveBeenCalled()
@@ -31,7 +31,7 @@ describe('updatePrimaryColor', () => {
     const supabase = mockSupabaseClient({ user: { id: 'u1' } })
     vi.mocked(createClient).mockResolvedValue(supabase as never)
 
-    await updatePrimaryColor(formData({ householdId: '1', householdName: 'name', color: 'not a color' }))
+    await updatePrimaryColor(formData({ householdId: '1', color: 'not a color' }))
 
     expect(supabase.from).not.toHaveBeenCalled()
     expect(revalidatePath).not.toHaveBeenCalled()
@@ -42,7 +42,7 @@ describe('updatePrimaryColor', () => {
     const supabase = mockSupabaseClient({ user: { id: 'u1' }, from: { households } })
     vi.mocked(createClient).mockResolvedValue(supabase as never)
 
-    await expect(updatePrimaryColor(formData({ householdId: '1', householdName: 'name', color: '#abcdef' })))
+    await expect(updatePrimaryColor(formData({ householdId: '1', color: '#abcdef' })))
       .rejects.toThrow('NEXT_REDIRECT')
 
     expect(revalidatePath).not.toHaveBeenCalled()
@@ -53,13 +53,13 @@ describe('updatePrimaryColor', () => {
     const supabase = mockSupabaseClient({ user: { id: 'u1' }, from: { households } })
     vi.mocked(createClient).mockResolvedValue(supabase as never)
 
-    await updatePrimaryColor(formData({ householdId: '1', householdName: 'name', color: '#abcdef' }))
+    await updatePrimaryColor(formData({ householdId: '1', color: '#abcdef' }))
 
     expect(households.update).toHaveBeenCalledWith({ primary_color: '#abcdef' })
     expect(households.eq).toHaveBeenCalledWith('id', '1')
-    expect(revalidatePath).toHaveBeenCalledWith('/household/name')
-    expect(revalidatePath).toHaveBeenCalledWith('/household/name/groceries')
-    expect(revalidatePath).toHaveBeenCalledWith('/household/name/expenses')
-    expect(revalidatePath).toHaveBeenCalledWith('/household/name/laundry')
+    expect(revalidatePath).toHaveBeenCalledWith('/household/1')
+    expect(revalidatePath).toHaveBeenCalledWith('/household/1/groceries')
+    expect(revalidatePath).toHaveBeenCalledWith('/household/1/expenses')
+    expect(revalidatePath).toHaveBeenCalledWith('/household/1/laundry')
   })
 })

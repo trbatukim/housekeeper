@@ -17,13 +17,12 @@ export async function addExpense(formData: FormData) {
     }
 
     const householdId = formData.get('householdId') as string
-    const householdName = formData.get('householdName') as string
     const description = (formData.get('description') as string).trim()
     const amount = Number(formData.get('amount') as string)
     const currency = formData.get('currency') as string
     const category = formData.get('category') as string
     const paidOn = formData.get('paidOn') as string
-    const expensesPath = `/household/${encodeURIComponent(householdName)}/expenses`
+    const expensesPath = `/household/${householdId}/expenses`
     const todayStr = new Date().toISOString().split('T')[0]
 
     if (!description || Number.isNaN(amount) || amount <= 0) {
@@ -86,9 +85,8 @@ export async function deleteExpense(formData: FormData) {
     }
 
     const householdId = formData.get('householdId') as string
-    const householdName = formData.get('householdName') as string
     const expenseId = formData.get('expenseId') as string
-    const expensesPath = `/household/${encodeURIComponent(householdName)}/expenses`
+    const expensesPath = `/household/${householdId}/expenses`
 
     const { error } = await supabase
         .from('expenses')
@@ -144,7 +142,7 @@ export async function rolloverRecurringExpenses(householdId: string) {
 export async function toggleExpense(
     expenseId: string,
     isPaid: boolean,
-    householdName: string
+    householdId: string
 ) {
     const supabase = await createClient()
     const { error } = await supabase
@@ -153,7 +151,7 @@ export async function toggleExpense(
         .eq('id', expenseId)
 
     if (error) console.error(error)
-    revalidatePath(`/household/${encodeURIComponent(householdName)}/expenses`)
+    revalidatePath(`/household/${householdId}/expenses`)
 }
 
 export async function sendReminder(formData: FormData) {
@@ -168,7 +166,7 @@ export async function sendReminder(formData: FormData) {
     const householdName = formData.get('householdName') as string
     const expenseDesc = formData.get('expenseDesc') as string
     const dueDate = formData.get('dueDate') as string
-    const expensesPath = `/household/${encodeURIComponent(householdName)}/expenses`
+    const expensesPath = `/household/${householdId}/expenses`
 
     const { data: profile } = await supabase
         .from('profiles')

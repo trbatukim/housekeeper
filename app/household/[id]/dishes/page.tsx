@@ -15,11 +15,18 @@ const DEFAULT_COLOR = '#a98bff'
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ name: string }>
+  params: Promise<{ id: string }>
 }): Promise<Metadata> {
-  const { name } = await params
+  const { id } = await params
+  const supabase = await createClient()
+  const { data: household } = await supabase
+    .from('households')
+    .select('name')
+    .eq('id', id)
+    .maybeSingle()
+
   return {
-    title: `Dishes - ${decodeURIComponent(name)}`,
+    title: `Dishes - ${household?.name ?? 'Household'}`,
   }
 }
 
@@ -27,11 +34,10 @@ export default async function DishesPage({
     params,
     searchParams
 }: {
-    params: Promise<{ name: string }>
+    params: Promise<{ id: string }>
     searchParams: Promise<{ error?: string }>
 }) {
-    const { name } = await params
-    const decodedName = decodeURIComponent(name)
+    const { id } = await params
     const { error: errorMessage } = await searchParams
 
     const supabase = await createClient()
@@ -43,8 +49,8 @@ export default async function DishesPage({
 
     const { data: household } = await supabase
         .from('households')
-        .select('id, primary_color')
-        .eq('name', decodedName)
+        .select('id, name, primary_color')
+        .eq('id', id)
         .maybeSingle()
 
     if (!household) {
@@ -68,21 +74,21 @@ export default async function DishesPage({
     return (
         <div className={styles.page} style={{ '--primary': primaryColor } as CSSProperties}>
             <HouseholdThemeSync color={primaryColor} />
-            <Link href={`/household/${decodedName}`} className={styles.themedBackButton}>&larr; Back</Link>
+            <Link href={`/household/${household.id}`} className={styles.themedBackButton}>&larr; Back</Link>
             <h1 className={styles.pageTitle}>Dishes</h1>
             <p className={styles.note}>To get notifications, subscribe to the ntfy topic: ntfy.sh/{household.id} <Link href="../../ntfy-info">More info</Link></p>
-            <div className={styles.card}> 
+            <div className={styles.card}>
                 <ul className={styles.list}>
                     {dishesStatus?.map((dishes, index) => (
                         <li className={styles.item} key={index}>
-                            <DishesItem householdId={household.id} status={dishes.status} householdName={decodedName} locked={isDishwasherRunning} />
+                            <DishesItem householdId={household.id} status={dishes.status} locked={isDishwasherRunning} />
                         </li>
                     ))}
                 </ul>
-            
+
                 <form action={addDishwasher} className={styles.form}>
                     <input type="hidden" name="householdId" value={household.id} />
-                    <input type="hidden" name="householdName" value={decodedName} />
+                    <input type="hidden" name="householdName" value={household.name} />
                     <EndTimePicker />
                     <button type="submit" className={styles.button}>Add</button>
                 </form>
@@ -93,10 +99,9 @@ export default async function DishesPage({
                     <ul className={styles.list}>
                         {dishwasherLoads.map((load) => (
                             <li key={load.id} className={styles.item}>
-                                <DishwasherItem item={load} householdName={decodedName} />
+                                <DishwasherItem item={load} />
                                 <form action={deleteDishwasher}>
                                     <input type="hidden" name="householdId" value={household.id} />
-                                    <input type="hidden" name="householdName" value={decodedName} />
                                     <input type="hidden" name="dishwasherId" value={load.id} />
                                     <input type="hidden" name="notificationId" value={load.ntfy_seq_id ?? ''} />
                                     <button type="submit" className="negativeButton">Delete</button>
