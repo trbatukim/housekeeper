@@ -91,7 +91,7 @@ export default async function ExpensesPage({
                         <option value='recurring'>Recurring</option>
                     </select>
 
-                    <input type="date" name="paidOn" className={styles.input} />
+                    <input type="date" name="paidOn" placeholder="Date" className={styles.input} />
                     <button type="submit" className={styles.button}>Add</button>
                 </form>
 
