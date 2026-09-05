@@ -34,7 +34,7 @@ export default async function FeedbackPage({
 
     return (
         <div className="container">
-            <Link href={page} className="backButton">&larr; Back</Link>
+            <Link href='/' className="backButton">&larr; Back to Home</Link>
             <h1 className="title">Feedback</h1>
             <div className="contentBox">
                 <form action={submitFeedback} className={styles.form}>

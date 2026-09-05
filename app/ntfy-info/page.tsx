@@ -8,22 +8,12 @@ export const metadata: Metadata = {
     title: "ntfy Info"
 }
 
-function refererPath(referer: string | null): string {
-    if (!referer) return '/household'
-    try {
-        return new URL(referer).pathname
-    } catch {
-        return '/household'
-    }
-}
-
 export default async function NtfyInfoPage() {
     const headersList = await headers()
-    const page = refererPath(headersList.get('referer'))
 
     return (
         <div className="container">
-            <Link href={page} className="backButton">&larr; Back</Link>
+            <Link href='/' className="backButton">&larr; Back to Home</Link>
             <h1 className="title" style={{ marginTop: 20 }}>ntfy Info</h1>
             <div className="contentBox" style={{ marginBottom: 60 }}>
                 <p>
