@@ -9,7 +9,7 @@ function formatCategory(category: string) {
 
 export default function ExpenseItem({
     expense,
-    householdName,
+    householdId,
 }: {
     expense: {
         id: string
@@ -20,13 +20,13 @@ export default function ExpenseItem({
         paid_on: string
         is_paid: boolean
     }
-    householdName: string
+    householdId: string
 }) {
     const [isPaid, setIsPaid] = useState(expense.is_paid)
     const [, startTransition] = useTransition()
 
     const currencyMap = new Map<string, string>([
-        ['euro', '€'], 
+        ['euro', '€'],
         ['tl', '₺'],
         ['dollar', '$'],
         ['pound', '£']
@@ -36,7 +36,7 @@ export default function ExpenseItem({
         const next = !isPaid
         setIsPaid(next) // updates instantly, before the server responds
         startTransition(() => {
-            toggleExpense(expense.id, next, householdName)
+            toggleExpense(expense.id, next, householdId)
         })
     }
 

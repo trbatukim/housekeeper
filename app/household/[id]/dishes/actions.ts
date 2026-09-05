@@ -7,8 +7,7 @@ import { computeDurationSeconds, isValidDuration } from '@/lib/duration'
 
 export async function toggleDishesStatus(
     householdId: string,
-    newStatus: string,
-    householdName: string
+    newStatus: string
 ) {
     const supabase = await createClient()
     const { error } = await supabase
@@ -17,7 +16,7 @@ export async function toggleDishesStatus(
     .eq('household_id', householdId)
 
     if (error) console.error(error)
-    revalidatePath(`/household/${encodeURIComponent(householdName)}/dishes`)
+    revalidatePath(`/household/${householdId}/dishes`)
 }
 
 export async function addDishwasher(formData: FormData) {
@@ -33,7 +32,7 @@ export async function addDishwasher(formData: FormData) {
     const hours = Number(formData.get('hours')) || 0
     const minutes = Number(formData.get('minutes')) || 0
     const durationSeconds = computeDurationSeconds(hours, minutes)
-    const dishesPath = `/household/${encodeURIComponent(householdName)}/dishes`
+    const dishesPath = `/household/${householdId}/dishes`
 
     if (!isValidDuration(durationSeconds)) {
         redirect(`${dishesPath}?error=${encodeURIComponent('Set an end time for the load.')}`)
@@ -76,10 +75,9 @@ export async function deleteDishwasher(formData: FormData) {
     }
 
     const householdId = formData.get('householdId') as string
-    const householdName = formData.get('householdName') as string
     const dishwasherId = formData.get('dishwasherId') as string
     const notificationId = formData.get('notificationId') as string
-    const dishesPath = `/household/${encodeURIComponent(householdName)}/dishes`
+    const dishesPath = `/household/${householdId}/dishes`
 
     const { data, error } = await supabase
         .from('dishwasher_loads')

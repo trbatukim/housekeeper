@@ -15,13 +15,12 @@ export async function addGroceryItem(formData: FormData) {
     }
 
     const householdId = formData.get('householdId') as string
-    const householdName = formData.get('householdName') as string
     const name = (formData.get('name') as string).trim()
     const amountRaw = formData.get('amount') as string | null
     const selectedAmountType = formData.get('amountType') as string | null
     const customAmountType = (formData.get('customAmountType') as string | null)?.trim()
     const amountType = selectedAmountType === CUSTOM_AMOUNT_TYPE ? customAmountType : selectedAmountType
-    const groceriesPath = `/household/${encodeURIComponent(householdName)}/groceries`
+    const groceriesPath = `/household/${householdId}/groceries`
 
     if (!name) {
         redirect(`${groceriesPath}?error=${encodeURIComponent('Item name cannot be empty.')}`)
@@ -76,8 +75,7 @@ export async function clearGroceryList(formData: FormData) {
     }
 
     const householdId = formData.get('householdId') as string
-    const householdName = formData.get('householdName') as string
-    const groceriesPath = `/household/${encodeURIComponent(householdName)}/groceries`
+    const groceriesPath = `/household/${householdId}/groceries`
 
     const { error } = await supabase
         .from('grocery_items')
@@ -100,8 +98,7 @@ export async function clearCheckedGroceries(formData: FormData) {
     }
 
     const householdId = formData.get('householdId') as string
-    const householdName = formData.get('householdName') as string
-    const groceriesPath = `/household/${encodeURIComponent(householdName)}/groceries`
+    const groceriesPath = `/household/${householdId}/groceries`
 
     const { error } = await supabase
         .from('grocery_items')
@@ -125,9 +122,8 @@ export async function deleteGrocery(formData: FormData) {
     }
 
     const householdId = formData.get('householdId') as string
-    const householdName = formData.get('householdName') as string
     const itemId = formData.get('itemId') as string
-    const groceriesPath = `/household/${encodeURIComponent(householdName)}/groceries`
+    const groceriesPath = `/household/${householdId}/groceries`
 
     const { error } = await supabase
         .from('grocery_items')
@@ -145,7 +141,7 @@ export async function deleteGrocery(formData: FormData) {
 export async function toggleGrocery(
   itemId: string,
   isPurchased: boolean,
-  householdName: string
+  householdId: string
 ) {
   const supabase = await createClient()
   const { error } = await supabase
@@ -154,7 +150,7 @@ export async function toggleGrocery(
     .eq('id', itemId)
 
   if (error) console.error(error)
-  revalidatePath(`/household/${encodeURIComponent(householdName)}/groceries`)
+  revalidatePath(`/household/${householdId}/groceries`)
 }
 
 export async function sendReminder(formData: FormData) {
@@ -167,7 +163,7 @@ export async function sendReminder(formData: FormData) {
 
     const householdId = formData.get('householdId') as string
     const householdName = formData.get('householdName') as string
-    const groceriesPath = `/household/${encodeURIComponent(householdName)}/groceries`
+    const groceriesPath = `/household/${householdId}/groceries`
 
     const { data: profile } = await supabase
         .from('profiles')

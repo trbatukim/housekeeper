@@ -14,11 +14,18 @@ const DEFAULT_COLOR = '#a98bff'
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ name: string }>
+  params: Promise<{ id: string }>
 }): Promise<Metadata> {
-  const { name } = await params
+  const { id } = await params
+  const supabase = await createClient()
+  const { data: household } = await supabase
+    .from('households')
+    .select('name')
+    .eq('id', id)
+    .maybeSingle()
+
   return {
-    title: decodeURIComponent(name),
+    title: household?.name ?? 'Household',
   }
 }
 
@@ -26,11 +33,10 @@ export default async function HouseholdPage({
   params,
   searchParams,
 }: {
-  params: Promise<{ name: string }>
+  params: Promise<{ id: string }>
   searchParams: Promise<{ error?: string }>
 }) {
-  const { name } = await params
-  const decodedName = decodeURIComponent(name)
+  const { id } = await params
   const { error: errorMessage } = await searchParams
 
   const supabase = await createClient()
@@ -44,7 +50,7 @@ export default async function HouseholdPage({
     .from('profiles_to_households')
     .select('households!inner(id, name, primary_color)')
     .eq('profile_id', user.id)
-    .eq('households.name', decodedName)
+    .eq('households.id', id)
     .maybeSingle()
 
   if (error || !membership) {
@@ -88,20 +94,20 @@ export default async function HouseholdPage({
 
         </div>
         <nav className={styles.nav}>
-          <Link href={`/household/${household.name}/groceries`} className={styles.navLink}>
+          <Link href={`/household/${household.id}/groceries`} className={styles.navLink}>
             Groceries
           </Link>
-          <Link href={`/household/${household.name}/expenses`} className={styles.navLink}>
+          <Link href={`/household/${household.id}/expenses`} className={styles.navLink}>
             Expenses
           </Link>
-          <Link href={`/household/${household.name}/laundry`} className={styles.navLink}>
+          <Link href={`/household/${household.id}/laundry`} className={styles.navLink}>
             Laundry
           </Link>
-          <Link href={`/household/${household.name}/dishes`} className={styles.navLink}>
+          <Link href={`/household/${household.id}/dishes`} className={styles.navLink}>
             Dishes
           </Link>
         </nav>
-        <ColorPicker householdId={household.id} householdName={household.name} color={primaryColor} />
+        <ColorPicker householdId={household.id} color={primaryColor} />
         {errorMessage && <p className="error">{errorMessage}</p>}
       </div>
     </div>

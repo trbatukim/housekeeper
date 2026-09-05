@@ -45,7 +45,7 @@ export default async function Households() {
             {households.map((household) => (
               <li key={household.id} className={styles.item}>
                 <Link
-                  href={`/household/${encodeURIComponent(household.name)}`}
+                  href={`/household/${household.id}`}
                   className={`link ${styles.linkGrow}`}
                 >
                   {household.name}

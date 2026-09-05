@@ -7,7 +7,6 @@ export default function LaundryItem({
     item,
 }: {
     item: { id: string; ends_at: string; status: string }
-    householdName: string
 }) {
 
     return (

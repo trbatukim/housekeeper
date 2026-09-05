@@ -14,11 +14,18 @@ const DEFAULT_COLOR = '#a98bff'
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ name: string }>
+  params: Promise<{ id: string }>
 }): Promise<Metadata> {
-  const { name } = await params
+  const { id } = await params
+  const supabase = await createClient()
+  const { data: household } = await supabase
+    .from('households')
+    .select('name')
+    .eq('id', id)
+    .maybeSingle()
+
   return {
-    title: `Expenses - ${decodeURIComponent(name)}`,
+    title: `Expenses - ${household?.name ?? 'Household'}`,
   }
 }
 
@@ -26,11 +33,10 @@ export default async function ExpensesPage({
     params,
     searchParams,
 }: {
-    params: Promise<{ name: string }>
+    params: Promise<{ id: string }>
     searchParams: Promise<{ error?: string }>
 }) {
-    const { name } = await params
-    const decodedName = decodeURIComponent(name)
+    const { id } = await params
     const { error: errorMessage } = await searchParams
 
     const supabase = await createClient()
@@ -42,8 +48,8 @@ export default async function ExpensesPage({
 
     const { data: household } = await supabase
         .from('households')
-        .select('id, primary_color')
-        .eq('name', decodedName)
+        .select('id, name, primary_color')
+        .eq('id', id)
         .maybeSingle()
 
     if (!household) {
@@ -63,14 +69,13 @@ export default async function ExpensesPage({
     return (
         <div className={styles.page} style={{ '--primary': primaryColor } as CSSProperties}>
             <HouseholdThemeSync color={primaryColor} />
-            <Link href={`/household/${decodedName}`} className={styles.themedBackButton}>&larr; Back</Link>
+            <Link href={`/household/${household.id}`} className={styles.themedBackButton}>&larr; Back</Link>
             <h1 className={styles.pageTitle}>Expenses</h1>
             <p className={styles.note}>To get notifications, subscribe to the ntfy topic: ntfy.sh/{household.id} <Link href="../../ntfy-info">More info</Link></p>
             <div className={styles.card}>
                 <form action={addExpense} className={styles.form}>
                     <input type="hidden" name="householdId" value={household.id} />
-                    <input type="hidden" name="householdName" value={decodedName} />
-                    
+
                     <input type="text" name="description" placeholder="Description" required maxLength={TEXT_MAX_LENGTH} className={styles.input} />
                     
                     <input type="number" step="0.01" name="amount" required placeholder="Price" className={styles.input} />
@@ -95,17 +100,16 @@ export default async function ExpensesPage({
                 <ul className={styles.list}>
                     {expenses?.map((expense) => (
                         <li key={expense.id} className={styles.item}>
-                            <ExpenseItem expense={expense} householdName={decodedName} />
+                            <ExpenseItem expense={expense} householdId={household.id} />
                             <form action={sendReminder} className={styles.toolbarFormGroup}>
                                 <input type="hidden" name="householdId" value={household.id} />
-                                <input type="hidden" name="householdName" value={decodedName} />
+                                <input type="hidden" name="householdName" value={household.name} />
                                 <input type="hidden" name="expenseDesc" value={expense.description} />
                                 <input type="hidden" name="dueDate" value={expense.paid_on} />
                                 <button type="submit" className={`${styles.button} ${styles.itemButton}`} title="Send reminder">Remind</button>
                             </form>
                             <form action={deleteExpense}>
                                 <input type="hidden" name="householdId" value={household.id} />
-                                <input type="hidden" name="householdName" value={decodedName} />
                                 <input type="hidden" name="expenseId" value={expense.id} />
                                 <button type="submit" className="negativeButton">Delete</button>
                             </form>

@@ -27,13 +27,13 @@ describe('createHousehold', () => {
     })
 
     it('creates new household when everything is valid', async () => {
-        const supabase = mockSupabaseClient({ user: { id: 'u1' } })
+        const supabase = mockSupabaseClient({ user: { id: 'u1' }, rpcResult: queryResult('h1') })
         vi.mocked(createClient).mockResolvedValue(supabase as never)
 
-        await expect(createHousehold(formData({ name: 'name' })))
-            .rejects.toThrow('NEXT_REDIRECT')
+        const error: { digest?: string } = await createHousehold(formData({ name: 'name' })).catch(e => e)
 
         expect(supabase.rpc).toHaveBeenCalledWith('create_household_and_join', { household_name: 'name' })
+        expect(error.digest).toContain('/household/h1')
     })
 })
 
@@ -54,15 +54,13 @@ describe('joinHousehold', () => {
 
     it('joins new household on valid id', async () => {
         const profilesToHouseholds = mockQueryBuilder(queryResult(null))
-        const households = mockQueryBuilder(queryResult({ name: 'house' }))
-        const supabase = mockSupabaseClient({ user: { id: 'u1' }, from: { profiles_to_households: profilesToHouseholds, households } })
+        const supabase = mockSupabaseClient({ user: { id: 'u1' }, from: { profiles_to_households: profilesToHouseholds } })
         vi.mocked(createClient).mockResolvedValue(supabase as never)
 
-        await expect(joinHousehold(formData({ householdId: 'h1' })))
-            .rejects.toThrow('NEXT_REDIRECT')
+        const error: { digest?: string } = await joinHousehold(formData({ householdId: 'h1' })).catch(e => e)
 
         expect(supabase.from).toHaveBeenCalledWith('profiles_to_households')
-        expect(supabase.from).toHaveBeenCalledWith('households')
+        expect(error.digest).toContain('/household/h1')
     })
 
     it('redirects with an error when no household exists with that id', async () => {

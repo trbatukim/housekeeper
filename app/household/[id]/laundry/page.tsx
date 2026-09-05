@@ -14,11 +14,18 @@ const DEFAULT_COLOR = '#a98bff'
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ name: string }>
+  params: Promise<{ id: string }>
 }): Promise<Metadata> {
-  const { name } = await params
+  const { id } = await params
+  const supabase = await createClient()
+  const { data: household } = await supabase
+    .from('households')
+    .select('name')
+    .eq('id', id)
+    .maybeSingle()
+
   return {
-    title: `Laundry - ${decodeURIComponent(name)}`,
+    title: `Laundry - ${household?.name ?? 'Household'}`,
   }
 }
 
@@ -26,11 +33,10 @@ export default async function LaundryPage({
     params,
     searchParams,
 }: {
-    params: Promise<{ name: string }>
+    params: Promise<{ id: string }>
     searchParams: Promise<{ error?: string }>
 }) {
-    const { name } = await params
-    const decodedName = decodeURIComponent(name)
+    const { id } = await params
     const { error: errorMessage } = await searchParams
 
     const supabase = await createClient()
@@ -42,8 +48,8 @@ export default async function LaundryPage({
 
     const { data: household } = await supabase
         .from('households')
-        .select('id, primary_color')
-        .eq('name', decodedName)
+        .select('id, name, primary_color')
+        .eq('id', id)
         .maybeSingle()
 
     if (!household) {
@@ -61,13 +67,13 @@ export default async function LaundryPage({
     return (
         <div className={styles.page} style={{ '--primary': primaryColor } as CSSProperties}>
             <HouseholdThemeSync color={primaryColor} />
-            <Link href={`/household/${decodedName}`} className={styles.themedBackButton}>&larr; Back</Link>
+            <Link href={`/household/${household.id}`} className={styles.themedBackButton}>&larr; Back</Link>
             <h1 className={styles.pageTitle}>Laundry</h1>
             <p className={styles.note}>To get notifications, subscribe to the ntfy topic: ntfy.sh/{household.id} <Link href="../../ntfy-info">More info</Link></p>
             <div className={styles.card}>
                 <form action={addLaundry} className={styles.form}>
                     <input type="hidden" name="householdId" value={household.id} />
-                    <input type="hidden" name="householdName" value={decodedName} />
+                    <input type="hidden" name="householdName" value={household.name} />
                     <EndTimePicker />
                     <button type="submit" className={styles.button}>Add</button>
                 </form>
@@ -78,10 +84,9 @@ export default async function LaundryPage({
                     <ul className={styles.list}>
                         {laundryLoads.map((load) => (
                             <li key={load.id} className={styles.item}>
-                                <LaundryItem item={load} householdName={decodedName} />
+                                <LaundryItem item={load} />
                                 <form action={deleteLaundry}>
                                     <input type="hidden" name="householdId" value={household.id} />
-                                    <input type="hidden" name="householdName" value={decodedName} />
                                     <input type="hidden" name="laundryId" value={load.id} />
                                     <input type="hidden" name="notificationId" value={load.ntfy_seq_id ?? ''} />
                                     <button type="submit" className="negativeButton">Delete</button>
