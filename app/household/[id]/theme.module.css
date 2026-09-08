@@ -578,6 +578,14 @@
   white-space: nowrap;
 }
 
+.itemActions {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  gap: 8px;
+}
+
 .topRightButtons {
   position: absolute;
   top: calc(24px + env(safe-area-inset-top));
@@ -702,4 +710,103 @@
   background: color-mix(in srgb, var(--primary, #a98bff) 8%, rgba(230, 220, 255, 0.05));
   border: 1px solid color-mix(in srgb, var(--primary, #a98bff) 12%, transparent);
   color: #f5f1ff;
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(10, 8, 16, 0.55);
+
+  /* Portaled to document.body, so it can't inherit --bg-end computed on .page — recompute it here from --primary. */
+  --bg-end: rgb(
+    from var(--primary, #a98bff)
+    calc(28 + 0.18 * (r - 169))
+    calc(19 + 0.18 * (g - 139))
+    calc(48 + 0.18 * (b - 255))
+  );
+}
+
+.modalPanel {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 28px;
+  border-radius: 14px;
+  background: var(--bg-end, #1c1330);
+  border: 1px solid color-mix(in srgb, var(--primary, #a98bff) 20%, transparent);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  animation: modalIn 0.15s ease-out;
+}
+
+.modalPanelClosing {
+  animation: modalOut 0.15s ease-in forwards;
+}
+
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes modalOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modalTitle {
+  color: var(--primary, #a98bff);
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.modalClose {
+  padding: 2px 8px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #9187a3;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.modalClose:hover {
+  color: #f5f1ff;
+}
+
+.modalForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
 }
