@@ -226,6 +226,26 @@ body {
   transition: background 0.15s ease, color 0.15s ease;
 }
 
+.demoBanner {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+
+  padding: 10px 16px calc(10px + env(safe-area-inset-top));
+  padding-top: max(10px, env(safe-area-inset-top));
+
+  text-align: center;
+  font-size: 14px;
+  color: #f5f1ff;
+  background: color-mix(in srgb, var(--primary, #a98bff) 35%, rgb(20, 16, 31));
+}
+
+.demoBanner a {
+  color: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
 .feedbackButton {
   position: absolute;
   bottom: calc(24px + env(safe-area-inset-bottom));

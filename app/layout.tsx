@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Comic_Neue } from "next/font/google";
 import "./globals.css";
 import FeedbackButton from "./FeedbackButton";
+import DemoBanner from "./DemoBanner";
 import { HouseholdThemeProvider } from "./HouseholdThemeContext";
 
 const geistSans = Geist({
@@ -54,6 +55,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col">
         <HouseholdThemeProvider>
+          <DemoBanner />
           {children}
           <FeedbackButton />
         </HouseholdThemeProvider>

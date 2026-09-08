@@ -1,11 +1,18 @@
 import Link from 'next/link'
 import type { Metadata } from "next";
+import { startDemo } from '../demo/actions'
 
 export const metadata: Metadata = {
   title: "Welcome"
 }
 
-export default async function WelcomePage() {
+export default async function WelcomePage({
+    searchParams,
+}: {
+    searchParams: Promise<{ error?: string }>
+}) {
+    const { error: errorMessage } = await searchParams
+
     return (
         <div className="container">
             <h1 className="titleRow">
@@ -16,6 +23,10 @@ export default async function WelcomePage() {
                     <Link href="/signup" className="link">Sign-Up</Link>
                     <Link href="/login" className="link">Login</Link>
                 </div>
+                <form action={startDemo}>
+                    <button type="submit" className="link">Explore Demo</button>
+                </form>
+                {errorMessage && <p className="error">{errorMessage}</p>}
             </div>
         </div>
     )

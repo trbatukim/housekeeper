@@ -13,11 +13,13 @@ export async function signup(formData: FormData) {
     redirect(`/signup?error=${encodeURIComponent(`Name cannot exceed ${NAME_MAX_LENGTH} characters.`)}`)
   }
 
-  const { error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: { data: { name } },
-  })
+  const { data: { user } } = await supabase.auth.getUser()
+
+  // An anonymous demo user converts in place, keeping their household and data.
+  const { error } = user?.is_anonymous
+    ? await supabase.auth.updateUser({ email, password, data: { name } })
+    : await supabase.auth.signUp({ email, password, options: { data: { name } } })
+
   if (error) {
     redirect(`/signup?error=${encodeURIComponent(error.message)}`)
   }

@@ -32,7 +32,7 @@ export function mockQueryBuilder(result: QueryResult) {
 }
 
 export function mockSupabaseClient(overrides: {
-  user?: { id: string } | null
+  user?: { id: string; is_anonymous?: boolean } | null
   from?: Record<string, ReturnType<typeof mockQueryBuilder>>
   rpcResult?: QueryResult
   authError?: PostgrestError | null
@@ -48,6 +48,8 @@ export function mockSupabaseClient(overrides: {
       getUser: vi.fn(async () => ({ data: { user: overrides.user ?? null } })),
       signInWithPassword: vi.fn(async () => ({ error: overrides.authError ?? null })),
       signUp: vi.fn(async () => ({ error: overrides.authError ?? null })),
+      signInAnonymously: vi.fn(async () => ({ error: overrides.authError ?? null })),
+      updateUser: vi.fn(async () => ({ error: overrides.authError ?? null })),
     },
     from: fromMock,
     rpc: vi.fn(async () => overrides.rpcResult ?? queryResult(null)),
