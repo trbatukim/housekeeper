@@ -4,6 +4,7 @@ import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import type { CSSProperties } from 'react'
 import ExpenseItem from './ExpenseItem'
+import EditExpenseItem from './EditExpenseItem'
 import styles from '../theme.module.css'
 import HouseholdThemeSync from '../../../HouseholdThemeSync'
 import type { Metadata } from "next";
@@ -101,18 +102,21 @@ export default async function ExpensesPage({
                     {expenses?.map((expense) => (
                         <li key={expense.id} className={styles.item}>
                             <ExpenseItem expense={expense} householdId={household.id} />
-                            <form action={sendReminder} className={styles.toolbarFormGroup}>
-                                <input type="hidden" name="householdId" value={household.id} />
-                                <input type="hidden" name="householdName" value={household.name} />
-                                <input type="hidden" name="expenseDesc" value={expense.description} />
-                                <input type="hidden" name="dueDate" value={expense.paid_on} />
-                                <button type="submit" className={`${styles.button} ${styles.itemButton}`} title="Send reminder">Remind</button>
-                            </form>
-                            <form action={deleteExpense}>
-                                <input type="hidden" name="householdId" value={household.id} />
-                                <input type="hidden" name="expenseId" value={expense.id} />
-                                <button type="submit" className="negativeButton">Delete</button>
-                            </form>
+                            <div className={styles.itemActions}>
+                                <form action={sendReminder} className={styles.toolbarFormGroup}>
+                                    <input type="hidden" name="householdId" value={household.id} />
+                                    <input type="hidden" name="householdName" value={household.name} />
+                                    <input type="hidden" name="expenseDesc" value={expense.description} />
+                                    <input type="hidden" name="dueDate" value={expense.paid_on} />
+                                    <button type="submit" className={`${styles.button} ${styles.itemButton}`} title="Send reminder">Remind</button>
+                                </form>
+                                <EditExpenseItem expense={expense} householdId={household.id} primaryColor={primaryColor} />
+                                <form action={deleteExpense}>
+                                    <input type="hidden" name="householdId" value={household.id} />
+                                    <input type="hidden" name="expenseId" value={expense.id} />
+                                    <button type="submit" className="negativeButton">Delete</button>
+                                </form>
+                            </div>
                         </li>
                     ))}
                 </ul>

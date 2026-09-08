@@ -33,3 +33,29 @@ export async function updatePrimaryColor(formData: FormData) {
     revalidatePath(`${path}/expenses`)
     revalidatePath(`${path}/laundry`)
 }
+
+export async function editHouseholdName(formData: FormData) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+        return
+    }
+
+    const id = formData.get('householdId') as string
+    const name = formData.get('householdName') as string
+    const householdPath = `/household/${id}`
+
+    const { error } = await supabase
+        .from('households')
+        .update({
+            name
+        })
+        .eq('id', id)
+
+    if (error) {
+        redirect(`${householdPath}?error=${encodeURIComponent(error.message)}`)
+    }
+
+    revalidatePath(householdPath)
+}

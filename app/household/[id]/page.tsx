@@ -7,7 +7,8 @@ import ColorPicker from './ColorPicker'
 import CopyButton from './CopyButton'
 import MembersSidebar from './MembersSidebar'
 import HouseholdThemeSync from '../../HouseholdThemeSync'
-import type { Metadata } from "next";
+import type { Metadata } from "next"
+import EditHouseholdName from './EditHouseholdName'
 
 const DEFAULT_COLOR = '#a98bff'
 
@@ -85,7 +86,10 @@ export default async function HouseholdPage({
       </div>
       <div className={styles.card}>
         <div className={styles.header}>
-          <h1 className={styles.themedTitle}>{household.name}</h1>
+          <div className={styles.itemActions}>
+            <h1 className={styles.themedTitle}>{household.name}</h1>
+            <EditHouseholdName household={household} primaryColor={primaryColor}></EditHouseholdName>
+          </div>
 
           <div className={styles.idBadgeContainer}>
             <span className={styles.idBadge}>ID: {household.id}</span>

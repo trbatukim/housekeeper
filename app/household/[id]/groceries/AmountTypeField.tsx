@@ -4,15 +4,25 @@ import styles from '../theme.module.css'
 import { CUSTOM_AMOUNT_TYPE } from './constants'
 import { NAME_MAX_LENGTH } from '@/lib/textLimits'
 
-export default function AmountTypeField() {
-    const [isCustom, setIsCustom] = useState(false)
+const KNOWN_AMOUNT_TYPES = [
+    'g', 'kg', 'mL', 'L', 'pcs', 'dozen',
+    'packet(s)', 'bottle(s)', 'can(s)', 'bag(s)', 'jar(s)', 'loaf/loaves',
+]
+
+export default function AmountTypeField({
+    defaultAmountType = 'g',
+}: {
+    defaultAmountType?: string
+}) {
+    const isKnown = KNOWN_AMOUNT_TYPES.includes(defaultAmountType)
+    const [isCustom, setIsCustom] = useState(!isKnown)
 
     return (
         <>
             <select
                 name="amountType"
                 required
-                defaultValue="g"
+                defaultValue={isKnown ? defaultAmountType : CUSTOM_AMOUNT_TYPE}
                 className={styles.select}
                 onChange={(e) => setIsCustom(e.target.value === CUSTOM_AMOUNT_TYPE)}
             >
@@ -37,6 +47,7 @@ export default function AmountTypeField() {
                     placeholder="Custom unit"
                     required
                     maxLength={NAME_MAX_LENGTH}
+                    defaultValue={isKnown ? '' : defaultAmountType}
                     className={styles.input}
                 />
             )}

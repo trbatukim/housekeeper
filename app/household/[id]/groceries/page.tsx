@@ -4,6 +4,7 @@ import Link from 'next/link'
 import type { CSSProperties } from 'react'
 import { addGroceryItem, clearGroceryList, clearCheckedGroceries, deleteGrocery, sendReminder } from './actions'
 import GroceryItem from './GroceryItem'
+import EditGroceryItem from './EditGroceryItem'
 import AmountTypeField from './AmountTypeField'
 import styles from '../theme.module.css'
 import HouseholdThemeSync from '../../../HouseholdThemeSync'
@@ -87,11 +88,14 @@ export default async function Groceries({
                         {groceries?.map((item) => (
                             <li key={item.id} className={styles.item}>
                                 <GroceryItem item={item} householdId={household.id} />
-                                <form action={deleteGrocery}>
-                                    <input type="hidden" name="householdId" value={household.id} />
-                                    <input type="hidden" name="itemId" value={item.id} />
-                                    <button type="submit" className="negativeButton">Delete</button>
-                                </form>
+                                <div className={styles.itemActions}>
+                                    <EditGroceryItem item={item} householdId={household.id} primaryColor={primaryColor} />
+                                    <form action={deleteGrocery}>
+                                        <input type="hidden" name="householdId" value={household.id} />
+                                        <input type="hidden" name="itemId" value={item.id} />
+                                        <button type="submit" className="negativeButton">Delete</button>
+                                    </form>
+                                </div>
                             </li>
                         ))}
                     </ul>
