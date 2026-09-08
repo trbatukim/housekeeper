@@ -4,13 +4,15 @@ A shared household management app. Create or join a household with your roommate
 
 ## Features
 
-- **Accounts & households** — sign up, log in, create a household or join one with its ID, and manage members from a shared sidebar.
+- **Accounts & households** — sign up, log in, create a household or join one with its ID, rename it, and manage members from a shared sidebar.
 - **Household themes** — pick a primary color per household to personalize its pages.
-- **Groceries** — add, check off, and clear a shared shopping list.
-- **Expenses** — log one-time or recurring costs with an amount, category, and paid-on date; recurring expenses roll over automatically.
+- **Groceries** — add, edit, check off, and clear a shared shopping list.
+- **Expenses** — log one-time or recurring costs with an amount, category, and paid-on date; edit them later, and recurring ones roll over automatically.
 - **Laundry** — start a load with an expected end time and track its status.
 - **Dishes** — track sink/dishwasher status and run a dishwasher cycle with an end time.
-- **Notifications** — subscribe to a household's [ntfy.sh](https://ntfy.sh) topic to get notified when laundry or dishwasher cycles finish.
+- **Notifications** — subscribe to a household's [ntfy.sh](https://ntfy.sh) topic to get notified when laundry or dishwasher cycles finish or when your housemates decide to remind you of groceries and expenses.
+- **Demo mode** — click "Explore Demo" on the welcome page to drop into a pre-filled household with no signup, powered by a throwaway Supabase anonymous account. Sign up from inside the demo to keep the data on a real account.
+- **Feedback** — a feedback button on every page for reporting bugs or ideas straight from the app.
 
 ## Tech stack
 
@@ -43,7 +45,9 @@ A shared household management app. Create or join a household with your roommate
 
 3. Apply the database schema to your Supabase project by running [`supabase/schema.sql`](supabase/schema.sql) in the SQL Editor (or via `supabase db push` if you're using the [Supabase CLI](https://supabase.com/docs/guides/local-development/cli/getting-started)). It sets up all tables, row-level security policies, and functions the app depends on.
 
-4. Start the dev server:
+4. In the Supabase dashboard, go to **Authentication → Sign In / Providers** and turn on **Allow anonymous sign-ins**. This is what powers demo mode — without it, the "Explore Demo" button will fail.
+
+5. Start the dev server:
 
    ```bash
    npm run dev
@@ -71,3 +75,11 @@ Re-run that command after making schema changes to keep the file in sync.
 | `npm run lint` | Lint the codebase |
 | `npm run test` | Run the test suite once |
 | `npm run test:watch` | Run tests in watch mode |
+
+## Contributors
+
+[![Contributors](https://contrib.rocks/image?repo=trbatukim/housekeeper)](https://github.com/trbatukim/housekeeper/graphs/contributors)
+
+## License
+
+See [LICENSE](LICENSE).
