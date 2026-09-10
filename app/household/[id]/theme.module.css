@@ -66,7 +66,7 @@
   align-items: center;
   gap: 1.5rem;
   width: 100%;
-  max-width: 700px;
+  max-width: 850px;
   padding: 48px 44px;
   border-radius: 18px;
   border: 1px solid color-mix(in srgb, var(--primary, #a98bff) 20%, transparent);
@@ -552,6 +552,37 @@
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+.daySection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 560px;
+}
+
+.dayDivider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.dayDividerLine {
+  flex: 1;
+  height: 1px;
+  background: color-mix(in srgb, var(--primary, #a98bff) 25%, transparent);
+}
+
+.dayDividerLabel {
+  color: var(--primary, #a98bff);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
 }
 
 .item {

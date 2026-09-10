@@ -110,6 +110,9 @@ export default async function HouseholdPage({
           <Link href={`/household/${household.id}/dishes`} className={styles.navLink}>
             Dishes
           </Link>
+          <Link href={`/household/${household.id}/meal-planner`} className={styles.navLink}>
+            Meal Planner
+          </Link>
         </nav>
         <ColorPicker householdId={household.id} color={primaryColor} />
         {errorMessage && <p className="error">{errorMessage}</p>}
