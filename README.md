@@ -1,22 +1,24 @@
 # HouseKeeper
 
-A shared household management app. Create or join a household with your roommates and keep track of groceries, expenses, laundry, and dishes together, with optional push notifications when a laundry or dishwasher cycle finishes.
+A shared household management app. Create or join a household with your roommates and keep track of groceries, expenses, meals, laundry, and dishes together, with optional push notifications when a laundry or dishwasher cycle finishes.
 
 ## Features
 
-- **Accounts & households** — sign up, log in, create a household or join one with its ID, rename it, and manage members from a shared sidebar.
-- **Household themes** — pick a primary color per household to personalize its pages.
-- **Groceries** — add, edit, check off, and clear a shared shopping list.
-- **Expenses** — log one-time or recurring costs with an amount, category, and paid-on date; edit them later, and recurring ones roll over automatically.
-- **Laundry** — start a load with an expected end time and track its status.
-- **Dishes** — track sink/dishwasher status and run a dishwasher cycle with an end time.
-- **Notifications** — subscribe to a household's [ntfy.sh](https://ntfy.sh) topic to get notified when laundry or dishwasher cycles finish or when your housemates decide to remind you of groceries and expenses.
-- **Demo mode** — click "Explore Demo" on the welcome page to drop into a pre-filled household with no signup, powered by a throwaway Supabase anonymous account. Sign up from inside the demo to keep the data on a real account.
-- **Feedback** — a feedback button on every page for reporting bugs or ideas straight from the app.
+- **Accounts & households**: sign up, log in, create a household or join one with its ID, rename it, and manage members from a shared sidebar.
+- **Household themes**: pick a primary color per household to personalize its pages.
+- **Groceries**: add items with an amount and unit, edit them, check them off, and clear either the whole list or just the checked items.
+- **Expenses**: log one-time or recurring costs with an amount, category, and paid-on date; edit them later, and recurring ones roll over automatically.
+- **Meal planner**: keep a library of the household's meals, give each one its ingredients with amounts and units (picking from ingredients the household already saved, or adding new ones with a custom unit), and plan meals onto the days of the week. Tick the ingredients of any meal to push them straight onto the grocery list, skipping anything that is already there.
+- **Laundry**: start a load with an expected end time and track its status.
+- **Dishes**: track sink/dishwasher status and run a dishwasher cycle with an end time.
+- **Notifications**: subscribe to a household's [ntfy.sh](https://ntfy.sh) topic to get notified when laundry or dishwasher cycles finish or when your housemates decide to remind you of groceries and expenses.
+- **Installable**: ships a web app manifest and icons, so it can be installed from the browser and run as a standalone app on desktop or mobile.
+- **Demo mode**: click "Explore Demo" on the welcome page to drop into a pre-filled household with no signup, powered by a throwaway Supabase anonymous account. Sign up from inside the demo to keep the data on a real account.
+- **Feedback**: a feedback button on every page for reporting bugs or ideas straight from the app.
 
 ## Tech stack
 
-- [Next.js](https://nextjs.org) (App Router) with React 19 and TypeScript
+- [Next.js](https://nextjs.org) 16 (App Router) with React 19 and TypeScript
 - [Supabase](https://supabase.com) for auth and Postgres data
 - [Tailwind CSS](https://tailwindcss.com) v4
 - [Vitest](https://vitest.dev) + Testing Library for tests
@@ -45,7 +47,7 @@ A shared household management app. Create or join a household with your roommate
 
 3. Apply the database schema to your Supabase project by running [`supabase/schema.sql`](supabase/schema.sql) in the SQL Editor (or via `supabase db push` if you're using the [Supabase CLI](https://supabase.com/docs/guides/local-development/cli/getting-started)). It sets up all tables, row-level security policies, and functions the app depends on.
 
-4. In the Supabase dashboard, go to **Authentication → Sign In / Providers** and turn on **Allow anonymous sign-ins**. This is what powers demo mode — without it, the "Explore Demo" button will fail.
+4. In the Supabase dashboard, go to **Authentication → Sign In / Providers** and turn on **Allow anonymous sign-ins**. This is what powers demo mode; without it, the "Explore Demo" button will fail.
 
 5. Start the dev server:
 
