@@ -5,8 +5,8 @@ import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import type { CSSProperties } from 'react'
 import HouseholdThemeSync from '../../../../HouseholdThemeSync'
-import { deleteMeal } from './actions'
 import AddMealItem from './AddMealItem'
+import MealItem from './MealItem'
 
 const DEFAULT_COLOR = '#a98bff'
 
@@ -33,10 +33,10 @@ export default async function Meals({
     searchParams,
 }:{
     params: Promise<{ id: string }>
-    searchParams: Promise<{ error?: string }>
+    searchParams: Promise<{ error?: string; notice?: string }>
 }) {
     const { id } = await params
-    const { error: errorMessage } = await searchParams
+    const { error: errorMessage, notice } = await searchParams
 
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
@@ -61,6 +61,26 @@ export default async function Meals({
         .eq('household_id', household.id)
         .order('created_at')
 
+    const { data: savedIngredients } = await supabase
+        .from('ingredients')
+        .select('id, name, amount, amount_type')
+        .eq('household_id', household.id)
+        .order('created_at', { ascending: false })
+
+    const seenNames = new Set<string>()
+    const ingredientOptions = (savedIngredients ?? [])
+        .filter((ingredient) => {
+            const key = ingredient.name.toLowerCase()
+
+            if (seenNames.has(key)) {
+                return false
+            }
+
+            seenNames.add(key)
+            return true
+        })
+        .sort((a, b) => a.name.localeCompare(b.name))
+
     const primaryColor = household.primary_color ?? DEFAULT_COLOR
 
     return (
@@ -70,30 +90,23 @@ export default async function Meals({
             <h1 className={styles.pageTitle}>Meals</h1>
 
             {errorMessage && <p className="error">{errorMessage}</p>}
+            {notice && <p className={styles.notice}>{notice}</p>}
 
             <div className={styles.card}>
-                <AddMealItem householdId={household.id} primaryColor={primaryColor} />
+                <AddMealItem
+                    householdId={household.id}
+                    primaryColor={primaryColor}
+                    savedIngredients={ingredientOptions}
+                />
 
                 {meals && meals.length > 0 ? (
                     <ul className={styles.list}>
                         {meals.map((meal) => (
-                            <li key={meal.id} className={styles.item}>
-                                <span>
-                                    {meal.name}
-                                    {meal.meal_to_ingredient.length > 0 && (
-                                        <span className={styles.ingredientSummary}>
-                                            {meal.meal_to_ingredient
-                                                .map((ingredient) => `${ingredient.name} (${ingredient.amount} ${ingredient.amount_type})`)
-                                                .join(', ')}
-                                        </span>
-                                    )}
-                                </span>
-                                <form action={deleteMeal}>
-                                    <input type="hidden" name="householdId" value={household.id} />
-                                    <input type="hidden" name="mealId" value={meal.id} />
-                                    <button type="submit" className="negativeButton">Delete</button>
-                                </form>
-                            </li>
+                            <MealItem
+                                key={meal.id}
+                                meal={{ id: meal.id, name: meal.name, ingredients: meal.meal_to_ingredient }}
+                                householdId={household.id}
+                            />
                         ))}
                     </ul>
                 ) : (

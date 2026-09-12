@@ -14,6 +14,13 @@ type IngredientRow = {
   customAmountType: string
 }
 
+type SavedIngredient = {
+  id: string
+  name: string
+  amount: number | null
+  amount_type: string | null
+}
+
 const EMPTY_INGREDIENT: IngredientRow = {
   name: '',
   amount: '',
@@ -24,9 +31,11 @@ const EMPTY_INGREDIENT: IngredientRow = {
 export default function AddMealItem({
   householdId,
   primaryColor,
+  savedIngredients,
 }: {
   householdId: string
   primaryColor: string
+  savedIngredients: SavedIngredient[]
 }) {
   const [open, setOpen] = useState(false)
   const [closing, setClosing] = useState(false)
@@ -35,6 +44,24 @@ export default function AddMealItem({
   const close = () => setClosing(true)
 
   const addIngredient = () => setIngredients((prev) => [...prev, EMPTY_INGREDIENT])
+
+  const addSavedIngredient = (ingredientId: string) => {
+    const saved = savedIngredients.find((ingredient) => ingredient.id === ingredientId)
+
+    if (!saved) {
+      return
+    }
+
+    const unit = saved.amount_type ?? ''
+    const isCustomUnit = unit !== '' && !AMOUNT_TYPES.includes(unit)
+
+    setIngredients((prev) => [...prev, {
+      name: saved.name,
+      amount: saved.amount?.toString() ?? '',
+      amountType: isCustomUnit ? CUSTOM_AMOUNT_TYPE : (unit || AMOUNT_TYPES[0]),
+      customAmountType: isCustomUnit ? unit : '',
+    }])
+  }
 
   const removeIngredient = (index: number) =>
     setIngredients((prev) => prev.filter((_, i) => i !== index))
@@ -156,9 +183,28 @@ export default function AddMealItem({
                     </div>
                   )
                 })}
-                <button type="button" className={styles.button} onClick={addIngredient}>
-                  + Add ingredient
-                </button>
+                <div className={styles.ingredientActions}>
+                  {savedIngredients.length > 0 && (
+                    <select
+                      value=""
+                      onChange={(e) => addSavedIngredient(e.target.value)}
+                      className={styles.select}
+                      aria-label="Add a saved ingredient"
+                    >
+                      <option value="" disabled>Saved ingredient...</option>
+                      {savedIngredients.map((ingredient) => (
+                        <option key={ingredient.id} value={ingredient.id}>
+                          {ingredient.name}
+                          {ingredient.amount != null && ingredient.amount_type &&
+                            ` (${ingredient.amount} ${ingredient.amount_type})`}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                  <button type="button" className={styles.button} onClick={addIngredient}>
+                    + Add ingredient
+                  </button>
+                </div>
               </div>
               <div className={styles.modalActions}>
                 <button type="button" className={styles.button} onClick={close}>

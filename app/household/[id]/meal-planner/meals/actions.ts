@@ -4,6 +4,9 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { NAME_MAX_LENGTH } from '@/lib/textLimits'
 
+const ingredientKey = (name: string, amount: number, amountType: string | null) =>
+    `${name.trim().toLowerCase()}|${amount}|${(amountType ?? '').trim().toLowerCase()}`
+
 export async function addMeal(formData: FormData) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
@@ -78,28 +81,139 @@ export async function addMeal(formData: FormData) {
     }
 
     if (ingredientRows.length > 0) {
-        const { data: insertedIngredients, error: ingredientsError } = await supabase
+        const { data: householdIngredients } = await supabase
             .from('ingredients')
-            .insert(ingredientRows)
-            .select('id')
+            .select('id, name, amount, amount_type')
+            .eq('household_id', householdId)
 
-        if (ingredientsError || !insertedIngredients) {
-            await supabase.from('meals').delete().eq('id', meal.id)
-            redirect(`${mealsPath}?error=${encodeURIComponent(ingredientsError?.message ?? 'Could not add ingredients.')}`)
+        const reusedIds: string[] = []
+        const newRows: typeof ingredientRows = []
+        const seen = new Set<string>()
+
+        for (const row of ingredientRows) {
+            const rowKey = ingredientKey(row.name, row.amount, row.amount_type)
+
+            if (seen.has(rowKey)) {
+                continue
+            }
+
+            seen.add(rowKey)
+
+            const match = (householdIngredients ?? []).find((ingredient) =>
+                ingredientKey(ingredient.name, Number(ingredient.amount), ingredient.amount_type) === rowKey)
+
+            if (match) {
+                reusedIds.push(match.id)
+            } else {
+                newRows.push(row)
+            }
+        }
+
+        const createdIds: string[] = []
+
+        if (newRows.length > 0) {
+            const { data: insertedIngredients, error: ingredientsError } = await supabase
+                .from('ingredients')
+                .insert(newRows)
+                .select('id')
+
+            if (ingredientsError || !insertedIngredients) {
+                await supabase.from('meals').delete().eq('id', meal.id)
+                redirect(`${mealsPath}?error=${encodeURIComponent(ingredientsError?.message ?? 'Could not add ingredients.')}`)
+            }
+
+            createdIds.push(...insertedIngredients.map((ingredient) => ingredient.id))
         }
 
         const { error: linkError } = await supabase
             .from('meal_to_ingredient')
-            .insert(insertedIngredients.map((ingredient) => ({ meal_id: meal.id, ingredient_id: ingredient.id })))
+            .insert([...reusedIds, ...createdIds].map((ingredientId) => ({ meal_id: meal.id, ingredient_id: ingredientId })))
 
         if (linkError) {
-            await supabase.from('ingredients').delete().in('id', insertedIngredients.map((ingredient) => ingredient.id))
+            if (createdIds.length > 0) {
+                await supabase.from('ingredients').delete().in('id', createdIds)
+            }
+
             await supabase.from('meals').delete().eq('id', meal.id)
             redirect(`${mealsPath}?error=${encodeURIComponent(linkError.message)}`)
         }
     }
 
     revalidatePath(mealsPath)
+}
+
+export async function addIngredientsToGroceries(formData: FormData) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+        return
+    }
+
+    const householdId = formData.get('householdId') as string
+    const ingredientIds = formData.getAll('ingredientId') as string[]
+    const mealsPath = `/household/${householdId}/meal-planner/meals`
+
+    if (ingredientIds.length === 0) {
+        redirect(`${mealsPath}?error=${encodeURIComponent('Check at least one ingredient.')}`)
+    }
+
+    const { data: ingredients, error } = await supabase
+        .from('ingredients')
+        .select('name, amount, amount_type')
+        .eq('household_id', householdId)
+        .in('id', ingredientIds)
+
+    if (error) {
+        redirect(`${mealsPath}?error=${encodeURIComponent(error.message)}`)
+    }
+
+    if (!ingredients || ingredients.length === 0) {
+        redirect(`${mealsPath}?error=${encodeURIComponent('Could not find those ingredients.')}`)
+    }
+
+    const { data: groceries } = await supabase
+        .from('grocery_items')
+        .select('name')
+        .eq('household_id', householdId)
+
+    const takenNames = new Set((groceries ?? []).map((item) => item.name.toLowerCase()))
+    const toAdd = ingredients.filter((ingredient) => {
+        const key = ingredient.name.toLowerCase()
+
+        if (takenNames.has(key)) {
+            return false
+        }
+
+        takenNames.add(key)
+        return true
+    })
+
+    if (toAdd.length === 0) {
+        redirect(`${mealsPath}?error=${encodeURIComponent('Those ingredients are already on the grocery list.')}`)
+    }
+
+    const { error: insertError } = await supabase
+        .from('grocery_items')
+        .insert(toAdd.map((ingredient) => ({
+            household_id: householdId,
+            name: ingredient.name,
+            added_by: user.id,
+            amount: ingredient.amount,
+            amount_type: ingredient.amount_type,
+        })))
+
+    if (insertError) {
+        redirect(`${mealsPath}?error=${encodeURIComponent(insertError.message)}`)
+    }
+
+    const skipped = ingredients.length - toAdd.length
+    const notice = skipped > 0
+        ? `Added ${toAdd.length} items to the grocery list (${skipped} items already there).`
+        : `Added ${toAdd.length} items to the grocery list.`
+
+    revalidatePath(`/household/${householdId}/groceries`)
+    redirect(`${mealsPath}?notice=${encodeURIComponent(notice)}`)
 }
 
 export async function deleteMeal(formData: FormData) {
@@ -114,8 +228,7 @@ export async function deleteMeal(formData: FormData) {
     const mealId = formData.get('mealId') as string
     const mealsPath = `/household/${householdId}/meal-planner/meals`
 
-    // Read the links first: deleting the meal cascades them away, but the
-    // ingredient rows they point at belong to this meal and would be orphaned.
+    // Read the links before the delete cascades them away.
     const { data: links } = await supabase
         .from('meal_to_ingredient')
         .select('ingredient_id')
@@ -132,11 +245,23 @@ export async function deleteMeal(formData: FormData) {
     }
 
     if (links && links.length > 0) {
-        await supabase
-            .from('ingredients')
-            .delete()
-            .eq('household_id', householdId)
-            .in('id', links.map((link) => link.ingredient_id))
+        const ingredientIds = links.map((link) => link.ingredient_id)
+
+        const { data: stillLinked } = await supabase
+            .from('meal_to_ingredient')
+            .select('ingredient_id')
+            .in('ingredient_id', ingredientIds)
+
+        const keep = new Set((stillLinked ?? []).map((link) => link.ingredient_id))
+        const orphaned = ingredientIds.filter((ingredientId) => !keep.has(ingredientId))
+
+        if (orphaned.length > 0) {
+            await supabase
+                .from('ingredients')
+                .delete()
+                .eq('household_id', householdId)
+                .in('id', orphaned)
+        }
     }
 
     revalidatePath(mealsPath)
