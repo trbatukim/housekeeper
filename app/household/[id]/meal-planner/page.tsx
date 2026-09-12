@@ -1,38 +1,18 @@
 import styles from '../theme.module.css'
 import type { Metadata } from "next";
-import { NAME_MAX_LENGTH } from '@/lib/textLimits'
 import { createClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import type { CSSProperties } from 'react'
 import HouseholdThemeSync from '../../../HouseholdThemeSync'
+import { DAYS_OF_WEEK, dayLabel, isDayOfWeek, type DayOfWeek } from '@/lib/days'
 import { addMealToDay, deleteMealFromDay } from './actions'
 
 const DEFAULT_COLOR = '#a98bff'
 
-const DAYS = [
-    'Monday',
-    'Tuesday',
-    'Wednesday',
-    'Thursday',
-    'Friday',
-    'Saturday',
-    'Sunday',
-] as const
-
 type Meal = {
     id: string
     name: string
-}
-
-const mealsByDay: Record<(typeof DAYS)[number], Meal[]> = {
-    Monday: [],
-    Tuesday: [],
-    Wednesday: [],
-    Thursday: [],
-    Friday: [],
-    Saturday: [],
-    Sunday: [],
 }
 
 export async function generateMetadata({
@@ -80,6 +60,26 @@ export default async function MealPlanner({
         notFound()
     }
 
+    const { data: meals } = await supabase
+        .from('meals')
+        .select('id, name, day_of_week')
+        .eq('household_id', household.id)
+        .order('name')
+
+    const mealsByDay = Object.fromEntries(
+        DAYS_OF_WEEK.map((day) => [day, [] as Meal[]]),
+    ) as Record<DayOfWeek, Meal[]>
+
+    const unplannedMeals: Meal[] = []
+
+    for (const meal of meals ?? []) {
+        if (isDayOfWeek(meal.day_of_week)) {
+            mealsByDay[meal.day_of_week].push({ id: meal.id, name: meal.name })
+        } else {
+            unplannedMeals.push({ id: meal.id, name: meal.name })
+        }
+    }
+
     const primaryColor = household.primary_color ?? DEFAULT_COLOR
 
     return (
@@ -92,50 +92,46 @@ export default async function MealPlanner({
 
             <div className={styles.card}>
                 <Link href={`/household/${household.id}/meal-planner/meals`} className={styles.navLink}>View All Meals</Link>
+
                 <form action={addMealToDay} className={styles.form}>
                     <input type="hidden" name="householdId" value={household.id} />
-                    <input
-                        type="text"
-                        name="name"
-                        placeholder="Add a meal"
-                        required
-                        maxLength={NAME_MAX_LENGTH}
-                        className={styles.input}
-                    />
 
-                    <select name="day" className={styles.select}>
-                        <option value='Monday'>Monday</option>
-                        <option value='Monday'>Tuesday</option>
-                        <option value='Monday'>Wednesday</option>
-                        <option value='Monday'>Thursday</option>
-                        <option value='Monday'>Friday</option>
-                        <option value='Monday'>Saturday</option>
-                        <option value='Monday'>Sunday</option>
+                    <select name="mealId" defaultValue="" required className={styles.select}>
+                        <option value="" disabled>Pick a meal</option>
+                        {unplannedMeals.map((meal) => (
+                            <option key={meal.id} value={meal.id}>{meal.name}</option>
+                        ))}
+                    </select>
+
+                    <select name="day" defaultValue={DAYS_OF_WEEK[0]} className={styles.select}>
+                        {DAYS_OF_WEEK.map((day) => (
+                            <option key={day} value={day}>{dayLabel(day)}</option>
+                        ))}
                     </select>
 
                     <button type="submit" className={styles.button}>Add</button>
                 </form>
 
-                {DAYS.map((day) => {
-                    const meals = mealsByDay[day]
+                {DAYS_OF_WEEK.map((day) => {
+                    const dayMeals = mealsByDay[day]
 
                     return (
                         <section key={day} className={styles.daySection}>
                             <div className={styles.dayDivider}>
                                 <span className={styles.dayDividerLine} />
-                                <h2 className={styles.dayDividerLabel}>{day}</h2>
+                                <h2 className={styles.dayDividerLabel}>{dayLabel(day)}</h2>
                                 <span className={styles.dayDividerLine} />
                             </div>
 
-                            {meals.length > 0 ? (
+                            {dayMeals.length > 0 ? (
                                 <ul className={styles.list}>
-                                    {meals.map((meal) => (
+                                    {dayMeals.map((meal) => (
                                         <li key={meal.id} className={styles.item}>
                                             <span>{meal.name}</span>
                                             <form action={deleteMealFromDay}>
                                                 <input type="hidden" name="householdId" value={household.id} />
                                                 <input type="hidden" name="mealId" value={meal.id} />
-                                                <button type="submit" className="negativeButton">Delete</button>
+                                                <button type="submit" className="negativeButton">Remove</button>
                                             </form>
                                         </li>
                                     ))}
