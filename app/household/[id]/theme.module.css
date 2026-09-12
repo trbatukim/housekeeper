@@ -66,7 +66,7 @@
   align-items: center;
   gap: 1.5rem;
   width: 100%;
-  max-width: 700px;
+  max-width: 850px;
   padding: 48px 44px;
   border-radius: 18px;
   border: 1px solid color-mix(in srgb, var(--primary, #a98bff) 20%, transparent);
@@ -554,6 +554,37 @@
   list-style: none;
 }
 
+.daySection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 560px;
+}
+
+.dayDivider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.dayDividerLine {
+  flex: 1;
+  height: 1px;
+  background: color-mix(in srgb, var(--primary, #a98bff) 25%, transparent);
+}
+
+.dayDividerLabel {
+  color: var(--primary, #a98bff);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
 .item {
   display: flex;
   flex-wrap: wrap;
@@ -820,4 +851,108 @@
   display: flex;
   justify-content: flex-end;
   gap: 8px;
+}
+
+.ingredientList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ingredientRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--primary, #a98bff) 15%, transparent);
+  background: color-mix(in srgb, var(--primary, #a98bff) 6%, transparent);
+}
+
+.ingredientName {
+  flex: 1 1 140px;
+  min-width: 0;
+}
+
+.ingredientRemove {
+  margin-left: auto;
+}
+
+.ingredientCustomUnit {
+  flex: 1 1 120px;
+  min-width: 0;
+}
+
+.ingredientActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.notice {
+  color: var(--primary, #a98bff);
+  font-size: 14px;
+  margin: 0;
+}
+
+.mealToggle {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #f5f1ff;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.mealChevron {
+  flex: 0 0 auto;
+  color: var(--primary, #a98bff);
+}
+
+.mealChevron[data-open='true'] {
+  transform: rotate(180deg);
+}
+
+.mealDetails {
+  flex: 1 1 100%;
+  padding-top: 10px;
+  border-top: 1px solid color-mix(in srgb, var(--primary, #a98bff) 15%, transparent);
+}
+
+.mealDetailsForm {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.mealEmpty {
+  color: #b1b0b3;
+  font-size: 13px;
+  margin: 0;
+}
+
+.ingredientChecklist {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ingredientCheck {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  cursor: pointer;
 }

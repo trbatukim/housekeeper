@@ -2,7 +2,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { CUSTOM_AMOUNT_TYPE } from './constants'
+import { CUSTOM_AMOUNT_TYPE } from '@/lib/amountTypes'
 import { NAME_MAX_LENGTH } from '@/lib/textLimits'
 import { sendNtfyReqWithoutDelay } from '@/lib/ntfy'
 
