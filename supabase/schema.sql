@@ -279,7 +279,9 @@ CREATE TABLE IF NOT EXISTS "public"."meals" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
     "household_id" "uuid" NOT NULL,
     "name" "text" NOT NULL,
-    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "day_of_week" "text",
+    CONSTRAINT "meals_day_of_week_check" CHECK (("day_of_week" = ANY (ARRAY['monday'::"text", 'tuesday'::"text", 'wednesday'::"text", 'thursday'::"text", 'friday'::"text", 'saturday'::"text", 'sunday'::"text"])))
 );
 
 
