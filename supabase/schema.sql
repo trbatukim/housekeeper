@@ -235,6 +235,19 @@ CREATE TABLE IF NOT EXISTS "public"."households" (
 ALTER TABLE "public"."households" OWNER TO "postgres";
 
 
+CREATE TABLE IF NOT EXISTS "public"."ingredients" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "household_id" "uuid" NOT NULL,
+    "name" "text" NOT NULL,
+    "amount" numeric(10,2),
+    "amount_type" "text",
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL
+);
+
+
+ALTER TABLE "public"."ingredients" OWNER TO "postgres";
+
+
 CREATE TABLE IF NOT EXISTS "public"."laundry_loads" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
     "household_id" "uuid" NOT NULL,
@@ -249,6 +262,28 @@ CREATE TABLE IF NOT EXISTS "public"."laundry_loads" (
 
 
 ALTER TABLE "public"."laundry_loads" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "public"."meal_to_ingredient" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "meal_id" "uuid" NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "ingredient_id" "uuid" NOT NULL
+);
+
+
+ALTER TABLE "public"."meal_to_ingredient" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "public"."meals" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "household_id" "uuid" NOT NULL,
+    "name" "text" NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL
+);
+
+
+ALTER TABLE "public"."meals" OWNER TO "postgres";
 
 
 CREATE TABLE IF NOT EXISTS "public"."profiles" (
@@ -301,8 +336,23 @@ ALTER TABLE ONLY "public"."households"
 
 
 
+ALTER TABLE ONLY "public"."ingredients"
+    ADD CONSTRAINT "ingredients_pkey" PRIMARY KEY ("id");
+
+
+
 ALTER TABLE ONLY "public"."laundry_loads"
     ADD CONSTRAINT "laundry_loads_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."meal_to_ingredient"
+    ADD CONSTRAINT "meal_to_ingredient_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."meals"
+    ADD CONSTRAINT "meals_pkey" PRIMARY KEY ("id");
 
 
 
@@ -360,8 +410,28 @@ ALTER TABLE ONLY "public"."grocery_items"
 
 
 
+ALTER TABLE ONLY "public"."ingredients"
+    ADD CONSTRAINT "ingredients_household_id_fkey" FOREIGN KEY ("household_id") REFERENCES "public"."households"("id") ON DELETE CASCADE;
+
+
+
 ALTER TABLE ONLY "public"."laundry_loads"
     ADD CONSTRAINT "laundry_loads_household_id_fkey" FOREIGN KEY ("household_id") REFERENCES "public"."households"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."meal_to_ingredient"
+    ADD CONSTRAINT "meal_to_ingredient_ingredient_id_fkey" FOREIGN KEY ("ingredient_id") REFERENCES "public"."ingredients"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."meal_to_ingredient"
+    ADD CONSTRAINT "meal_to_ingredient_meal_id_fkey" FOREIGN KEY ("meal_id") REFERENCES "public"."meals"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."meals"
+    ADD CONSTRAINT "meals_household_id_fkey" FOREIGN KEY ("household_id") REFERENCES "public"."households"("id") ON DELETE CASCADE;
 
 
 
@@ -428,6 +498,22 @@ CREATE POLICY "Leave a household" ON "public"."profiles_to_households" FOR DELET
 
 
 
+CREATE POLICY "Manage household ingredients" ON "public"."ingredients" TO "authenticated" USING ("public"."is_household_member"("household_id")) WITH CHECK ("public"."is_household_member"("household_id"));
+
+
+
+CREATE POLICY "Manage household meal ingredients" ON "public"."meal_to_ingredient" TO "authenticated" USING ((EXISTS ( SELECT 1
+   FROM "public"."meals"
+  WHERE (("meals"."id" = "meal_to_ingredient"."meal_id") AND "public"."is_household_member"("meals"."household_id"))))) WITH CHECK ((EXISTS ( SELECT 1
+   FROM "public"."meals"
+  WHERE (("meals"."id" = "meal_to_ingredient"."meal_id") AND "public"."is_household_member"("meals"."household_id")))));
+
+
+
+CREATE POLICY "Manage household meals" ON "public"."meals" TO "authenticated" USING ("public"."is_household_member"("household_id")) WITH CHECK ("public"."is_household_member"("household_id"));
+
+
+
 CREATE POLICY "Update household dish status" ON "public"."dishes_status" FOR UPDATE TO "authenticated" USING ("public"."is_household_member"("household_id"));
 
 
@@ -474,7 +560,21 @@ CREATE POLICY "View household groceries" ON "public"."grocery_items" FOR SELECT 
 
 
 
+CREATE POLICY "View household ingredients" ON "public"."ingredients" FOR SELECT TO "authenticated" USING ("public"."is_household_member"("household_id"));
+
+
+
 CREATE POLICY "View household laundry" ON "public"."laundry_loads" FOR SELECT TO "authenticated" USING ("public"."is_household_member"("household_id"));
+
+
+
+CREATE POLICY "View household meal ingredients" ON "public"."meal_to_ingredient" FOR SELECT TO "authenticated" USING ((EXISTS ( SELECT 1
+   FROM "public"."meals"
+  WHERE (("meals"."id" = "meal_to_ingredient"."meal_id") AND "public"."is_household_member"("meals"."household_id")))));
+
+
+
+CREATE POLICY "View household meals" ON "public"."meals" FOR SELECT TO "authenticated" USING ("public"."is_household_member"("household_id"));
 
 
 
@@ -514,7 +614,16 @@ ALTER TABLE "public"."grocery_items" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."households" ENABLE ROW LEVEL SECURITY;
 
 
+ALTER TABLE "public"."ingredients" ENABLE ROW LEVEL SECURITY;
+
+
 ALTER TABLE "public"."laundry_loads" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."meal_to_ingredient" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."meals" ENABLE ROW LEVEL SECURITY;
 
 
 ALTER TABLE "public"."profiles" ENABLE ROW LEVEL SECURITY;
@@ -763,9 +872,27 @@ GRANT REFERENCES,TRIGGER,TRUNCATE,MAINTAIN ON TABLE "public"."households" TO "se
 
 
 
+GRANT ALL ON TABLE "public"."ingredients" TO "anon";
+GRANT ALL ON TABLE "public"."ingredients" TO "authenticated";
+GRANT ALL ON TABLE "public"."ingredients" TO "service_role";
+
+
+
 GRANT ALL ON TABLE "public"."laundry_loads" TO "anon";
 GRANT ALL ON TABLE "public"."laundry_loads" TO "authenticated";
 GRANT ALL ON TABLE "public"."laundry_loads" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."meal_to_ingredient" TO "anon";
+GRANT ALL ON TABLE "public"."meal_to_ingredient" TO "authenticated";
+GRANT ALL ON TABLE "public"."meal_to_ingredient" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."meals" TO "anon";
+GRANT ALL ON TABLE "public"."meals" TO "authenticated";
+GRANT ALL ON TABLE "public"."meals" TO "service_role";
 
 
 

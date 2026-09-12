@@ -852,3 +852,40 @@
   justify-content: flex-end;
   gap: 8px;
 }
+
+.ingredientList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ingredientRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--primary, #a98bff) 15%, transparent);
+  background: color-mix(in srgb, var(--primary, #a98bff) 6%, transparent);
+}
+
+.ingredientName {
+  flex: 1 1 140px;
+  min-width: 0;
+}
+
+.ingredientRemove {
+  margin-left: auto;
+}
+
+.ingredientCustomUnit {
+  flex: 1 1 120px;
+  min-width: 0;
+}
+
+.ingredientSummary {
+  display: block;
+  color: #b1b0b3;
+  font-size: 13px;
+}
