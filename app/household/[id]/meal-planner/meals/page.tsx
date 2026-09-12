@@ -5,7 +5,7 @@ import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import type { CSSProperties } from 'react'
 import HouseholdThemeSync from '../../../../HouseholdThemeSync'
-import AddMealItem from './AddMealItem'
+import MealFormModal from './MealFormModal'
 import MealItem from './MealItem'
 
 const DEFAULT_COLOR = '#a98bff'
@@ -93,7 +93,7 @@ export default async function Meals({
             {notice && <p className={styles.notice}>{notice}</p>}
 
             <div className={styles.card}>
-                <AddMealItem
+                <MealFormModal
                     householdId={household.id}
                     primaryColor={primaryColor}
                     savedIngredients={ingredientOptions}
@@ -106,6 +106,8 @@ export default async function Meals({
                                 key={meal.id}
                                 meal={{ id: meal.id, name: meal.name, ingredients: meal.meal_to_ingredient }}
                                 householdId={household.id}
+                                primaryColor={primaryColor}
+                                savedIngredients={ingredientOptions}
                             />
                         ))}
                     </ul>

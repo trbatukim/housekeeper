@@ -2,7 +2,9 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { isDayOfWeek } from '@/lib/days'
+import { dayLabel, isDayOfWeek } from '@/lib/days'
+
+const UNIQUE_VIOLATION = '23505'
 
 export async function addMealToDay(formData: FormData) {
     const supabase = await createClient()
@@ -25,20 +27,27 @@ export async function addMealToDay(formData: FormData) {
         redirect(`${plannerPath}?error=${encodeURIComponent('Pick a day of the week.')}`)
     }
 
-    const { data: meal, error } = await supabase
+    const { data: meal } = await supabase
         .from('meals')
-        .update({ day_of_week: day })
+        .select('id, name')
         .eq('id', mealId)
         .eq('household_id', householdId)
-        .select('id')
         .maybeSingle()
-
-    if (error) {
-        redirect(`${plannerPath}?error=${encodeURIComponent(error.message)}`)
-    }
 
     if (!meal) {
         redirect(`${plannerPath}?error=${encodeURIComponent('Could not find that meal.')}`)
+    }
+
+    const { error } = await supabase
+        .from('meal_to_day')
+        .insert({ meal_id: meal.id, day_of_week: day })
+
+    if (error?.code === UNIQUE_VIOLATION) {
+        redirect(`${plannerPath}?error=${encodeURIComponent(`"${meal.name}" is already planned for ${dayLabel(day)}.`)}`)
+    }
+
+    if (error) {
+        redirect(`${plannerPath}?error=${encodeURIComponent(error.message)}`)
     }
 
     revalidatePath(plannerPath)
@@ -54,14 +63,29 @@ export async function deleteMealFromDay(formData: FormData) {
 
     const householdId = formData.get('householdId') as string
     const mealId = formData.get('mealId') as string
+    const day = formData.get('day') as string
     const plannerPath = `/household/${householdId}/meal-planner`
 
-    // The meal stays in the household's meal list, it just loses its planned day.
-    const { error } = await supabase
+    if (!isDayOfWeek(day)) {
+        redirect(`${plannerPath}?error=${encodeURIComponent('Pick a day of the week.')}`)
+    }
+
+    const { data: meal } = await supabase
         .from('meals')
-        .update({ day_of_week: null })
+        .select('id')
         .eq('id', mealId)
         .eq('household_id', householdId)
+        .maybeSingle()
+
+    if (!meal) {
+        redirect(`${plannerPath}?error=${encodeURIComponent('Could not find that meal.')}`)
+    }
+
+    const { error } = await supabase
+        .from('meal_to_day')
+        .delete()
+        .eq('meal_id', meal.id)
+        .eq('day_of_week', day)
 
     if (error) {
         redirect(`${plannerPath}?error=${encodeURIComponent(error.message)}`)

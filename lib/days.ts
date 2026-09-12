@@ -1,4 +1,3 @@
-// Values match the meals.day_of_week check constraint in supabase/schema.sql.
 export const DAYS_OF_WEEK = [
     'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday',
 ] as const

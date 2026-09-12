@@ -62,7 +62,7 @@ export default async function MealPlanner({
 
     const { data: meals } = await supabase
         .from('meals')
-        .select('id, name, day_of_week')
+        .select('id, name, meal_to_day(day_of_week)')
         .eq('household_id', household.id)
         .order('name')
 
@@ -70,13 +70,11 @@ export default async function MealPlanner({
         DAYS_OF_WEEK.map((day) => [day, [] as Meal[]]),
     ) as Record<DayOfWeek, Meal[]>
 
-    const unplannedMeals: Meal[] = []
-
     for (const meal of meals ?? []) {
-        if (isDayOfWeek(meal.day_of_week)) {
-            mealsByDay[meal.day_of_week].push({ id: meal.id, name: meal.name })
-        } else {
-            unplannedMeals.push({ id: meal.id, name: meal.name })
+        for (const { day_of_week: day } of meal.meal_to_day) {
+            if (isDayOfWeek(day)) {
+                mealsByDay[day].push({ id: meal.id, name: meal.name })
+            }
         }
     }
 
@@ -98,7 +96,7 @@ export default async function MealPlanner({
 
                     <select name="mealId" defaultValue="" required className={styles.select}>
                         <option value="" disabled>Pick a meal</option>
-                        {unplannedMeals.map((meal) => (
+                        {(meals ?? []).map((meal) => (
                             <option key={meal.id} value={meal.id}>{meal.name}</option>
                         ))}
                     </select>
@@ -131,6 +129,7 @@ export default async function MealPlanner({
                                             <form action={deleteMealFromDay}>
                                                 <input type="hidden" name="householdId" value={household.id} />
                                                 <input type="hidden" name="mealId" value={meal.id} />
+                                                <input type="hidden" name="day" value={day} />
                                                 <button type="submit" className="negativeButton">Remove</button>
                                             </form>
                                         </li>

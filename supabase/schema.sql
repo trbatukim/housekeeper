@@ -264,6 +264,18 @@ CREATE TABLE IF NOT EXISTS "public"."laundry_loads" (
 ALTER TABLE "public"."laundry_loads" OWNER TO "postgres";
 
 
+CREATE TABLE IF NOT EXISTS "public"."meal_to_day" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "meal_id" "uuid" NOT NULL,
+    "day_of_week" "text" NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    CONSTRAINT "meal_to_day_day_of_week_check" CHECK (("day_of_week" = ANY (ARRAY['monday'::"text", 'tuesday'::"text", 'wednesday'::"text", 'thursday'::"text", 'friday'::"text", 'saturday'::"text", 'sunday'::"text"])))
+);
+
+
+ALTER TABLE "public"."meal_to_day" OWNER TO "postgres";
+
+
 CREATE TABLE IF NOT EXISTS "public"."meal_to_ingredient" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
     "meal_id" "uuid" NOT NULL,
@@ -279,9 +291,7 @@ CREATE TABLE IF NOT EXISTS "public"."meals" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
     "household_id" "uuid" NOT NULL,
     "name" "text" NOT NULL,
-    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
-    "day_of_week" "text",
-    CONSTRAINT "meals_day_of_week_check" CHECK (("day_of_week" = ANY (ARRAY['monday'::"text", 'tuesday'::"text", 'wednesday'::"text", 'thursday'::"text", 'friday'::"text", 'saturday'::"text", 'sunday'::"text"])))
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL
 );
 
 
@@ -345,6 +355,16 @@ ALTER TABLE ONLY "public"."ingredients"
 
 ALTER TABLE ONLY "public"."laundry_loads"
     ADD CONSTRAINT "laundry_loads_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."meal_to_day"
+    ADD CONSTRAINT "meal_to_day_meal_id_day_of_week_key" UNIQUE ("meal_id", "day_of_week");
+
+
+
+ALTER TABLE ONLY "public"."meal_to_day"
+    ADD CONSTRAINT "meal_to_day_pkey" PRIMARY KEY ("id");
 
 
 
@@ -419,6 +439,11 @@ ALTER TABLE ONLY "public"."ingredients"
 
 ALTER TABLE ONLY "public"."laundry_loads"
     ADD CONSTRAINT "laundry_loads_household_id_fkey" FOREIGN KEY ("household_id") REFERENCES "public"."households"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."meal_to_day"
+    ADD CONSTRAINT "meal_to_day_meal_id_fkey" FOREIGN KEY ("meal_id") REFERENCES "public"."meals"("id") ON DELETE CASCADE;
 
 
 
@@ -504,6 +529,14 @@ CREATE POLICY "Manage household ingredients" ON "public"."ingredients" TO "authe
 
 
 
+CREATE POLICY "Manage household meal days" ON "public"."meal_to_day" TO "authenticated" USING ((EXISTS ( SELECT 1
+   FROM "public"."meals"
+  WHERE (("meals"."id" = "meal_to_day"."meal_id") AND "public"."is_household_member"("meals"."household_id"))))) WITH CHECK ((EXISTS ( SELECT 1
+   FROM "public"."meals"
+  WHERE (("meals"."id" = "meal_to_day"."meal_id") AND "public"."is_household_member"("meals"."household_id")))));
+
+
+
 CREATE POLICY "Manage household meal ingredients" ON "public"."meal_to_ingredient" TO "authenticated" USING ((EXISTS ( SELECT 1
    FROM "public"."meals"
   WHERE (("meals"."id" = "meal_to_ingredient"."meal_id") AND "public"."is_household_member"("meals"."household_id"))))) WITH CHECK ((EXISTS ( SELECT 1
@@ -570,6 +603,12 @@ CREATE POLICY "View household laundry" ON "public"."laundry_loads" FOR SELECT TO
 
 
 
+CREATE POLICY "View household meal days" ON "public"."meal_to_day" FOR SELECT TO "authenticated" USING ((EXISTS ( SELECT 1
+   FROM "public"."meals"
+  WHERE (("meals"."id" = "meal_to_day"."meal_id") AND "public"."is_household_member"("meals"."household_id")))));
+
+
+
 CREATE POLICY "View household meal ingredients" ON "public"."meal_to_ingredient" FOR SELECT TO "authenticated" USING ((EXISTS ( SELECT 1
    FROM "public"."meals"
   WHERE (("meals"."id" = "meal_to_ingredient"."meal_id") AND "public"."is_household_member"("meals"."household_id")))));
@@ -620,6 +659,9 @@ ALTER TABLE "public"."ingredients" ENABLE ROW LEVEL SECURITY;
 
 
 ALTER TABLE "public"."laundry_loads" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."meal_to_day" ENABLE ROW LEVEL SECURITY;
 
 
 ALTER TABLE "public"."meal_to_ingredient" ENABLE ROW LEVEL SECURITY;
@@ -883,6 +925,12 @@ GRANT ALL ON TABLE "public"."ingredients" TO "service_role";
 GRANT ALL ON TABLE "public"."laundry_loads" TO "anon";
 GRANT ALL ON TABLE "public"."laundry_loads" TO "authenticated";
 GRANT ALL ON TABLE "public"."laundry_loads" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."meal_to_day" TO "anon";
+GRANT ALL ON TABLE "public"."meal_to_day" TO "authenticated";
+GRANT ALL ON TABLE "public"."meal_to_day" TO "service_role";
 
 
 

@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { addIngredientsToGroceries, deleteMeal } from './actions'
+import MealFormModal from './MealFormModal'
 import styles from '../../theme.module.css'
 
 type Ingredient = {
@@ -13,9 +14,13 @@ type Ingredient = {
 export default function MealItem({
   meal,
   householdId,
+  primaryColor,
+  savedIngredients,
 }: {
   meal: { id: string; name: string; ingredients: Ingredient[] }
   householdId: string
+  primaryColor: string
+  savedIngredients: Ingredient[]
 }) {
   const [expanded, setExpanded] = useState(false)
 
@@ -45,11 +50,19 @@ export default function MealItem({
         </svg>
         {meal.name}
       </button>
-      <form action={deleteMeal}>
-        <input type="hidden" name="householdId" value={householdId} />
-        <input type="hidden" name="mealId" value={meal.id} />
-        <button type="submit" className="negativeButton">Delete</button>
-      </form>
+      <div className={styles.itemActions}>
+        <MealFormModal
+          householdId={householdId}
+          primaryColor={primaryColor}
+          savedIngredients={savedIngredients}
+          meal={meal}
+        />
+        <form action={deleteMeal}>
+          <input type="hidden" name="householdId" value={householdId} />
+          <input type="hidden" name="mealId" value={meal.id} />
+          <button type="submit" className="negativeButton">Delete</button>
+        </form>
+      </div>
       {expanded && (
         <div className={styles.mealDetails}>
           {meal.ingredients.length > 0 ? (
