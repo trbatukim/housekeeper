@@ -1,3 +1,9 @@
+// HTTP headers only allow Latin-1, so fetch throws on turksih chars or emojis.
+// ntfy decodes RFC 2047 encoded-words, which keeps the title intact.
+function encodeHeader(value: string) {
+    return `=?UTF-8?B?${Buffer.from(value, 'utf8').toString('base64')}?=`
+}
+
 export async function sendNtfyReq(textBody: string, endsAt: string, householdName: string, householdId: string) {
     const url = 'https://ntfy.sh/' + householdId
     const delayUnixSeconds = Math.floor(new Date(endsAt).getTime() / 1000)
@@ -7,7 +13,7 @@ export async function sendNtfyReq(textBody: string, endsAt: string, householdNam
             method: 'POST',
             headers: {
                 'Content-Type': 'text/plain',
-                'title': householdName,
+                'title': encodeHeader(householdName),
                 'X-Delay': String(delayUnixSeconds)
             },
             body: textBody
@@ -50,7 +56,7 @@ export async function sendNtfyReqWithoutDelay(textBody: string, householdName: s
             method: 'POST',
             headers: {
                 'Content-Type': 'text/plain',
-                'title': householdName
+                'title': encodeHeader(householdName)
             },
             body: textBody
         })
