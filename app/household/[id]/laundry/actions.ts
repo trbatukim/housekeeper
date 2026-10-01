@@ -1,9 +1,10 @@
 'use server'
-import { createClient } from '@/lib/supabase/server'
-import { revalidatePath } from 'next/cache'
-import { redirect } from 'next/navigation'
-import { sendNtfyReq, cancelNtfyReq } from '@/lib/ntfy'
-import { computeDurationSeconds, isValidDuration } from '@/lib/duration'
+import {createClient} from '@/lib/supabase/server'
+import {revalidatePath} from 'next/cache'
+import {redirect} from 'next/navigation'
+import {cancelNtfyReq, sendNtfyReq} from '@/lib/ntfy'
+import {ActivityType, createLiveActivity, deleteLiveActivity} from '@/lib/pushward'
+import {computeDurationSeconds, isValidDuration} from '@/lib/duration'
 
 export async function addLaundry(formData: FormData) {
     const supabase = await createClient()
@@ -44,6 +45,8 @@ export async function addLaundry(formData: FormData) {
         redirect(`${laundryPath}?error=${encodeURIComponent(error.message)}`)
     }
 
+    createLiveActivity(ActivityType.LAUNDRY, durationSeconds)
+
     revalidatePath(laundryPath)
 }
 
@@ -78,6 +81,8 @@ export async function deleteLaundry(formData: FormData) {
     if (notificationId) {
         cancelNtfyReq(notificationId, householdId)
     }
+
+    deleteLiveActivity(ActivityType.LAUNDRY)
 
     revalidatePath(laundryPath)
 }
