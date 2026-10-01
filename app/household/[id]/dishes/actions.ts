@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { sendNtfyReq, cancelNtfyReq } from '@/lib/ntfy'
 import { computeDurationSeconds, isValidDuration } from '@/lib/duration'
+import {ActivityType, createLiveActivity, deleteLiveActivity} from "@/lib/pushward";
 
 export async function toggleDishesStatus(
     householdId: string,
@@ -63,6 +64,8 @@ export async function addDishwasher(formData: FormData) {
         .update({ status: 'cleaning' })
         .eq('household_id', householdId)
 
+    createLiveActivity(ActivityType.DISHWASHER, durationSeconds)
+
     revalidatePath(dishesPath)
 }
 
@@ -110,6 +113,8 @@ export async function deleteDishwasher(formData: FormData) {
             .update({ status: 'clean' })
             .eq('household_id', householdId)
     }
+
+    deleteLiveActivity(ActivityType.DISHWASHER)
 
     revalidatePath(dishesPath)
 }
