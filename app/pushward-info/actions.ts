@@ -30,3 +30,23 @@ export async function updateAPIKey(formData: FormData) {
 
     redirect("/pushward-info?saved=1")
 }
+
+export async function clearAPIKey() {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+        redirect("/login")
+    }
+
+    const { error } = await supabase
+        .from("pushward_keys")
+        .delete()
+        .eq("profile_id", user.id)
+
+    if (error) {
+        redirect(`/pushward-info?error=${encodeURIComponent(error.message)}`)
+    }
+
+    redirect("/pushward-info?cleared=1")
+}
