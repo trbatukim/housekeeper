@@ -1,16 +1,38 @@
-import Link from 'next/link'
-import type { Metadata } from "next";
-import styles from './ntfy-info.module.css'
+import type {Metadata} from "next";
+import Link from "next/link";
+import styles from "@/app/ntfy-info/ntfy-info.module.css";
+import {createClient} from "@/lib/supabase/server";
+import {redirect} from "next/navigation";
 
 export const metadata: Metadata = {
-    title: "ntfy Info"
+    title: "PushWard Info"
 }
 
-export default async function NtfyInfoPage() {
+export default async function PushwardInfoPage({
+   params,
+   searchParams
+}: {
+    params: Promise<{ id: string }>
+    searchParams: Promise<{ error?: string }>
+}) {
+    const { id } = await params
+    const { error: errorMessage } = await searchParams
+
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+        redirect('/login')
+    }
+
     return (
         <div className="container">
             <Link href='/' className="backButton">&larr; Back to Home</Link>
-            <h1 className="title" style={{ marginTop: 20 }}>ntfy Info</h1>
+            <h1 className="title" style={{ marginTop: 20 }}>PushWard Info</h1>
+            <form className="form">
+                <label>Enter your API key here: <input className="input" type="text"></input></label>
+                <button type="submit" className="button">Submit</button>
+            </form>
             <div className="contentBox" style={{ marginBottom: 60 }}>
                 <p>
                     Housekeeper sends laundry and dishwasher notifications through{' '}
