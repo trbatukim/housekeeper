@@ -24,9 +24,9 @@ export default async function PushwardInfoPage({
     }
 
     return (
-        <div className="container">
+        <div className="container infoPage">
             <Link href='/' className="backButton">&larr; Back to Home</Link>
-            <h1 className="title" style={{ marginTop: 20 }}>PushWard Info</h1>
+            <h1 className="title">PushWard Info</h1>
 
             <div className={styles.keySection}>
                 <label className={styles.keyLabel} htmlFor="key">Your PushWard integration key</label>

@@ -233,6 +233,14 @@ body {
   transition: background 0.15s ease, color 0.15s ease;
 }
 
+/* Long pages overflow the viewport, so centering lays their first child out at
+   the top padding edge, right under the absolute back button. Pin the content
+   to the top instead and reserve room for the button. */
+.infoPage {
+  justify-content: flex-start;
+  padding-top: calc(max(24px, env(safe-area-inset-top)) + 52px);
+}
+
 .demoBanner {
   position: sticky;
   top: 0;

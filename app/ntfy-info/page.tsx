@@ -8,9 +8,9 @@ export const metadata: Metadata = {
 
 export default async function NtfyInfoPage() {
     return (
-        <div className="container">
+        <div className="container infoPage">
             <Link href='/' className="backButton">&larr; Back to Home</Link>
-            <h1 className="title" style={{ marginTop: 20 }}>ntfy Info</h1>
+            <h1 className="title">ntfy Info</h1>
             <div className="contentBox" style={{ marginBottom: 60 }}>
                 <p>
                     Housekeeper sends laundry and dishwasher notifications through{' '}
