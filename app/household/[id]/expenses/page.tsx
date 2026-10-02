@@ -98,28 +98,34 @@ export default async function ExpensesPage({
 
                 {errorMessage && <p className="error">{errorMessage}</p>}
 
-                <ul className={styles.list}>
-                    {expenses?.map((expense) => (
-                        <li key={expense.id} className={styles.item}>
-                            <ExpenseItem expense={expense} householdId={household.id} />
-                            <div className={styles.itemActions}>
-                                <form action={sendReminder} className={styles.toolbarFormGroup}>
-                                    <input type="hidden" name="householdId" value={household.id} />
-                                    <input type="hidden" name="householdName" value={household.name} />
-                                    <input type="hidden" name="expenseDesc" value={expense.description} />
-                                    <input type="hidden" name="dueDate" value={expense.paid_on} />
-                                    <button type="submit" className={`${styles.button} ${styles.itemButton}`} title="Send reminder">Remind</button>
-                                </form>
-                                <EditExpenseItem expense={expense} householdId={household.id} primaryColor={primaryColor} />
-                                <form action={deleteExpense}>
-                                    <input type="hidden" name="householdId" value={household.id} />
-                                    <input type="hidden" name="expenseId" value={expense.id} />
-                                    <button type="submit" className="negativeButton">Delete</button>
-                                </form>
-                            </div>
-                        </li>
-                    ))}
-                </ul>
+                {expenses && expenses.length > 0 ? (<ul className={styles.list}>
+                        {expenses?.map((expense) => (
+                            <li key={expense.id} className={styles.item}>
+                                <ExpenseItem expense={expense} householdId={household.id}/>
+                                <div className={styles.itemActions}>
+                                    <form action={sendReminder} className={styles.toolbarFormGroup}>
+                                        <input type="hidden" name="householdId" value={household.id}/>
+                                        <input type="hidden" name="householdName" value={household.name}/>
+                                        <input type="hidden" name="expenseDesc" value={expense.description}/>
+                                        <input type="hidden" name="dueDate" value={expense.paid_on}/>
+                                        <button type="submit" className={`${styles.button} ${styles.itemButton}`}
+                                                title="Send reminder">Remind
+                                        </button>
+                                    </form>
+                                    <EditExpenseItem expense={expense} householdId={household.id}
+                                                     primaryColor={primaryColor}/>
+                                    <form action={deleteExpense}>
+                                        <input type="hidden" name="householdId" value={household.id}/>
+                                        <input type="hidden" name="expenseId" value={expense.id}/>
+                                        <button type="submit" className="negativeButton">Delete</button>
+                                    </form>
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
+                ): (
+                    <p className={styles.emptyState}>No expenses added.</p>
+                )}
             </div>
         </div>
     )

@@ -1,4 +1,4 @@
-// HTTP headers only allow Latin-1, so fetch throws on turksih chars or emojis.
+// HTTP headers only allow Latin-1, so fetch throws on Turkish chars or emojis.
 // ntfy decodes RFC 2047 encoded-words, which keeps the title intact.
 function encodeHeader(value: string) {
     return `=?UTF-8?B?${Buffer.from(value, 'utf8').toString('base64')}?=`

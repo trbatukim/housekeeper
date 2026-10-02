@@ -17,6 +17,12 @@ vi.mock('@/lib/ntfy', () => ({
     cancelNtfyReq: vi.fn(),
 }))
 
+vi.mock('@/lib/pushward', async (importOriginal) => ({
+    ...await importOriginal<typeof import('@/lib/pushward')>(),
+    createLiveActivity: vi.fn(),
+    deleteLiveActivity: vi.fn(),
+}))
+
 describe('addLaundry', () => {
     beforeEach(() => {
         vi.clearAllMocks()
@@ -124,7 +130,7 @@ describe('deleteLaundry', () => {
         vi.mocked(createClient).mockResolvedValue(supabase as never)
 
         await deleteLaundry(formData({
-            householdId: 'h1',
+            householdId: 'h1',
             laundryId: 'l1',
             notificationId: 'ntfy1'
         }))
@@ -139,7 +145,7 @@ describe('deleteLaundry', () => {
         vi.mocked(createClient).mockResolvedValue(supabase as never)
 
         await expect(deleteLaundry(formData({
-            householdId: 'h1',
+            householdId: 'h1',
             laundryId: 'l1',
             notificationId: 'ntfy1'
         }))).rejects.toThrow('NEXT_REDIRECT')
@@ -153,7 +159,7 @@ describe('deleteLaundry', () => {
         vi.mocked(createClient).mockResolvedValue(supabase as never)
 
         await expect(deleteLaundry(formData({
-            householdId: 'h1',
+            householdId: 'h1',
             laundryId: 'l1',
             notificationId: 'ntfy1'
         }))).rejects.toThrow('NEXT_REDIRECT')
@@ -167,7 +173,7 @@ describe('deleteLaundry', () => {
         vi.mocked(createClient).mockResolvedValue(supabase as never)
 
         await deleteLaundry(formData({
-            householdId: 'h1',
+            householdId: 'h1',
             laundryId: 'l1',
             notificationId: 'ntfy1'
         }))
@@ -183,7 +189,7 @@ describe('deleteLaundry', () => {
         vi.mocked(createClient).mockResolvedValue(supabase as never)
 
         await deleteLaundry(formData({
-            householdId: 'h1',
+            householdId: 'h1',
             laundryId: 'l1'
         }))
 

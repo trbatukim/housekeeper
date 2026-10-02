@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { sendNtfyReq, cancelNtfyReq } from '@/lib/ntfy'
 import { computeDurationSeconds, isValidDuration } from '@/lib/duration'
+import {ActivityType, createLiveActivity, deleteLiveActivity} from "@/lib/pushward";
 
 export async function toggleDishesStatus(
     householdId: string,
@@ -38,7 +39,8 @@ export async function addDishwasher(formData: FormData) {
         redirect(`${dishesPath}?error=${encodeURIComponent('Set an end time for the load.')}`)
     }
 
-    const endsAt = new Date(Date.now() + durationSeconds * 1000).toISOString()
+    const endsAtDate = new Date(Date.now() + durationSeconds * 1000)
+    const endsAt = endsAtDate.toISOString()
 
     const notificationId = await sendNtfyReq("Dishwasher done!", endsAt, householdName, householdId)
 
@@ -62,6 +64,8 @@ export async function addDishwasher(formData: FormData) {
         .from('dishes_status')
         .update({ status: 'cleaning' })
         .eq('household_id', householdId)
+
+    createLiveActivity(ActivityType.DISHWASHER, endsAtDate, householdId)
 
     revalidatePath(dishesPath)
 }
@@ -110,6 +114,8 @@ export async function deleteDishwasher(formData: FormData) {
             .update({ status: 'clean' })
             .eq('household_id', householdId)
     }
+
+    deleteLiveActivity(ActivityType.DISHWASHER, householdId)
 
     revalidatePath(dishesPath)
 }

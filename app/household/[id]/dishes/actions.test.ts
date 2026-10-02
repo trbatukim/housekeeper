@@ -18,6 +18,12 @@ vi.mock('@/lib/ntfy', () => ({
     cancelNtfyReq: vi.fn(),
 }))
 
+vi.mock('@/lib/pushward', async (importOriginal) => ({
+    ...await importOriginal<typeof import('@/lib/pushward')>(),
+    createLiveActivity: vi.fn(),
+    deleteLiveActivity: vi.fn(),
+}))
+
 describe('addDishwasher', () => {
     beforeEach(() => {
         vi.clearAllMocks()
@@ -132,7 +138,7 @@ describe('deleteDishwasher', () => {
         vi.mocked(createClient).mockResolvedValue(supabase as never)
 
         await deleteDishwasher(formData({
-            householdId: 'h1',
+            householdId: 'h1',
             dishwasherId: 'd1',
             notificationId: 'ntfy1'
         }))
@@ -147,7 +153,7 @@ describe('deleteDishwasher', () => {
         vi.mocked(createClient).mockResolvedValue(supabase as never)
 
         await expect(deleteDishwasher(formData({
-            householdId: 'h1',
+            householdId: 'h1',
             dishwasherId: 'd1',
             notificationId: 'ntfy1'
         }))).rejects.toThrow('NEXT_REDIRECT')
@@ -161,7 +167,7 @@ describe('deleteDishwasher', () => {
         vi.mocked(createClient).mockResolvedValue(supabase as never)
 
         await expect(deleteDishwasher(formData({
-            householdId: 'h1',
+            householdId: 'h1',
             dishwasherId: 'd1',
             notificationId: 'ntfy1'
         }))).rejects.toThrow('NEXT_REDIRECT')
@@ -175,7 +181,7 @@ describe('deleteDishwasher', () => {
         vi.mocked(createClient).mockResolvedValue(supabase as never)
 
         await deleteDishwasher(formData({
-            householdId: 'h1',
+            householdId: 'h1',
             dishwasherId: 'd1',
             notificationId: 'ntfy1'
         }))
@@ -192,7 +198,7 @@ describe('deleteDishwasher', () => {
         vi.mocked(createClient).mockResolvedValue(supabase as never)
 
         await deleteDishwasher(formData({
-            householdId: 'h1',
+            householdId: 'h1',
             dishwasherId: 'd1'
         }))
 
@@ -219,7 +225,7 @@ describe('deleteDishwasher', () => {
         vi.mocked(createClient).mockResolvedValue(supabase as never)
 
         await deleteDishwasher(formData({
-            householdId: 'h1',
+            householdId: 'h1',
             dishwasherId: 'd1',
             notificationId: 'ntfy1'
         }))
@@ -248,7 +254,7 @@ describe('deleteDishwasher', () => {
         vi.mocked(createClient).mockResolvedValue(supabase as never)
 
         await deleteDishwasher(formData({
-            householdId: 'h1',
+            householdId: 'h1',
             dishwasherId: 'd1',
             notificationId: 'ntfy1'
         }))

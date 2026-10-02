@@ -1,6 +1,4 @@
-import { headers } from 'next/headers'
 import Link from 'next/link'
-import type { CSSProperties } from 'react'
 import type { Metadata } from "next";
 import styles from './ntfy-info.module.css'
 
@@ -9,8 +7,6 @@ export const metadata: Metadata = {
 }
 
 export default async function NtfyInfoPage() {
-    const headersList = await headers()
-
     return (
         <div className="container">
             <Link href='/' className="backButton">&larr; Back to Home</Link>
