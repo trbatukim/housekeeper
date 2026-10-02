@@ -70,6 +70,7 @@ export default async function LaundryPage({
             <Link href={`/household/${household.id}`} className={styles.themedBackButton}>&larr; Back</Link>
             <h1 className={styles.pageTitle}>Laundry</h1>
             <p className={styles.note}>To get notifications, subscribe to the ntfy topic: ntfy.sh/{household.id} <Link href="../../ntfy-info">More info</Link></p>
+            <p className={styles.note}>For more info about Live Activites on your iOS devices <Link href="../../pushward-info">click here</Link></p>
             <div className={styles.card}>
                 <form action={addLaundry} className={styles.form}>
                     <input type="hidden" name="householdId" value={household.id} />
