@@ -25,7 +25,8 @@ export async function addLaundry(formData: FormData) {
         redirect(`${laundryPath}?error=${encodeURIComponent('Set an end time for the load.')}`)
     }
 
-    const endsAt = new Date(Date.now() + durationSeconds * 1000).toISOString()
+    const endsAtDate = new Date(Date.now() + durationSeconds * 1000)
+    const endsAt = endsAtDate.toISOString()
 
     const notificationId = await sendNtfyReq("Laundry done!", endsAt, householdName, householdId)
 
@@ -45,7 +46,7 @@ export async function addLaundry(formData: FormData) {
         redirect(`${laundryPath}?error=${encodeURIComponent(error.message)}`)
     }
 
-    createLiveActivity(ActivityType.LAUNDRY, durationSeconds)
+    createLiveActivity(ActivityType.LAUNDRY, endsAtDate, householdId)
 
     revalidatePath(laundryPath)
 }
@@ -82,7 +83,7 @@ export async function deleteLaundry(formData: FormData) {
         cancelNtfyReq(notificationId, householdId)
     }
 
-    deleteLiveActivity(ActivityType.LAUNDRY)
+    deleteLiveActivity(ActivityType.LAUNDRY, householdId)
 
     revalidatePath(laundryPath)
 }

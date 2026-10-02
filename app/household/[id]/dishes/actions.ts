@@ -39,7 +39,8 @@ export async function addDishwasher(formData: FormData) {
         redirect(`${dishesPath}?error=${encodeURIComponent('Set an end time for the load.')}`)
     }
 
-    const endsAt = new Date(Date.now() + durationSeconds * 1000).toISOString()
+    const endsAtDate = new Date(Date.now() + durationSeconds * 1000)
+    const endsAt = endsAtDate.toISOString()
 
     const notificationId = await sendNtfyReq("Dishwasher done!", endsAt, householdName, householdId)
 
@@ -64,7 +65,7 @@ export async function addDishwasher(formData: FormData) {
         .update({ status: 'cleaning' })
         .eq('household_id', householdId)
 
-    createLiveActivity(ActivityType.DISHWASHER, durationSeconds)
+    createLiveActivity(ActivityType.DISHWASHER, endsAtDate, householdId)
 
     revalidatePath(dishesPath)
 }
@@ -114,7 +115,7 @@ export async function deleteDishwasher(formData: FormData) {
             .eq('household_id', householdId)
     }
 
-    deleteLiveActivity(ActivityType.DISHWASHER)
+    deleteLiveActivity(ActivityType.DISHWASHER, householdId)
 
     revalidatePath(dishesPath)
 }
