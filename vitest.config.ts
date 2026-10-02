@@ -5,6 +5,10 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     tsconfigPaths: true,
+    alias: {
+      // `next dev` aliases this marker package internally; Vite has to be told.
+      'server-only': 'next/dist/compiled/server-only/empty.js',
+    },
   },
   test: {
     environment: 'jsdom',
