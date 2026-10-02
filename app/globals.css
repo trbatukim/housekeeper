@@ -4,6 +4,12 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /* Where the absolute back button sits, and how much room it needs below
+     that (its own height plus a gap). Shared so .infoPage stays in step with
+     it once a notch pushes the safe-area inset past zero. */
+  --back-button-top: calc(24px + env(safe-area-inset-top));
+  --back-button-clearance: 52px;
 }
 
 @theme inline {
@@ -211,7 +217,7 @@ body {
 
 .backButton {
   position: absolute;
-  top: calc(24px + env(safe-area-inset-top));
+  top: var(--back-button-top);
   left: calc(24px + env(safe-area-inset-left));
 
   display: inline-block;
@@ -238,7 +244,7 @@ body {
    to the top instead and reserve room for the button. */
 .infoPage {
   justify-content: flex-start;
-  padding-top: calc(max(24px, env(safe-area-inset-top)) + 52px);
+  padding-top: calc(var(--back-button-top) + var(--back-button-clearance));
 }
 
 .demoBanner {
