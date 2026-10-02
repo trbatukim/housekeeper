@@ -318,6 +318,16 @@ CREATE TABLE IF NOT EXISTS "public"."profiles_to_households" (
 ALTER TABLE "public"."profiles_to_households" OWNER TO "postgres";
 
 
+CREATE TABLE IF NOT EXISTS "public"."pushward_keys" (
+    "profile_id" "uuid" NOT NULL,
+    "encrypted_key" "text" NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"()
+);
+
+
+ALTER TABLE "public"."pushward_keys" OWNER TO "postgres";
+
+
 ALTER TABLE ONLY "public"."dishes_status"
     ADD CONSTRAINT "dishes_status_pkey" PRIMARY KEY ("household_id");
 
@@ -385,6 +395,11 @@ ALTER TABLE ONLY "public"."profiles"
 
 ALTER TABLE ONLY "public"."profiles_to_households"
     ADD CONSTRAINT "profiles_to_households_pkey" PRIMARY KEY ("profile_id", "household_id");
+
+
+
+ALTER TABLE ONLY "public"."pushward_keys"
+    ADD CONSTRAINT "pushward_keys_pkey" PRIMARY KEY ("profile_id");
 
 
 
@@ -474,6 +489,11 @@ ALTER TABLE ONLY "public"."profiles_to_households"
 
 ALTER TABLE ONLY "public"."profiles_to_households"
     ADD CONSTRAINT "profiles_to_households_profile_id_fkey" FOREIGN KEY ("profile_id") REFERENCES "public"."profiles"("id") ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."pushward_keys"
+    ADD CONSTRAINT "pushward_keys_profile_id_fkey" FOREIGN KEY ("profile_id") REFERENCES "public"."profiles"("id") ON DELETE CASCADE;
 
 
 
@@ -670,10 +690,17 @@ ALTER TABLE "public"."meal_to_ingredient" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."meals" ENABLE ROW LEVEL SECURITY;
 
 
+CREATE POLICY "own key only" ON "public"."pushward_keys" TO "authenticated" USING (("profile_id" = "auth"."uid"())) WITH CHECK (("profile_id" = "auth"."uid"()));
+
+
+
 ALTER TABLE "public"."profiles" ENABLE ROW LEVEL SECURITY;
 
 
 ALTER TABLE "public"."profiles_to_households" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."pushward_keys" ENABLE ROW LEVEL SECURITY;
 
 
 
@@ -955,6 +982,11 @@ GRANT ALL ON TABLE "public"."profiles" TO "service_role";
 GRANT ALL ON TABLE "public"."profiles_to_households" TO "anon";
 GRANT ALL ON TABLE "public"."profiles_to_households" TO "authenticated";
 GRANT ALL ON TABLE "public"."profiles_to_households" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."pushward_keys" TO "service_role";
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "public"."pushward_keys" TO "authenticated";
 
 
 
