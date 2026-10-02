@@ -1,3 +1,4 @@
+/* noinspection CssUnresolvedCustomProperty */
 @import "tailwindcss";
 
 :root {
@@ -198,6 +199,12 @@ body {
 
 .error {
   color: #FF8A80;
+  font-size: 14px;
+  margin: 0;
+}
+
+.success {
+  color: #8FE3A8;
   font-size: 14px;
   margin: 0;
 }

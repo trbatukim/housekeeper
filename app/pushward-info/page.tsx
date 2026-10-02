@@ -3,20 +3,18 @@ import Link from "next/link";
 import styles from "@/app/ntfy-info/ntfy-info.module.css";
 import {createClient} from "@/lib/supabase/server";
 import {redirect} from "next/navigation";
+import {updateAPIKey} from "@/app/pushward-info/actions";
 
 export const metadata: Metadata = {
     title: "PushWard Info"
 }
 
 export default async function PushwardInfoPage({
-   params,
    searchParams
 }: {
-    params: Promise<{ id: string }>
-    searchParams: Promise<{ error?: string }>
+    searchParams: Promise<{ error?: string, saved?: string }>
 }) {
-    const { id } = await params
-    const { error: errorMessage } = await searchParams
+    const { error: errorMessage, saved } = await searchParams
 
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
@@ -29,10 +27,14 @@ export default async function PushwardInfoPage({
         <div className="container">
             <Link href='/' className="backButton">&larr; Back to Home</Link>
             <h1 className="title" style={{ marginTop: 20 }}>PushWard Info</h1>
-            <form className="form">
-                <label>Enter your API key here: <input className="input" type="text"></input></label>
+            <form className="form" action={updateAPIKey}>
+                <label>Enter your API key here: <input name="key" className="input" type="text"></input></label>
                 <button type="submit" className="button">Submit</button>
             </form>
+
+            {errorMessage && <p className="error">{errorMessage}</p>}
+            {saved && <p className="success">Key saved!</p>}
+
             <div className="contentBox" style={{ marginBottom: 60 }}>
                 <p>
                     Housekeeper sends laundry and dishwasher notifications through{' '}
