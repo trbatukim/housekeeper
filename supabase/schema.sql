@@ -425,6 +425,10 @@ ALTER TABLE ONLY "public"."pushward_keys"
 
 
 
+CREATE UNIQUE INDEX "api_keys_profile_household_key" ON "public"."api_keys" USING "btree" ("profile_id", "household_id");
+
+
+
 CREATE OR REPLACE TRIGGER "on_household_member_removed" AFTER DELETE ON "public"."profiles_to_households" FOR EACH ROW EXECUTE FUNCTION "public"."delete_empty_household"();
 
 
@@ -553,6 +557,10 @@ CREATE POLICY "Create a household" ON "public"."households" FOR INSERT TO "authe
 
 
 
+CREATE POLICY "Create own API key" ON "public"."api_keys" FOR INSERT TO "authenticated" WITH CHECK ((("profile_id" = ( SELECT "auth"."uid"() AS "uid")) AND "public"."is_household_member"("household_id")));
+
+
+
 CREATE POLICY "Delete household dishwasher loads" ON "public"."dishwasher_loads" FOR DELETE TO "authenticated" USING ("public"."is_household_member"("household_id"));
 
 
@@ -566,6 +574,10 @@ CREATE POLICY "Delete household groceries" ON "public"."grocery_items" FOR DELET
 
 
 CREATE POLICY "Delete household laundry" ON "public"."laundry_loads" FOR DELETE TO "authenticated" USING ("public"."is_household_member"("household_id"));
+
+
+
+CREATE POLICY "Delete own API keys" ON "public"."api_keys" FOR DELETE TO "authenticated" USING (("profile_id" = ( SELECT "auth"."uid"() AS "uid")));
 
 
 
@@ -621,6 +633,10 @@ CREATE POLICY "Update household laundry" ON "public"."laundry_loads" FOR UPDATE 
 
 
 
+CREATE POLICY "Update own API keys" ON "public"."api_keys" FOR UPDATE TO "authenticated" USING (("profile_id" = ( SELECT "auth"."uid"() AS "uid"))) WITH CHECK ((("profile_id" = ( SELECT "auth"."uid"() AS "uid")) AND "public"."is_household_member"("household_id")));
+
+
+
 CREATE POLICY "Update own households" ON "public"."households" FOR UPDATE TO "authenticated" USING (("id" IN ( SELECT "profiles_to_households"."household_id"
    FROM "public"."profiles_to_households"
   WHERE ("profiles_to_households"."profile_id" = ( SELECT "auth"."uid"() AS "uid")))));
@@ -668,6 +684,10 @@ CREATE POLICY "View household meal ingredients" ON "public"."meal_to_ingredient"
 
 
 CREATE POLICY "View household meals" ON "public"."meals" FOR SELECT TO "authenticated" USING ("public"."is_household_member"("household_id"));
+
+
+
+CREATE POLICY "View own API keys" ON "public"."api_keys" FOR SELECT TO "authenticated" USING (("profile_id" = ( SELECT "auth"."uid"() AS "uid")));
 
 
 
@@ -943,6 +963,7 @@ GRANT ALL ON FUNCTION "public"."rls_auto_enable"() TO "service_role";
 
 
 GRANT ALL ON TABLE "public"."api_keys" TO "service_role";
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE "public"."api_keys" TO "authenticated";
 
 
 
@@ -978,7 +999,7 @@ GRANT ALL ON TABLE "public"."grocery_items" TO "service_role";
 
 GRANT REFERENCES,TRIGGER,TRUNCATE,MAINTAIN ON TABLE "public"."households" TO "anon";
 GRANT SELECT,INSERT,REFERENCES,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE "public"."households" TO "authenticated";
-GRANT REFERENCES,TRIGGER,TRUNCATE,MAINTAIN ON TABLE "public"."households" TO "service_role";
+GRANT SELECT,REFERENCES,TRIGGER,TRUNCATE,MAINTAIN ON TABLE "public"."households" TO "service_role";
 
 
 

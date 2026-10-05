@@ -4,18 +4,19 @@ A shared household management app. Create or join a household with your roommate
 
 ## Features
 
-- **Accounts & households**: sign up, log in, create a household or join one with its ID, rename it, and manage members from a shared sidebar.
-- **Household themes**: pick a primary color per household to personalize its pages.
-- **Groceries**: add items with an amount and unit, edit them, check them off, and clear either the whole list or just the checked items.
-- **Expenses**: log one-time or recurring costs with an amount, category, and paid-on date; edit them later, and recurring ones roll over automatically.
-- **Meal planner**: keep a library of the household's meals, give each one its ingredients with amounts and units (picking from ingredients the household already saved, or adding new ones with a custom unit), and plan meals onto the days of the week. Tick the ingredients of any meal to push them straight onto the grocery list, skipping anything that is already there.
-- **Laundry**: start a load with an expected end time and track its status.
-- **Dishes**: track sink/dishwasher status and run a dishwasher cycle with an end time.
-- **Notifications**: subscribe to a household's [ntfy.sh](https://ntfy.sh) topic to get notified when laundry or dishwasher cycles finish or when your housemates decide to remind you of groceries and expenses.
-- **Live activities**: save a [PushWard](https://pushward.app) integration key to get a running countdown on your iPhone's Lock Screen and Dynamic Island while a laundry load or dishwasher cycle is going. Keys are per person, so starting a cycle pushes an activity to every member of the household who has saved one, and the activity ends when the cycle finishes or is cleared. Keys are stored encrypted with AES-256-GCM and can be removed again from the in-app info page.
-- **Installable**: ships a web app manifest and icons, so it can be installed from the browser and run as a standalone app on desktop or mobile.
-- **Demo mode**: click "Explore Demo" on the welcome page to drop into a pre-filled household with no signup, powered by a throwaway Supabase anonymous account. Sign up from inside the demo to keep the data on a real account.
-- **Feedback**: a feedback button on every page for reporting bugs or ideas straight from the app.
+- **Accounts & households**: Sign up, log in, create a household or join one with its ID, rename it, and manage members from a shared sidebar.
+- **Household themes**: Pick a primary color per household to personalize its pages.
+- **Groceries**: Add items with an amount and unit, edit them, check them off, and clear either the whole list or just the checked items.
+- **Expenses**: Log one-time or recurring costs with an amount, category, and paid-on date; edit them later, and recurring ones roll over automatically.
+- **Meal planner**: Keep a library of the household's meals, give each one its ingredients with amounts and units (picking from ingredients the household already saved, or adding new ones with a custom unit), and plan meals onto the days of the week. Tick the ingredients of any meal to push them straight onto the grocery list, skipping anything that is already there.
+- **Laundry**: Start a load with an expected end time and track its status.
+- **Dishes**: Track sink/dishwasher status and run a dishwasher cycle with an end time.
+- **Notifications**: Subscribe to a household's [ntfy.sh](https://ntfy.sh) topic to get notified when laundry or dishwasher cycles finish or when your housemates decide to remind you of groceries and expenses.
+- **Live activities**: Save a [PushWard](https://pushward.app) integration key to get a running countdown on your iPhone's Lock Screen and Dynamic Island while a laundry load or dishwasher cycle is going. Keys are per person, so starting a cycle pushes an activity to every member of the household who has saved one, and the activity ends when the cycle finishes or is cleared. Keys are stored encrypted with AES-256-GCM and can be removed again from the in-app info page.
+- **API**: Generate an API key per household from the settings page, then start a laundry load or dishwasher cycle, add a grocery item, or log an expense from anything that can send an HTTP request. Keys are stored as SHA-256 hashes and shown only once, generating a new one replaces the old, and a key stops working if its owner leaves the household.
+- **Installable**: Ships a web app manifest and icons, so it can be installed from the browser and run as a standalone app on desktop or mobile.
+- **Demo mode**: Click "Explore Demo" on the welcome page to drop into a pre-filled household with no signup, powered by a throwaway Supabase anonymous account. Sign up from inside the demo to keep the data on a real account.
+- **Feedback**: A feedback button on every page for reporting bugs or ideas straight from the app.
 
 ## Tech stack
 
@@ -24,6 +25,7 @@ A shared household management app. Create or join a household with your roommate
 - [Tailwind CSS](https://tailwindcss.com) v4
 - [Vitest](https://vitest.dev) + Testing Library for tests
 - [ntfy.sh](https://ntfy.sh) for push notifications and [PushWard](https://pushward.app) for iOS live activities
+- [Redoc](https://redocly.com) on GitHub Pages for the API reference
 
 ## Getting started
 
@@ -80,6 +82,26 @@ npx supabase db dump -f supabase/schema.sql
 ```
 
 Re-run that command after making schema changes to keep the file in sync.
+
+## API
+
+Every endpoint takes an API key as a bearer token. Generate one per household from the settings page.
+
+```bash
+curl -X POST https://housekeeper-tan.vercel.app/api/laundry \
+  -H "Authorization: Bearer $HOUSEKEEPER_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"hours": 1, "minutes": 30}'
+```
+
+| Endpoint | Body |
+| --- | --- |
+| `POST /api/laundry` | `hours` and `minutes`, both optional, defaulting to a 2 hour cycle |
+| `POST /api/dishwasher` | `hours` and `minutes`, both optional, defaulting to a 2 hour cycle |
+| `POST /api/groceries` | `name`, `amount`, `amount_type` |
+| `POST /api/expenses` | `description`, `price`, `currency`, `type`, and `due_date` as `dd.mm.yyyy` |
+
+The full reference, with every validation rule and error response, is published at [trbatukim.github.io/housekeeper](https://trbatukim.github.io/housekeeper) from [`docs/openapi.yaml`](docs/openapi.yaml). Update that spec in the same commit as any route change to keep the two in sync.
 
 ## Scripts
 
