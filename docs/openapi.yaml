@@ -16,7 +16,7 @@ info:
     ```
 
     Generate a key from **Settings** in the app. A key is tied to one
-    household and to the member who created it — treat it like a password,
+    household and to the member who created it. Treat your API key like a password,
     since it grants write access to that household's data. If the member is
     later removed from the household, their keys stop working.
 
@@ -314,7 +314,7 @@ components:
           type: string
           pattern: '^\d{2}\.\d{2}\.\d{4}$'
           description: |
-            Day-first `dd.mm.yyyy`, zero-padded — **not** ISO format. Must be a
+            Day-first `dd.mm.yyyy` **not** ISO format. Must be a
             real calendar date, so `31.02.2026` is rejected. Today is allowed;
             earlier dates are not.
           example: "25.12.2026"
