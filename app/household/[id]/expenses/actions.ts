@@ -5,12 +5,11 @@ import { redirect } from 'next/navigation'
 import { TEXT_MAX_LENGTH } from '@/lib/textLimits'
 import { sendNtfyReqWithoutDelay } from '@/lib/ntfy'
 import { formatDate } from '@/lib/dates'
+import { CURRENCY_VALUES } from '@/lib/currencies'
 
 export async function addExpense(formData: FormData) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
-
-    const validCurrencies: string[] = ['tl', 'euro', 'dollar', 'pound']
 
     if (!user) {
         return
@@ -37,7 +36,7 @@ export async function addExpense(formData: FormData) {
         redirect(`${expensesPath}?error=${encodeURIComponent('Invalid category.')}`)
     }
 
-    if (!validCurrencies.includes(currency)) {
+    if (!CURRENCY_VALUES.includes(currency)) {
         redirect(`${expensesPath}?error=${encodeURIComponent('Invalid category.')}`)
     }
 
@@ -188,8 +187,6 @@ export async function editExpenseItem(formData: FormData) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
-    const validCurrencies: string[] = ['tl', 'euro', 'dollar', 'pound']
-
     if (!user) {
         return
     }
@@ -216,7 +213,7 @@ export async function editExpenseItem(formData: FormData) {
         redirect(`${expensesPath}?error=${encodeURIComponent('Invalid category.')}`)
     }
 
-    if (!validCurrencies.includes(currency)) {
+    if (!CURRENCY_VALUES.includes(currency)) {
         redirect(`${expensesPath}?error=${encodeURIComponent('Invalid currency.')}`)
     }
 

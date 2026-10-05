@@ -9,6 +9,7 @@ import styles from '../theme.module.css'
 import HouseholdThemeSync from '../../../HouseholdThemeSync'
 import type { Metadata } from "next";
 import { TEXT_MAX_LENGTH } from '@/lib/textLimits'
+import { CURRENCIES } from '@/lib/currencies'
 
 const DEFAULT_COLOR = '#a98bff'
 
@@ -81,10 +82,9 @@ export default async function ExpensesPage({
                     
                     <input type="number" step="0.01" name="amount" required placeholder="Price" className={styles.input} />
                     <select name="currency" className={styles.select}>
-                        <option value="euro">Euro €</option>
-                        <option value="dollar">Dollar $</option>
-                        <option value="tl">Turkish Lira ₺</option>
-                        <option value="pound">Pound £</option>
+                        {CURRENCIES.map((currency) => (
+                            <option key={currency.value} value={currency.value}>{currency.label} {currency.symbol}</option>
+                        ))}
                     </select>
 
                     <select name="category" className={styles.select}>

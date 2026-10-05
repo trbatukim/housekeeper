@@ -2,6 +2,7 @@
 import { useState, useTransition } from 'react'
 import { toggleExpense } from './actions'
 import { formatDate } from '@/lib/dates'
+import { currencySymbol } from '@/lib/currencies'
 
 function formatCategory(category: string) {
     return category.charAt(0).toUpperCase() + category.slice(1)
@@ -25,13 +26,6 @@ export default function ExpenseItem({
     const [isPaid, setIsPaid] = useState(expense.is_paid)
     const [, startTransition] = useTransition()
 
-    const currencyMap = new Map<string, string>([
-        ['euro', '€'],
-        ['tl', '₺'],
-        ['dollar', '$'],
-        ['pound', '£']
-    ]);
-
     function handleToggle() {
         const next = !isPaid
         setIsPaid(next) // updates instantly, before the server responds
@@ -50,7 +44,7 @@ export default function ExpenseItem({
                 style={{ accentColor: 'var(--primary)' }}
             />
             <span style={{ textDecoration: isPaid ? 'line-through' : 'none', fontStyle: isPaid ? 'italic' : 'normal' }}> 
-                {expense.description}: {currencyMap.get(expense.currency)}{expense.amount} - Due: {formatDate(expense.paid_on)} ({formatCategory(expense.category)})
+                {expense.description}: {currencySymbol(expense.currency)}{expense.amount} - Due: {formatDate(expense.paid_on)} ({formatCategory(expense.category)})
             </span>
         </>
     )
