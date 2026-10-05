@@ -31,6 +31,7 @@ export default async function Home() {
         <div className={styles.actions}>
           <Link href="/household/setup" className="link">Create or Join a Household</Link>
           <Link href="/household" className="link">View Current Households</Link>
+          <Link href="/settings" className="link">Settings</Link>
         </div>
         <form action={signOut}>
           <button className="negativeButton" type="submit">Sign Out</button>

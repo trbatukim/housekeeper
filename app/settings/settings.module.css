@@ -1,0 +1,85 @@
+.keyList {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.keyItem {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  color: #f5f1ff;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.keyForm {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 10px;
+  width: 100%;
+}
+
+.inputWrap {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+
+  /* Zero basis so the field shrinks to share the row rather than wrapping
+     the button onto its own line. */
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+/* Scoped under .inputWrap so padding-right wins over the global .input
+   shorthand regardless of stylesheet order. */
+.inputWrap .keyInput {
+  width: 100%;
+
+  /* Room for the copy button sitting inside the right edge. */
+  padding-right: 38px;
+
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px;
+  text-overflow: ellipsis;
+}
+
+.copySlot {
+  position: absolute;
+  right: 12px;
+
+  display: flex;
+  align-items: center;
+}
+
+.generateButton {
+  white-space: nowrap;
+}
+
+.hint {
+  color: #b1b0b3;
+  font-size: 13px;
+  margin: 0;
+}
+
+/* Too narrow to share a row — stack the field and button instead. */
+@media (max-width: 480px) {
+  .keyForm {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .generateButton {
+    width: 100%;
+  }
+}

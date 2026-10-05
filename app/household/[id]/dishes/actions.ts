@@ -55,7 +55,7 @@ export async function addDishwasher(formData: FormData) {
 
     if (error) {
         if (notificationId) {
-            cancelNtfyReq(notificationId, householdId)
+            await cancelNtfyReq(notificationId, householdId)
         }
         redirect(`${dishesPath}?error=${encodeURIComponent(error.message)}`)
     }
@@ -99,7 +99,7 @@ export async function deleteDishwasher(formData: FormData) {
     }
 
     if (notificationId) {
-        cancelNtfyReq(notificationId, householdId)
+        await cancelNtfyReq(notificationId, householdId)
     }
 
     const { data: remainingLoads } = await supabase
@@ -115,7 +115,7 @@ export async function deleteDishwasher(formData: FormData) {
             .eq('household_id', householdId)
     }
 
-    deleteLiveActivity(ActivityType.DISHWASHER, householdId)
+    await deleteLiveActivity(ActivityType.DISHWASHER, householdId)
 
     revalidatePath(dishesPath)
 }

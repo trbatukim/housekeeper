@@ -1,25 +1,10 @@
 import "server-only"
-import { createClient as createAdminClient, type SupabaseClient } from "@supabase/supabase-js"
+import { getAdmin } from "@/lib/supabase/admin"
 import { decrypt } from "@/lib/crypto"
 
 export enum ActivityType {
     LAUNDRY = "Laundry",
     DISHWASHER = "Dishwasher",
-}
-
-let admin: SupabaseClient | null = null
-
-function getAdmin() {
-    if (admin) return admin
-
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-    if (!url || !serviceRoleKey) {
-        throw new Error("NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set")
-    }
-
-    admin = createAdminClient(url, serviceRoleKey)
-    return admin
 }
 
 async function getHouseholdKeys(householdId: string): Promise<string[]> {

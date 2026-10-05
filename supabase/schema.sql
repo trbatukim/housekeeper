@@ -150,6 +150,18 @@ SET default_tablespace = '';
 SET default_table_access_method = "heap";
 
 
+CREATE TABLE IF NOT EXISTS "public"."api_keys" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "profile_id" "uuid",
+    "household_id" "uuid",
+    "token_hash" "text" NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"()
+);
+
+
+ALTER TABLE "public"."api_keys" OWNER TO "postgres";
+
+
 CREATE TABLE IF NOT EXISTS "public"."dishes_status" (
     "household_id" "uuid" NOT NULL,
     "status" "text" DEFAULT 'clean'::"text" NOT NULL,
@@ -328,6 +340,16 @@ CREATE TABLE IF NOT EXISTS "public"."pushward_keys" (
 ALTER TABLE "public"."pushward_keys" OWNER TO "postgres";
 
 
+ALTER TABLE ONLY "public"."api_keys"
+    ADD CONSTRAINT "api_tokens_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."api_keys"
+    ADD CONSTRAINT "api_tokens_token_hash_key" UNIQUE ("token_hash");
+
+
+
 ALTER TABLE ONLY "public"."dishes_status"
     ADD CONSTRAINT "dishes_status_pkey" PRIMARY KEY ("household_id");
 
@@ -404,6 +426,16 @@ ALTER TABLE ONLY "public"."pushward_keys"
 
 
 CREATE OR REPLACE TRIGGER "on_household_member_removed" AFTER DELETE ON "public"."profiles_to_households" FOR EACH ROW EXECUTE FUNCTION "public"."delete_empty_household"();
+
+
+
+ALTER TABLE ONLY "public"."api_keys"
+    ADD CONSTRAINT "api_tokens_household_id_fkey" FOREIGN KEY ("household_id") REFERENCES "public"."households"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."api_keys"
+    ADD CONSTRAINT "api_tokens_profile_id_fkey" FOREIGN KEY ("profile_id") REFERENCES "public"."profiles"("id") ON DELETE CASCADE;
 
 
 
@@ -657,6 +689,9 @@ CREATE POLICY "View own households" ON "public"."households" FOR SELECT TO "auth
 
 
 
+ALTER TABLE "public"."api_keys" ENABLE ROW LEVEL SECURITY;
+
+
 ALTER TABLE "public"."dishes_status" ENABLE ROW LEVEL SECURITY;
 
 
@@ -904,6 +939,10 @@ GRANT ALL ON FUNCTION "public"."rls_auto_enable"() TO "service_role";
 
 
 
+
+
+
+GRANT ALL ON TABLE "public"."api_keys" TO "service_role";
 
 
 

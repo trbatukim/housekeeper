@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom'
 import { editExpenseItem } from './actions'
 import styles from '../theme.module.css'
 import { TEXT_MAX_LENGTH } from '@/lib/textLimits'
+import { CURRENCIES } from '@/lib/currencies'
 
 export default function EditExpenseItem({
   expense,
@@ -90,10 +91,9 @@ export default function EditExpenseItem({
                 className={styles.input}
               />
               <select name="currency" defaultValue={expense.currency} className={styles.select}>
-                <option value="euro">Euro €</option>
-                <option value="dollar">Dollar $</option>
-                <option value="tl">Turkish Lira ₺</option>
-                <option value="pound">Pound £</option>
+                {CURRENCIES.map((currency) => (
+                  <option key={currency.value} value={currency.value}>{currency.label} {currency.symbol}</option>
+                ))}
               </select>
               <select name="category" defaultValue={expense.category} className={styles.select}>
                 <option value="one-time">One-time</option>
