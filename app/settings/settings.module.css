@@ -1,3 +1,21 @@
+/* Aside under the title. Same muted treatment as .hint, with the link toned
+   down to inherit it — a bright link would pull focus back to the line. */
+.muted {
+  color: #b1b0b3;
+  font-size: 13px;
+  margin: 0;
+  text-align: center;
+}
+
+.muted a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.muted a:hover {
+  color: #a98bff;
+}
+
 .keyList {
   display: flex;
   flex-direction: column;

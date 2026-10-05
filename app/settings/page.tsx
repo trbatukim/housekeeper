@@ -27,6 +27,7 @@ export default async function SettingsPage({searchParams}: {searchParams: Promis
             <Link href="/" className="backButton">&larr; Back</Link>
             <h1 className="title">Settings</h1>
 
+            <p className={styles.muted}>For more info about API visit <Link target="_blank" href={"https://trbatukim.github.io/housekeeper"}>trbatukim.github.io/housekeeper</Link></p>
             {errorMessage && <p className="error">{errorMessage}</p>}
 
             <div className="contentBox">
