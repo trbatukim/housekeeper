@@ -41,7 +41,7 @@ export async function addLaundry(formData: FormData) {
 
     if (error) {
         if (notificationId) {
-            cancelNtfyReq(notificationId, householdId)
+            await cancelNtfyReq(notificationId, householdId)
         }
         redirect(`${laundryPath}?error=${encodeURIComponent(error.message)}`)
     }
@@ -80,7 +80,7 @@ export async function deleteLaundry(formData: FormData) {
     }
 
     if (notificationId) {
-        cancelNtfyReq(notificationId, householdId)
+        await cancelNtfyReq(notificationId, householdId)
     }
 
     deleteLiveActivity(ActivityType.LAUNDRY, householdId)
