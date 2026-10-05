@@ -1,0 +1,409 @@
+openapi: 3.0.3
+
+info:
+  title: HouseKeeper API
+  version: 1.0.0
+  description: |
+    Automate your household from outside the app: start a dishwasher or laundry
+    cycle, add groceries, and log expenses.
+
+    ## Authentication
+
+    Every endpoint takes an API key as a bearer token:
+
+    ```
+    Authorization: Bearer <your-api-key>
+    ```
+
+    Generate a key from **Settings** in the app. A key is tied to one
+    household and to the member who created it — treat it like a password,
+    since it grants write access to that household's data. If the member is
+    later removed from the household, their keys stop working.
+
+    ## Request bodies
+
+    All endpoints take `application/json`. A malformed body is treated as an
+    empty one, so you get a `400` listing the missing fields rather than a
+    parse error.
+
+servers:
+  - url: https://housekeeper-tan.vercel.app
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: Appliances
+    description: Timed dishwasher and laundry cycles.
+  - name: Groceries
+    description: The shared shopping list.
+  - name: Expenses
+    description: Shared household costs.
+
+paths:
+  /api/dishwasher:
+    post:
+      tags: [Appliances]
+      summary: Start a dishwasher cycle
+      description: |
+        Starts a cycle, schedules an ntfy reminder for when it finishes, and
+        opens a live activity on every household member's device. Also flips
+        the household's dish status to `cleaning`.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoadRequest'
+            examples:
+              default:
+                summary: Default 2 hour cycle
+                value: {}
+              explicit:
+                summary: 1 hour 45 minutes
+                value: { hours: 1, minutes: 45 }
+      responses:
+        '200':
+          $ref: '#/components/responses/LoadStarted'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/HouseholdNotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      x-codeSamples:
+        - lang: curl
+          source: |
+            curl -X POST https://housekeeper-tan.vercel.app/api/dishwasher \
+              -H "Authorization: Bearer $HOUSEKEEPER_KEY" \
+              -H "Content-Type: application/json" \
+              -d '{"hours": 1, "minutes": 45}'
+
+  /api/laundry:
+    post:
+      tags: [Appliances]
+      summary: Start a laundry cycle
+      description: |
+        Starts a load, schedules an ntfy reminder for when it finishes, and
+        opens a live activity on every household member's device.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoadRequest'
+            examples:
+              default:
+                summary: Default 2 hour cycle
+                value: {}
+              explicit:
+                summary: 30 minutes
+                value: { minutes: 30 }
+      responses:
+        '200':
+          $ref: '#/components/responses/LoadStarted'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/HouseholdNotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      x-codeSamples:
+        - lang: curl
+          source: |
+            curl -X POST https://housekeeper-tan.vercel.app/api/laundry \
+              -H "Authorization: Bearer $HOUSEKEEPER_KEY" \
+              -H "Content-Type: application/json" \
+              -d '{"minutes": 30}'
+
+  /api/groceries:
+    post:
+      tags: [Groceries]
+      summary: Add an item to the grocery list
+      description: |
+        Adds one item. Item names are compared case-insensitively, so adding a
+        name already on the list returns `409` instead of creating a duplicate.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GroceryRequest'
+            examples:
+              default:
+                value: { name: "Milk", amount: 2, amount_type: "L" }
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/HouseholdNotFound'
+        '409':
+          description: An item with that name is already on the list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: '"Milk" is already on the list.'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      x-codeSamples:
+        - lang: curl
+          source: |
+            curl -X POST https://housekeeper-tan.vercel.app/api/groceries \
+              -H "Authorization: Bearer $HOUSEKEEPER_KEY" \
+              -H "Content-Type: application/json" \
+              -d '{"name": "Milk", "amount": 2, "amount_type": "L"}'
+
+  /api/expenses:
+    post:
+      tags: [Expenses]
+      summary: Log a household expense
+      description: |
+        Logs an expense with a due date. Descriptions are compared
+        case-insensitively against existing expenses sharing the same due date
+        and currency, so a repeat submission returns `409`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpenseRequest'
+            examples:
+              default:
+                value:
+                  description: "Internet bill"
+                  price: 399.90
+                  currency: "tl"
+                  type: "recurring"
+                  due_date: "25.12.2026"
+      responses:
+        '200':
+          $ref: '#/components/responses/Ok'
+        '400':
+          description: |
+            Validation failed. Possible `error` values:
+
+            - `Fill in description, price, currency, type, and due_date (dd.mm.yyyy) fields, bad request`
+            - `Description cannot be empty`
+            - `Description cannot exceed 500 characters`
+            - `Price is not a number`
+            - `Price must be greater than 0`
+            - `Currency must be one of: euro, dollar, tl, pound`
+            - `Type must be 'recurring' or 'one-time'`
+            - `Due date must be a real date in dd.mm.yyyy format`
+            - `Due date cannot be in the past.`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: "Due date cannot be in the past."
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/HouseholdNotFound'
+        '409':
+          description: That description is already logged for that date and currency.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: '"Internet bill" is already logged for that date.'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      x-codeSamples:
+        - lang: curl
+          source: |
+            curl -X POST https://housekeeper-tan.vercel.app/api/expenses \
+              -H "Authorization: Bearer $HOUSEKEEPER_KEY" \
+              -H "Content-Type: application/json" \
+              -d '{
+                    "description": "Internet bill",
+                    "price": 399.90,
+                    "currency": "tl",
+                    "type": "recurring",
+                    "due_date": "25.12.2026"
+                  }'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: An API key generated from Settings in the app.
+
+  schemas:
+    LoadRequest:
+      type: object
+      description: |
+        Omit both fields for the default 2 hour cycle. If either is given, the
+        two are added together and the total must be greater than zero.
+      properties:
+        hours:
+          type: integer
+          minimum: 0
+          example: 1
+        minutes:
+          type: integer
+          minimum: 0
+          example: 45
+
+    GroceryRequest:
+      type: object
+      required: [name, amount, amount_type]
+      properties:
+        name:
+          type: string
+          description: Compared case-insensitively against the existing list.
+          example: Milk
+        amount:
+          type: number
+          description: Any finite number, including 0.
+          example: 2
+        amount_type:
+          type: string
+          description: |
+            Free-form unit. The app's own picker offers `g`, `kg`, `mL`, `L`,
+            `pcs`, `dozen`, `packet(s)`, `bottle(s)`, `can(s)`, `bag(s)`,
+            `jar(s)`, and `loaf/loaves`, but any string is accepted.
+          example: L
+
+    ExpenseRequest:
+      type: object
+      required: [description, price, currency, type, due_date]
+      properties:
+        description:
+          type: string
+          maxLength: 500
+          description: Trimmed before saving. Cannot be blank.
+          example: Internet bill
+        price:
+          type: number
+          exclusiveMinimum: true
+          minimum: 0
+          description: Must be greater than zero.
+          example: 399.90
+        currency:
+          type: string
+          enum: [euro, dollar, tl, pound]
+          example: tl
+        type:
+          type: string
+          enum: [recurring, one-time]
+          description: |
+            `recurring` expenses roll forward a month at a time once their due
+            date passes. `one-time` expenses do not.
+          example: recurring
+        due_date:
+          type: string
+          pattern: '^\d{2}\.\d{2}\.\d{4}$'
+          description: |
+            Day-first `dd.mm.yyyy`, zero-padded — **not** ISO format. Must be a
+            real calendar date, so `31.02.2026` is rejected. Today is allowed;
+            earlier dates are not.
+          example: "25.12.2026"
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          example: Invalid API key
+
+    Ok:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          example: true
+
+    LoadStarted:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          example: true
+        endsAt:
+          type: string
+          format: date-time
+          description: When the cycle finishes, and when the reminder fires.
+          example: "2026-10-05T18:30:00.000Z"
+
+  responses:
+    Ok:
+      description: Created.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Ok'
+
+    LoadStarted:
+      description: The cycle is running.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/LoadStarted'
+
+    BadRequest:
+      description: The requested duration was zero or negative.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: Set an end time for the load.
+
+    Unauthorized:
+      description: The `Authorization` header is missing, or the key is unknown.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            missing:
+              value: { error: Missing API key }
+            invalid:
+              value: { error: Invalid API key }
+
+    Forbidden:
+      description: The key's owner is no longer a member of the household.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: Not a member of this household
+
+    HouseholdNotFound:
+      description: The household the key points at no longer exists.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: Household not found
+
+    ServerError:
+      description: The write failed. Nothing was saved, and any scheduled reminder is cancelled.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: Couldn't add cycle
