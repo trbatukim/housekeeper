@@ -8,9 +8,11 @@ import {computeDurationSeconds, isValidDuration} from "@/lib/duration";
 
 const DEFAULT_DURATION_MINUTES = 120
 
+const isFilled = (value: unknown) => value !== undefined && value !== null && value !== ''
+
 type Household = { id: string, name: string }
 
-type Caller = { db: SupabaseClient, household: Household }
+type Caller = { db: SupabaseClient, household: Household, profileId: string }
 
 type LoadConfig = {
     table: string
@@ -64,7 +66,7 @@ export async function authenticate(req: Request): Promise<Caller | Response> {
         return Response.json({ error: "Household not found" }, { status: 404 })
     }
 
-    return { db, household: household as Household }
+    return { db, household: household as Household, profileId: key.profile_id as string }
 }
 
 export async function startLoad(req: Request, config: LoadConfig): Promise<Response> {
@@ -112,4 +114,53 @@ export async function startLoad(req: Request, config: LoadConfig): Promise<Respo
     await createLiveActivity(config.activityType, endsAtDate, household.id)
 
     return Response.json({ ok: true, endsAt })
+}
+
+export async function addGrocery(req: Request): Promise<Response> {
+    const caller = await authenticate(req)
+    if (caller instanceof Response) {
+        return caller
+    }
+
+    const { db, household, profileId } = caller
+
+    const body = await req.json().catch(() => ({}))
+
+    if (!isFilled(body.name) || !isFilled(body.amount) || !isFilled(body.amount_type)) {
+        return Response.json({ error: "Fill in name, amount, and amount_type fields, bad request" }, { status: 400 })
+    }
+
+    const amount = Number(body.amount)
+
+    if (!Number.isFinite(amount)) {
+        return Response.json({ error: "Amount is not a number" }, { status: 400 })
+    }
+
+    const { data: existing } = await db
+        .from("grocery_items")
+        .select("id")
+        .eq("household_id", household.id)
+        .ilike("name", body.name)
+        .maybeSingle()
+
+    if (existing) {
+        return Response.json({ error: `"${body.name}" is already on the list.` }, { status: 409 })
+    }
+
+    const { error } = await db
+        .from("grocery_items")
+        .insert({
+            household_id: household.id,
+            name: body.name,
+            added_by: profileId,
+            amount: amount,
+            amount_type: body.amount_type,
+        })
+
+    if (error) {
+        console.error("Couldn't add grocery:", error)
+        return Response.json({ error: "Couldn't add grocery" }, { status: 500 })
+    }
+
+    return Response.json({ ok: true }, { status: 200 })
 }
