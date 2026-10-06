@@ -10,6 +10,10 @@ const DEFAULT_DURATION_MINUTES = 120
 
 export const isFilled = (value: unknown) => value !== undefined && value !== null && value !== ''
 
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+export const isUuid = (value: unknown) => typeof value === "string" && UUID_PATTERN.test(value)
+
 type Household = { id: string, name: string }
 
 type Caller = { db: SupabaseClient, household: Household, profileId: string }
@@ -74,6 +78,35 @@ export async function authenticate(req: Request): Promise<Caller | Response> {
     }
 
     return { db, household: household as Household, profileId: key.profile_id as string }
+}
+
+// Case-insensitive exact match, done in JS because ilike treats % and _ as wildcards
+// and maybeSingle errors out when more than one row matches.
+export async function hasDuplicate(
+    db: SupabaseClient,
+    table: TableType,
+    column: string,
+    value: string,
+    filters: Record<string, unknown>,
+    excludeId?: string,
+): Promise<boolean | Response> {
+    let query = db.from(table).select(`id, ${column}`)
+    for (const [key, filterValue] of Object.entries(filters)) {
+        query = query.eq(key, filterValue)
+    }
+    if (excludeId) {
+        query = query.neq("id", excludeId)
+    }
+
+    const { data, error } = await query
+
+    if (error) {
+        console.error(`Couldn't check ${table} for duplicates:`, error)
+        return Response.json({ error: "Couldn't check for duplicates" }, { status: 500 })
+    }
+
+    const target = value.toLowerCase()
+    return (data as unknown as Record<string, unknown>[]).some(row => String(row[column]).toLowerCase() === target)
 }
 
 export async function startLoad(req: Request, config: LoadConfig): Promise<Response> {
