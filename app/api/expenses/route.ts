@@ -1,4 +1,4 @@
-import {authenticate, isFilled} from "@/lib/api";
+import {authenticate, getAllContentFromTable, isFilled, TableType} from "@/lib/api";
 import {parseDueDate} from "@/lib/dates";
 import {CURRENCY_VALUES} from "@/lib/currencies";
 import {TEXT_MAX_LENGTH} from "@/lib/textLimits";
@@ -87,4 +87,8 @@ export async function POST(req: Request): Promise<Response> {
     }
 
     return Response.json({ ok: true }, { status: 200 })
+}
+
+export async function GET(req: Request): Promise<Response> {
+    return getAllContentFromTable(req, TableType.EXPENSES)
 }

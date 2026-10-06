@@ -21,6 +21,13 @@ type LoadConfig = {
     onStarted?: (db: SupabaseClient, householdId: string) => Promise<void>
 }
 
+export enum TableType {
+    GROCERIES = "grocery_items",
+    EXPENSES = "expenses",
+    LAUNDRY = "laundry_loads",
+    DISHWASHER = "dishwasher_loads",
+}
+
 export async function authenticate(req: Request): Promise<Caller | Response> {
     const token = req.headers.get("authorization")?.replace("Bearer ", "").trim()
     if (!token) {
@@ -114,4 +121,25 @@ export async function startLoad(req: Request, config: LoadConfig): Promise<Respo
     await createLiveActivity(config.activityType, endsAtDate, household.id)
 
     return Response.json({ ok: true, endsAt })
+}
+
+export async function getAllContentFromTable(req: Request, table: TableType): Promise<Response> {
+    const caller = await authenticate(req)
+    if (caller instanceof Response) {
+        return caller
+    }
+
+    const { db, household } = caller
+
+    const { data, error } = await db
+        .from(table)
+        .select()
+        .eq("household_id", household.id)
+
+    if (error) {
+        console.error(`Couldn't get ${table}`, error)
+        return Response.json({ error: `Couldn't get ${table}` }, { status: 500 })
+    }
+
+    return Response.json({ data }, { status: 200 })
 }
