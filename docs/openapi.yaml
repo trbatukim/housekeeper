@@ -2,7 +2,7 @@ openapi: 3.0.3
 
 info:
   title: HouseKeeper API
-  version: 1.0.0
+  version: 1.1.0
   description: |
     Automate your household from outside the app: start a dishwasher or laundry
     cycle, add groceries, and log expenses.
@@ -82,6 +82,61 @@ paths:
               -H "Content-Type: application/json" \
               -d '{"hours": 1, "minutes": 45}'
 
+    get:
+      tags: [Appliances]
+      summary: List dishwasher cycles
+      description: Returns every dishwasher cycle for the household.
+      responses:
+        '200':
+          $ref: '#/components/responses/List'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/HouseholdNotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      x-codeSamples:
+        - lang: curl
+          source: |
+            curl https://housekeeper-tan.vercel.app/api/dishwasher \
+              -H "Authorization: Bearer $HOUSEKEEPER_KEY"
+
+    delete:
+      tags: [Appliances]
+      summary: Delete a dishwasher cycle
+      description: |
+        Deletes the cycle with the given `id`, cancels its ntfy reminder, and
+        ends the live activity. If no other dishwasher cycle is running, the
+        household's dish status goes back to `clean`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteByIdRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/Deleted'
+        '400':
+          $ref: '#/components/responses/MissingId'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/HouseholdNotFound'
+        '500':
+          $ref: '#/components/responses/DeleteFailed'
+      x-codeSamples:
+        - lang: curl
+          source: |
+            curl -X DELETE https://housekeeper-tan.vercel.app/api/dishwasher \
+              -H "Authorization: Bearer $HOUSEKEEPER_KEY" \
+              -H "Content-Type: application/json" \
+              -d '{"id": "0b6f1c2e-3c1a-4c5e-9f1e-2a7d8b9c0d1e"}'
+
   /api/laundry:
     post:
       tags: [Appliances]
@@ -121,6 +176,60 @@ paths:
               -H "Authorization: Bearer $HOUSEKEEPER_KEY" \
               -H "Content-Type: application/json" \
               -d '{"minutes": 30}'
+
+    get:
+      tags: [Appliances]
+      summary: List laundry cycles
+      description: Returns every laundry cycle for the household.
+      responses:
+        '200':
+          $ref: '#/components/responses/List'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/HouseholdNotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      x-codeSamples:
+        - lang: curl
+          source: |
+            curl https://housekeeper-tan.vercel.app/api/laundry \
+              -H "Authorization: Bearer $HOUSEKEEPER_KEY"
+
+    delete:
+      tags: [Appliances]
+      summary: Delete a laundry cycle
+      description: |
+        Deletes the cycle with the given `id`, cancels its ntfy reminder, and
+        ends the live activity.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteByIdRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/Deleted'
+        '400':
+          $ref: '#/components/responses/MissingId'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/HouseholdNotFound'
+        '500':
+          $ref: '#/components/responses/DeleteFailed'
+      x-codeSamples:
+        - lang: curl
+          source: |
+            curl -X DELETE https://housekeeper-tan.vercel.app/api/laundry \
+              -H "Authorization: Bearer $HOUSEKEEPER_KEY" \
+              -H "Content-Type: application/json" \
+              -d '{"id": "0b6f1c2e-3c1a-4c5e-9f1e-2a7d8b9c0d1e"}'
 
   /api/groceries:
     post:
@@ -167,6 +276,128 @@ paths:
               -H "Content-Type: application/json" \
               -d '{"name": "Milk", "amount": 2, "amount_type": "L"}'
 
+    put:
+      tags: [Groceries]
+      summary: Edit an item on the grocery list
+      description: |
+        Updates only the fields you send. Renaming an item to a name already
+        on the list (compared case-insensitively) returns `409`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GroceryUpdateRequest'
+            examples:
+              default:
+                value: { id: "0b6f1c2e-3c1a-4c5e-9f1e-2a7d8b9c0d1e", amount: 3 }
+      responses:
+        '200':
+          $ref: '#/components/responses/Updated'
+        '400':
+          description: |
+            Validation failed. Possible `error` values:
+
+            - `Fill in the id field, bad request`
+            - `id must be a valid UUID`
+            - `Amount is not a number`
+            - `Fill in at least one of name, amount, or amount_type fields, bad request`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: id must be a valid UUID
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: No item with that id in this household, or the household no longer exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: Item you're trying to edit does not exist
+        '409':
+          description: Another item with that name is already on the list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: '"Milk" is already on the list.'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      x-codeSamples:
+        - lang: curl
+          source: |
+            curl -X PUT https://housekeeper-tan.vercel.app/api/groceries \
+              -H "Authorization: Bearer $HOUSEKEEPER_KEY" \
+              -H "Content-Type: application/json" \
+              -d '{"id": "0b6f1c2e-3c1a-4c5e-9f1e-2a7d8b9c0d1e", "amount": 3}'
+
+    get:
+      tags: [Groceries]
+      summary: List grocery items
+      description: Returns every item on the household's grocery list.
+      responses:
+        '200':
+          $ref: '#/components/responses/List'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/HouseholdNotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      x-codeSamples:
+        - lang: curl
+          source: |
+            curl https://housekeeper-tan.vercel.app/api/groceries \
+              -H "Authorization: Bearer $HOUSEKEEPER_KEY"
+
+    delete:
+      tags: [Groceries]
+      summary: Delete a grocery item
+      description: |
+        Send either `name` or `id`. If `name` is set, `id` is ignored and every
+        item with exactly that name is deleted. The name match is
+        case-sensitive.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GroceryDeleteRequest'
+            examples:
+              byName:
+                value: { name: "Milk" }
+              byId:
+                value: { id: "0b6f1c2e-3c1a-4c5e-9f1e-2a7d8b9c0d1e" }
+      responses:
+        '200':
+          $ref: '#/components/responses/Deleted'
+        '400':
+          $ref: '#/components/responses/MissingId'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/HouseholdNotFound'
+        '500':
+          $ref: '#/components/responses/DeleteFailed'
+      x-codeSamples:
+        - lang: curl
+          source: |
+            curl -X DELETE https://housekeeper-tan.vercel.app/api/groceries \
+              -H "Authorization: Bearer $HOUSEKEEPER_KEY" \
+              -H "Content-Type: application/json" \
+              -d '{"name": "Milk"}'
+
   /api/expenses:
     post:
       tags: [Expenses]
@@ -185,7 +416,7 @@ paths:
               default:
                 value:
                   description: "Internet bill"
-                  price: 399.90
+                  amount: 399.90
                   currency: "tl"
                   type: "recurring"
                   due_date: "25.12.2026"
@@ -196,11 +427,11 @@ paths:
           description: |
             Validation failed. Possible `error` values:
 
-            - `Fill in description, price, currency, type, and due_date (dd.mm.yyyy) fields, bad request`
+            - `Fill in description, amount, currency, type, and due_date (dd.mm.yyyy) fields, bad request`
             - `Description cannot be empty`
             - `Description cannot exceed 500 characters`
-            - `Price is not a number`
-            - `Price must be greater than 0`
+            - `amount is not a number`
+            - `amount must be greater than 0`
             - `Currency must be one of: euro, dollar, tl, pound`
             - `Type must be 'recurring' or 'one-time'`
             - `Due date must be a real date in dd.mm.yyyy format`
@@ -235,11 +466,150 @@ paths:
               -H "Content-Type: application/json" \
               -d '{
                     "description": "Internet bill",
-                    "price": 399.90,
+                    "amount": 399.90,
                     "currency": "tl",
                     "type": "recurring",
                     "due_date": "25.12.2026"
                   }'
+
+    put:
+      tags: [Expenses]
+      summary: Edit a household expense
+      description: |
+        Updates only the fields you send, with the same validation as `POST`.
+        If the result would match another expense's description
+        (case-insensitively), due date, and currency, it returns `409`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpenseUpdateRequest'
+            examples:
+              default:
+                value: { id: "0b6f1c2e-3c1a-4c5e-9f1e-2a7d8b9c0d1e", amount: 449.90, due_date: "25.01.2027" }
+      responses:
+        '200':
+          $ref: '#/components/responses/Updated'
+        '400':
+          description: |
+            Validation failed. Possible `error` values:
+
+            - `Fill in the id field, bad request`
+            - `id must be a valid UUID`
+            - `Description cannot be empty`
+            - `Description cannot exceed 500 characters`
+            - `amount is not a number`
+            - `amount must be greater than 0`
+            - `Currency must be one of: euro, dollar, tl, pound`
+            - `Type must be 'recurring' or 'one-time'`
+            - `Due date must be a real date in dd.mm.yyyy format`
+            - `Due date cannot be in the past.`
+            - `Fill in at least one of description, amount, currency, type, or due_date fields, bad request`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: amount must be greater than 0
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: No expense with that id in this household, or the household no longer exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: Expense you're trying to edit does not exist
+        '409':
+          description: Another expense with that description is already logged for that date and currency.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: '"Internet bill" is already logged for that date.'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      x-codeSamples:
+        - lang: curl
+          source: |
+            curl -X PUT https://housekeeper-tan.vercel.app/api/expenses \
+              -H "Authorization: Bearer $HOUSEKEEPER_KEY" \
+              -H "Content-Type: application/json" \
+              -d '{"id": "0b6f1c2e-3c1a-4c5e-9f1e-2a7d8b9c0d1e", "amount": 449.90}'
+
+    get:
+      tags: [Expenses]
+      summary: List expenses
+      description: Returns every expense for the household.
+      responses:
+        '200':
+          $ref: '#/components/responses/List'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/HouseholdNotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
+      x-codeSamples:
+        - lang: curl
+          source: |
+            curl https://housekeeper-tan.vercel.app/api/expenses \
+              -H "Authorization: Bearer $HOUSEKEEPER_KEY"
+
+    delete:
+      tags: [Expenses]
+      summary: Delete an expense
+      description: |
+        Send either `description` or `id`. If `description` is set, `id` is
+        ignored and the expense with exactly that description is deleted. The
+        match is case-sensitive. If more than one expense has that description,
+        nothing is deleted and you get a `409`, so use the `id` instead.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpenseDeleteRequest'
+            examples:
+              byDescription:
+                value: { description: "Internet bill" }
+              byId:
+                value: { id: "0b6f1c2e-3c1a-4c5e-9f1e-2a7d8b9c0d1e" }
+      responses:
+        '200':
+          $ref: '#/components/responses/Deleted'
+        '400':
+          $ref: '#/components/responses/MissingId'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/HouseholdNotFound'
+        '409':
+          description: More than one expense has that description.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: 'More than one expense is called "Internet bill". Delete it by id instead.'
+        '500':
+          $ref: '#/components/responses/DeleteFailed'
+      x-codeSamples:
+        - lang: curl
+          source: |
+            curl -X DELETE https://housekeeper-tan.vercel.app/api/expenses \
+              -H "Authorization: Bearer $HOUSEKEEPER_KEY" \
+              -H "Content-Type: application/json" \
+              -d '{"id": "0b6f1c2e-3c1a-4c5e-9f1e-2a7d8b9c0d1e"}'
 
 components:
   securitySchemes:
@@ -286,14 +656,14 @@ components:
 
     ExpenseRequest:
       type: object
-      required: [description, price, currency, type, due_date]
+      required: [description, amount, currency, type, due_date]
       properties:
         description:
           type: string
           maxLength: 500
           description: Trimmed before saving. Cannot be blank.
           example: Internet bill
-        price:
+        amount:
           type: number
           exclusiveMinimum: true
           minimum: 0
@@ -318,6 +688,85 @@ components:
             real calendar date, so `31.02.2026` is rejected. Today is allowed;
             earlier dates are not.
           example: "25.12.2026"
+
+    DeleteByIdRequest:
+      type: object
+      required: [id]
+      properties:
+        id:
+          type: string
+          format: uuid
+
+    GroceryDeleteRequest:
+      type: object
+      description: Send `name` or `id`. `name` wins if both are set.
+      properties:
+        name:
+          type: string
+          example: Milk
+        id:
+          type: string
+          format: uuid
+
+    ExpenseDeleteRequest:
+      type: object
+      description: Send `description` or `id`. `description` wins if both are set.
+      properties:
+        description:
+          type: string
+          example: Internet bill
+        id:
+          type: string
+          format: uuid
+
+    GroceryUpdateRequest:
+      type: object
+      required: [id]
+      description: Send `id` plus at least one other field.
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          description: Compared case-insensitively against the rest of the list.
+          example: Oat milk
+        amount:
+          type: number
+          example: 3
+        amount_type:
+          type: string
+          example: L
+
+    ExpenseUpdateRequest:
+      type: object
+      required: [id]
+      description: |
+        Send `id` plus at least one other field. Each field follows the same
+        rules as in `ExpenseRequest`.
+      properties:
+        id:
+          type: string
+          format: uuid
+        description:
+          type: string
+          maxLength: 500
+          example: Internet bill
+        amount:
+          type: number
+          exclusiveMinimum: true
+          minimum: 0
+          example: 449.90
+        currency:
+          type: string
+          enum: [euro, dollar, tl, pound]
+        type:
+          type: string
+          enum: [recurring, one-time]
+        due_date:
+          type: string
+          pattern: '^\d{2}\.\d{2}\.\d{4}$'
+          example: "25.01.2027"
 
     Error:
       type: object
@@ -346,6 +795,65 @@ components:
           example: "2026-10-05T18:30:00.000Z"
 
   responses:
+    List:
+      description: Every row for the household. The array is empty if there are none.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  type: object
+
+    Deleted:
+      description: The deleted rows. The array is empty if no row matched.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              deleted:
+                type: array
+                items:
+                  type: object
+
+    MissingId:
+      description: |
+        No `id` was sent (and no name or description, where those are
+        accepted), or `id` is not a valid UUID.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            missing:
+              value: { error: "Fill in the id field, bad request" }
+            invalid:
+              value: { error: id must be a valid UUID }
+
+    DeleteFailed:
+      description: The delete failed.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: Couldn't delete item
+
+    Updated:
+      description: Updated. Returns the edited row.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              updated:
+                type: array
+                items:
+                  type: object
+
     Ok:
       description: Created.
       content:

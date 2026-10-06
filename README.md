@@ -97,9 +97,21 @@ curl -X POST https://housekeeper-tan.vercel.app/api/laundry \
 | Endpoint | Body |
 | --- | --- |
 | `POST /api/laundry` | `hours` and `minutes`, both optional, defaulting to a 2 hour cycle |
+| `GET /api/laundry` | None |
+| `DELETE /api/laundry` | `id` |
 | `POST /api/dishwasher` | `hours` and `minutes`, both optional, defaulting to a 2 hour cycle |
+| `GET /api/dishwasher` | None |
+| `DELETE /api/dishwasher` | `id` |
 | `POST /api/groceries` | `name`, `amount`, `amount_type` |
-| `POST /api/expenses` | `description`, `price`, `currency`, `type`, and `due_date` as `dd.mm.yyyy` |
+| `GET /api/groceries` | None |
+| `PUT /api/groceries` | `id`, plus at least one of `name`, `amount`, `amount_type` |
+| `DELETE /api/groceries` | `name` or `id` |
+| `POST /api/expenses` | `description`, `amount`, `currency`, `type`, and `due_date` as `dd.mm.yyyy` |
+| `GET /api/expenses` | None |
+| `PUT /api/expenses` | `id`, plus at least one of `description`, `amount`, `currency`, `type`, `due_date` |
+| `DELETE /api/expenses` | `description` or `id` |
+
+`GET` returns every row for the key's household.
 
 The full reference, with every validation rule and error response, is published at [trbatukim.github.io/housekeeper](https://trbatukim.github.io/housekeeper) from [`docs/openapi.yaml`](docs/openapi.yaml). Update that spec in the same commit as any route change to keep the two in sync.
 
