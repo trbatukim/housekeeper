@@ -57,16 +57,17 @@ export async function POST(req: Request): Promise<Response> {
         return Response.json({ error: "Due date cannot be in the past." }, { status: 400 })
     }
 
-    const { data: existing } = await db
-        .from("expenses")
-        .select("id")
-        .eq("household_id", household.id)
-        .eq("paid_on", dueDate)
-        .eq("currency", body.currency)
-        .ilike("description", description)
-        .maybeSingle()
+    const duplicate = await hasDuplicate(db, TableType.EXPENSES, "description", description, {
+        household_id: household.id,
+        paid_on: dueDate,
+        currency: body.currency,
+    })
 
-    if (existing) {
+    if (duplicate instanceof Response) {
+        return duplicate
+    }
+
+    if (duplicate) {
         return Response.json({ error: `"${description}" is already logged for that date.` }, { status: 409 })
     }
 
@@ -105,6 +106,21 @@ export async function DELETE(req: Request): Promise<Response> {
 
     if (!isFilled(body.description)) {
         return deleteContentFromTable(req, TableType.EXPENSES)
+    }
+
+    const { data: matches, error: matchError } = await db
+        .from("expenses")
+        .select("id")
+        .eq("description", body.description)
+        .eq("household_id", household.id)
+
+    if (matchError) {
+        console.error("Couldn't find item:", matchError)
+        return Response.json({ error: "Couldn't delete item" }, { status: 500 })
+    }
+
+    if (matches.length > 1) {
+        return Response.json({ error: `More than one expense is called "${body.description}". Delete it by id instead.` }, { status: 409 })
     }
 
     const { data, error } = await db

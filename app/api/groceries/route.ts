@@ -20,14 +20,13 @@ export async function POST(req: Request): Promise<Response> {
         return Response.json({ error: "Amount is not a number" }, { status: 400 })
     }
 
-    const { data: existing } = await db
-        .from("grocery_items")
-        .select("id")
-        .eq("household_id", household.id)
-        .ilike("name", body.name)
-        .maybeSingle()
+    const duplicate = await hasDuplicate(db, TableType.GROCERIES, "name", String(body.name), { household_id: household.id })
 
-    if (existing) {
+    if (duplicate instanceof Response) {
+        return duplicate
+    }
+
+    if (duplicate) {
         return Response.json({ error: `"${body.name}" is already on the list.` }, { status: 409 })
     }
 
