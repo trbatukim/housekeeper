@@ -1,4 +1,4 @@
-import {authenticate, getAllContentFromTable, isFilled, TableType} from "@/lib/api";
+import {authenticate, deleteContentFromTable, getAllContentFromTable, isFilled, TableType} from "@/lib/api";
 import {parseDueDate} from "@/lib/dates";
 import {CURRENCY_VALUES} from "@/lib/currencies";
 import {TEXT_MAX_LENGTH} from "@/lib/textLimits";
@@ -91,4 +91,33 @@ export async function POST(req: Request): Promise<Response> {
 
 export async function GET(req: Request): Promise<Response> {
     return getAllContentFromTable(req, TableType.EXPENSES)
+}
+
+export async function DELETE(req: Request): Promise<Response> {
+    const caller = await authenticate(req)
+    if (caller instanceof Response) {
+        return caller
+    }
+
+    const { db, household } = caller
+
+    const body = await req.clone().json().catch(() => ({}))
+
+    if (!isFilled(body.description)) {
+        return deleteContentFromTable(req, TableType.EXPENSES)
+    }
+
+    const { data, error } = await db
+        .from("expenses")
+        .delete()
+        .eq("description", body.description)
+        .eq("household_id", household.id)
+        .select()
+
+    if (error) {
+        console.error("Couldn't delete item:", error)
+        return Response.json({ error: "Couldn't delete item" }, { status: 500 })
+    }
+
+    return Response.json({ deleted: data }, { status: 200 })
 }

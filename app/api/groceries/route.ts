@@ -1,4 +1,4 @@
-import {authenticate, getAllContentFromTable, isFilled, TableType} from "@/lib/api"
+import {authenticate, deleteContentFromTable, getAllContentFromTable, isFilled, TableType} from "@/lib/api"
 
 export async function POST(req: Request): Promise<Response> {
     const caller = await authenticate(req)
@@ -57,10 +57,10 @@ export async function DELETE(req: Request): Promise<Response> {
 
     const { db, household } = caller
 
-    const body = await req.json().catch(() => ({}))
+    const body = await req.clone().json().catch(() => ({}))
 
     if (!isFilled(body.name)) {
-        return Response.json({ error: "Fill in the name field, bad request" }, { status: 400 })
+        return deleteContentFromTable(req, TableType.GROCERIES)
     }
 
     const { data, error } = await db

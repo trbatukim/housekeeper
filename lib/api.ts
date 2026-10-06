@@ -143,3 +143,32 @@ export async function getAllContentFromTable(req: Request, table: TableType): Pr
 
     return Response.json({ data }, { status: 200 })
 }
+
+export async function deleteContentFromTable(req: Request, table: TableType): Promise<Response> {
+    const caller = await authenticate(req)
+    if (caller instanceof Response) {
+        return caller
+    }
+
+    const { db, household } = caller
+
+    const body = await req.json().catch(() => ({}))
+
+    if (!isFilled(body.id)) {
+        return Response.json({ error: "Fill in the id field, bad request" }, { status: 400 })
+    }
+
+    const { data, error } = await db
+        .from(table)
+        .delete()
+        .eq("household_id", household.id)
+        .eq("id", body.id)
+        .select()
+
+    if (error) {
+        console.error(`Couldn't delete item`, error)
+        return Response.json({ error: `Couldn't delete item` }, { status: 500 })
+    }
+
+    return Response.json({ data }, { status: 200 })
+}

@@ -1,5 +1,5 @@
 import { ActivityType } from "@/lib/pushward"
-import {getAllContentFromTable, startLoad, TableType} from "@/lib/api"
+import {deleteContentFromTable, getAllContentFromTable, startLoad, TableType} from "@/lib/api"
 
 export async function POST(req: Request) {
     return startLoad(req, {
@@ -17,4 +17,8 @@ export async function POST(req: Request) {
 
 export async function GET(req: Request): Promise<Response> {
     return getAllContentFromTable(req, TableType.DISHWASHER)
+}
+
+export async function DELETE(req: Request): Promise<Response> {
+    return deleteContentFromTable(req, TableType.DISHWASHER)
 }
