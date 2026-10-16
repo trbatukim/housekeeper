@@ -40,6 +40,6 @@ export async function DELETE(req: Request): Promise<Response> {
                 .eq('household_id', householdId)
         }
 
-        await deleteLiveActivity(ActivityType.DISHWASHER, householdId)
+        await deleteLiveActivity(ActivityType.DISHWASHER, householdId, rows[0].id as string)
     })
 }

@@ -44,7 +44,7 @@ export async function addDishwasher(formData: FormData) {
 
     const notificationId = await sendNtfyReq("Dishwasher done!", endsAt, householdName, householdId)
 
-    const { error } = await supabase
+    const { data: load, error } = await supabase
         .from('dishwasher_loads')
         .insert({
             household_id: householdId,
@@ -52,6 +52,8 @@ export async function addDishwasher(formData: FormData) {
             status: 'running',
             ntfy_seq_id: notificationId ?? null,
         })
+        .select('id')
+        .single()
 
     if (error) {
         if (notificationId) {
@@ -65,7 +67,7 @@ export async function addDishwasher(formData: FormData) {
         .update({ status: 'cleaning' })
         .eq('household_id', householdId)
 
-    createLiveActivity(ActivityType.DISHWASHER, endsAtDate, householdId)
+    createLiveActivity(ActivityType.DISHWASHER, endsAtDate, householdId, load.id)
 
     revalidatePath(dishesPath)
 }
@@ -115,7 +117,7 @@ export async function deleteDishwasher(formData: FormData) {
             .eq('household_id', householdId)
     }
 
-    await deleteLiveActivity(ActivityType.DISHWASHER, householdId)
+    await deleteLiveActivity(ActivityType.DISHWASHER, householdId, dishwasherId)
 
     revalidatePath(dishesPath)
 }

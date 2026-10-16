@@ -30,7 +30,7 @@ export async function addLaundry(formData: FormData) {
 
     const notificationId = await sendNtfyReq("Laundry done!", endsAt, householdName, householdId)
 
-    const { error } = await supabase
+    const { data: load, error } = await supabase
         .from('laundry_loads')
         .insert({
             household_id: householdId,
@@ -38,6 +38,8 @@ export async function addLaundry(formData: FormData) {
             status: 'running',
             ntfy_seq_id: notificationId ?? null,
         })
+        .select('id')
+        .single()
 
     if (error) {
         if (notificationId) {
@@ -46,7 +48,7 @@ export async function addLaundry(formData: FormData) {
         redirect(`${laundryPath}?error=${encodeURIComponent(error.message)}`)
     }
 
-    createLiveActivity(ActivityType.LAUNDRY, endsAtDate, householdId)
+    createLiveActivity(ActivityType.LAUNDRY, endsAtDate, householdId, load.id)
 
     revalidatePath(laundryPath)
 }
@@ -83,7 +85,7 @@ export async function deleteLaundry(formData: FormData) {
         await cancelNtfyReq(notificationId, householdId)
     }
 
-    deleteLiveActivity(ActivityType.LAUNDRY, householdId)
+    deleteLiveActivity(ActivityType.LAUNDRY, householdId, laundryId)
 
     revalidatePath(laundryPath)
 }

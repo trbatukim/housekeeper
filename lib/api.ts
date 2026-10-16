@@ -132,7 +132,7 @@ export async function startLoad(req: Request, config: LoadConfig): Promise<Respo
 
     const notificationId = await sendNtfyReq(config.doneMessage, endsAt, household.name, household.id)
 
-    const { error } = await db
+    const { data: load, error } = await db
         .from(config.table)
         .insert({
             household_id: household.id,
@@ -140,6 +140,8 @@ export async function startLoad(req: Request, config: LoadConfig): Promise<Respo
             status: 'running',
             ntfy_seq_id: notificationId ?? null,
         })
+        .select('id')
+        .single()
 
     if (error) {
         if (notificationId) {
@@ -151,7 +153,7 @@ export async function startLoad(req: Request, config: LoadConfig): Promise<Respo
 
     await config.onStarted?.(db, household.id)
 
-    await createLiveActivity(config.activityType, endsAtDate, household.id)
+    await createLiveActivity(config.activityType, endsAtDate, household.id, load.id)
 
     return Response.json({ ok: true, endsAt })
 }

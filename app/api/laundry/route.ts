@@ -21,6 +21,6 @@ export async function DELETE(req: Request): Promise<Response> {
             await cancelNtfyReq(notificationId, householdId)
         }
 
-        await deleteLiveActivity(ActivityType.LAUNDRY, householdId)
+        await deleteLiveActivity(ActivityType.LAUNDRY, householdId, rows[0].id as string)
     })
 }

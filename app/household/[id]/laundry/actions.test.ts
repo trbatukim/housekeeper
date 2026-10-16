@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { addLaundry, deleteLaundry } from './actions'
 import { createClient } from '@/lib/supabase/server'
 import { sendNtfyReq, cancelNtfyReq } from '@/lib/ntfy'
+import { ActivityType, createLiveActivity, deleteLiveActivity } from '@/lib/pushward'
 import { mockSupabaseClient, mockQueryBuilder, queryResult, formData } from '@/lib/supabase/testing'
 
 vi.mock('@/lib/supabase/server', () => ({
@@ -66,7 +67,7 @@ describe('addLaundry', () => {
 
     it('adds laundry and schedules a notification when everything is valid', async () => {
         vi.mocked(sendNtfyReq).mockResolvedValue('ntfy1')
-        const laundryLoads = mockQueryBuilder(queryResult(null))
+        const laundryLoads = mockQueryBuilder(queryResult({ id: 'l1' }))
         const supabase = mockSupabaseClient({ user: { id: 'u1' }, from: { laundry_loads: laundryLoads } })
         vi.mocked(createClient).mockResolvedValue(supabase as never)
 
@@ -84,6 +85,7 @@ describe('addLaundry', () => {
             status: 'running',
             ntfy_seq_id: 'ntfy1',
         })
+        expect(createLiveActivity).toHaveBeenCalledWith(ActivityType.LAUNDRY, new Date('2024-01-01T01:00:00.000Z'), 'h1', 'l1')
         expect(cancelNtfyReq).not.toHaveBeenCalled()
     })
 
@@ -181,6 +183,7 @@ describe('deleteLaundry', () => {
         expect(laundryLoads.eq).toHaveBeenCalledWith('household_id', 'h1')
         expect(laundryLoads.eq).toHaveBeenCalledWith('id', 'l1')
         expect(cancelNtfyReq).toHaveBeenCalledWith('ntfy1', 'h1')
+        expect(deleteLiveActivity).toHaveBeenCalledWith(ActivityType.LAUNDRY, 'h1', 'l1')
     })
 
     it('does not attempt to cancel a notification when none is associated with the load', async () => {
