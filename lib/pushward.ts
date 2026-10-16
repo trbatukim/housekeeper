@@ -35,20 +35,27 @@ async function getHouseholdKeys(householdId: string): Promise<string[]> {
     return rows.map((r) => decrypt(r.encrypted_key))
 }
 
-async function patchForAll(keys: string[], slug: string, body: object) {
+function activitySlug(type: ActivityType, loadId: string) {
+    return `${type.toLowerCase()}-${loadId}`
+}
+
+async function sendForAll(
+    keys: string[],
+    method: "POST" | "PATCH",
+    path: string,
+    contentType: string,
+    body: object
+) {
     const results = await Promise.allSettled(
         keys.map(async (key) => {
-            const res = await fetch(
-                `https://api.pushward.app/activities/${slug}?upsert=true`,
-                {
-                    method: "PATCH",
-                    headers: {
-                        Authorization: `Bearer ${key}`,
-                        "Content-Type": "application/merge-patch+json",
-                    },
-                    body: JSON.stringify(body),
-                }
-            )
+            const res = await fetch(`https://api.pushward.app${path}`, {
+                method,
+                headers: {
+                    Authorization: `Bearer ${key}`,
+                    "Content-Type": contentType,
+                },
+                body: JSON.stringify(body),
+            })
             if (!res.ok) {
                 throw new Error(`${res.status} ${await res.text()}`)
             }
@@ -60,17 +67,29 @@ async function patchForAll(keys: string[], slug: string, body: object) {
     })
 }
 
+async function postForAll(keys: string[], body: { slug: string; name: string }) {
+    await sendForAll(keys, "POST", "/activities", "application/json", body)
+}
+
+async function patchForAll(keys: string[], slug: string, body: object) {
+    await sendForAll(keys, "PATCH", `/activities/${slug}?upsert=true`, "application/merge-patch+json", body)
+}
+
 export async function createLiveActivity(
     type: ActivityType,
     endsAt: Date,
-    householdId: string
+    householdId: string,
+    loadId: string,
 ) {
     const keys = await getHouseholdKeys(householdId)
     if (keys.length === 0) return
 
+    const slug = activitySlug(type, loadId)
     const toUnix = (d: Date) => Math.floor(d.getTime() / 1000)
 
-    await patchForAll(keys, `${type.toLowerCase()}-timer`, {
+    await postForAll(keys, { slug, name: type })
+
+    await patchForAll(keys, slug, {
         state: "ongoing",
         content: {
             template: "countdown",
@@ -79,7 +98,7 @@ export async function createLiveActivity(
             progress: 0,
             start_date: toUnix(new Date()),
             end_date: toUnix(endsAt),
-            completion_message: `${type} done!`,
+            completion_message: `Done!`,
             icon: "timer",
             accent_color: "blue",
             alarm: false,
@@ -88,11 +107,11 @@ export async function createLiveActivity(
     })
 }
 
-export async function deleteLiveActivity(type: ActivityType, householdId: string) {
+export async function deleteLiveActivity(type: ActivityType, householdId: string, loadId: string) {
     const keys = await getHouseholdKeys(householdId)
     if (keys.length === 0) return
 
-    await patchForAll(keys, `${type.toLowerCase()}-timer`, {
+    await patchForAll(keys, activitySlug(type, loadId), {
         state: "ended",
         dismissal_ttl: 0,
     })

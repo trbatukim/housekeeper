@@ -3,6 +3,7 @@ import { addDishwasher, deleteDishwasher, toggleDishesStatus } from './actions'
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { sendNtfyReq, cancelNtfyReq } from '@/lib/ntfy'
+import { ActivityType, createLiveActivity, deleteLiveActivity } from '@/lib/pushward'
 import { mockSupabaseClient, mockQueryBuilder, queryResult, formData } from '@/lib/supabase/testing'
 
 vi.mock('@/lib/supabase/server', () => ({
@@ -67,7 +68,7 @@ describe('addDishwasher', () => {
 
     it('adds a dishwasher load, schedules a notification, and marks dishes as cleaning', async () => {
         vi.mocked(sendNtfyReq).mockResolvedValue('ntfy1')
-        const dishwasherLoads = mockQueryBuilder(queryResult(null))
+        const dishwasherLoads = mockQueryBuilder(queryResult({ id: 'd1' }))
         const dishesStatus = mockQueryBuilder(queryResult(null))
         const supabase = mockSupabaseClient({
             user: { id: 'u1' },
@@ -91,6 +92,7 @@ describe('addDishwasher', () => {
         })
         expect(dishesStatus.update).toHaveBeenCalledWith({ status: 'cleaning' })
         expect(dishesStatus.eq).toHaveBeenCalledWith('household_id', 'h1')
+        expect(createLiveActivity).toHaveBeenCalledWith(ActivityType.DISHWASHER, new Date('2024-01-01T01:00:00.000Z'), 'h1', 'd1')
         expect(cancelNtfyReq).not.toHaveBeenCalled()
         expect(revalidatePath).toHaveBeenCalledWith('/household/h1/dishes')
     })
@@ -189,6 +191,7 @@ describe('deleteDishwasher', () => {
         expect(dishwasherLoads.eq).toHaveBeenCalledWith('household_id', 'h1')
         expect(dishwasherLoads.eq).toHaveBeenCalledWith('id', 'd1')
         expect(cancelNtfyReq).toHaveBeenCalledWith('ntfy1', 'h1')
+        expect(deleteLiveActivity).toHaveBeenCalledWith(ActivityType.DISHWASHER, 'h1', 'd1')
         expect(revalidatePath).toHaveBeenCalledWith('/household/h1/dishes')
     })
 
