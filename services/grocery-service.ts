@@ -1,8 +1,10 @@
 import { NAME_MAX_LENGTH } from '@/lib/textLimits';
 import {InputTooLongError, EmptyFieldError, NaNFieldError, NotFiniteError} from '@/core/errors/validation.error';
 import {SupabaseClient} from "@supabase/supabase-js";
-import {insert, nameExists} from "@/repositories/grocery-repository";
+import {insert, nameExists, update} from "@/repositories/grocery-repository";
 import {DuplicateError} from "@/core/errors/conflict.error";
+import {GroceryType, GroceryUpdate} from "@/core/types/grocery";
+import {NotFoundError} from "@/core/errors/not-found.error";
 
 export function validateGroceryName(name: string) {
     if (!name) throw new EmptyFieldError("Grocery name cannot be empty");
@@ -38,7 +40,7 @@ export async function addGrocery(db: SupabaseClient, householdId: string, profil
     validateGrocery(input);
 
     if (await nameExists(db, input.name, householdId)) {
-        throw new DuplicateError(`"${input.name}" is already on the list.`)
+        throw new DuplicateError(`"${input.name}" is already on the list.`);
     }
 
     await insert(db, {
@@ -47,5 +49,41 @@ export async function addGrocery(db: SupabaseClient, householdId: string, profil
         amount: input.amount,
         amount_type: input.amountType ?? null,
         added_by: profileId
-    })
+    });
+}
+
+export async function updateGrocery(db: SupabaseClient, id: string, householdId: string, input: {
+    name?: string,
+    amount?: number,
+    amountType?: string | null,
+}): Promise<GroceryType> {
+    const updates: GroceryUpdate = {};
+
+    if (input.name !== undefined) {
+        validateGroceryName(input.name);
+        updates.name = input.name;
+    }
+    if (input.amount !== undefined) {
+        validateAmount(input.amount);
+        updates.amount = input.amount;
+    }
+    if (input.amountType !== undefined) {
+        validateAmountType(input.amountType);
+        updates.amount_type = input.amountType;
+    }
+
+    if (Object.keys(updates).length === 0) {
+        throw new EmptyFieldError("Fill in at least one of name, amount, or amount_type");
+    }
+
+    if (updates.name !== undefined && await nameExists(db, updates.name, householdId, id)) {
+        throw new DuplicateError(`"${updates.name}" is already on the list.`);
+    }
+
+    const updated = await update(db, id, householdId, updates);
+    if (!updated) {
+        throw new NotFoundError("Item you're trying to edit does not exist");
+    }
+
+    return updated;
 }

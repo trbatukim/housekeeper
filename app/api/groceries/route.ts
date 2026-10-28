@@ -1,9 +1,9 @@
 import {
     authenticate, deleteContentFromTable,
-    errorResponse, getAllContentFromTable, hasDuplicate, isFilled, isUuid, TableType
+    errorResponse, getAllContentFromTable, hasDuplicate, isFilled, isUuid
 } from "@/lib/api"
-import {validateGrocery} from "@/services/grocery-service";
-import {ValidationError} from "@/core/errors/validation.error";
+import {addGrocery} from "@/services/grocery-service";
+import {AppError} from "@/core/errors/base.error";
 
 export async function POST(req: Request): Promise<Response> {
     const caller = await authenticate(req)
@@ -20,40 +20,15 @@ export async function POST(req: Request): Promise<Response> {
     const amountType = typeof body.amount_type === "string" ? body.amount_type.trim() : null
 
     try {
-        validateGrocery({
-            name,
-            amount,
-            amountType
+        await addGrocery(db, household.id, profileId, {
+            name: name,
+            amount: amount,
+            amountType: amountType
         })
     } catch (e: unknown) {
-        if (e instanceof ValidationError) {
-            return Response.json(errorResponse(e));
+        if (e instanceof AppError) {
+            return errorResponse(e);
         }
-    }
-
-    const duplicate = await hasDuplicate(db, TableType.GROCERIES, "name", String(body.name), { household_id: household.id })
-
-    if (duplicate instanceof Response) {
-        return duplicate
-    }
-
-    if (duplicate) {
-        return Response.json({ error: `"${body.name}" is already on the list.` }, { status: 409 })
-    }
-
-    const { error } = await db
-        .from("grocery_items")
-        .insert({
-            household_id: household.id,
-            name: body.name,
-            added_by: profileId,
-            amount: amount,
-            amount_type: body.amount_type,
-        })
-
-    if (error) {
-        console.error("Couldn't add grocery:", error)
-        return Response.json({ error: "Couldn't add grocery" }, { status: 500 })
     }
 
     return Response.json({ ok: true })

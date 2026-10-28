@@ -1,19 +1,7 @@
 import {SupabaseClient} from "@supabase/supabase-js";
 import {DatabaseError} from "@/core/errors/database.error";
 import {TableType} from "@/lib/supabase/tables";
-
-export type GroceryType = {
-    id: string
-    household_id: string
-    name: string
-    amount: number | null
-    amount_type: string | null
-    is_purchased: boolean
-    added_by: string | null
-    created_at: string
-}
-
-export type NewGroceryType = Omit<GroceryType, "id" | "is_purchased" | "created_at">
+import {GroceryType, GroceryUpdate, NewGroceryType} from "@/core/types/grocery";
 
 export async function findAll(db: SupabaseClient, householdId: string): Promise<GroceryType[]> {
     const { data, error } = await db
@@ -40,7 +28,22 @@ export async function insert(db: SupabaseClient, item: NewGroceryType): Promise<
     }
 }
 
-// export async function update(db: SupabaseClient, id: string, householdId: string);
+export async function update(db: SupabaseClient, id: string, householdId: string, updates: GroceryUpdate): Promise<GroceryType | null> {
+    const { data, error } = await db
+        .from(TableType.GROCERIES)
+        .update(updates)
+        .eq("id", id)
+        .eq("household_id", householdId)
+        .select()
+        .maybeSingle();
+
+    if (error) {
+        console.error("Couldn't update groceries: ", error)
+        throw new DatabaseError("Database update query failed");
+    }
+
+    return data;
+}
 
 export async function deleteById(db: SupabaseClient, id: string, householdId: string): Promise<void> {
     const { error } = await db
@@ -72,18 +75,25 @@ export async function deleteByName(db: SupabaseClient, name: string, householdId
     }
 }
 
-export async function nameExists(db: SupabaseClient, name: string, householdId: string): Promise<boolean> {
-    const { data, error } = await db
+// Case-insensitive exact match, done in JS because ilike treats % and _ as wildcards
+// and maybeSingle errors out when more than one row matches.
+export async function nameExists(db: SupabaseClient, name: string, householdId: string, excludeId?: string): Promise<boolean> {
+    let query = db
         .from(TableType.GROCERIES)
-        .select()
+        .select("name")
         .eq("household_id", householdId)
-        .eq("name", name)
-        .maybeSingle()
+
+    if (excludeId) {
+        query = query.neq("id", excludeId)
+    }
+
+    const { data, error } = await query
 
     if (error) {
         console.error("Couldn't search groceries: ", error)
         throw new DatabaseError("Database search query failed");
     }
 
-    return data !== null;
+    const target = name.toLowerCase()
+    return data.some(row => row.name.toLowerCase() === target)
 }
