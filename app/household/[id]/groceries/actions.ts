@@ -5,6 +5,8 @@ import { redirect } from 'next/navigation'
 import { CUSTOM_AMOUNT_TYPE } from '@/lib/amountTypes'
 import { NAME_MAX_LENGTH } from '@/lib/textLimits'
 import { sendNtfyReqWithoutDelay } from '@/lib/ntfy'
+import { validateGrocery } from "@/services/grocery-service";
+import {ValidationError} from "@/core/errors/validation.error";
 
 export async function addGroceryItem(formData: FormData) {
     const supabase = await createClient()
@@ -22,26 +24,20 @@ export async function addGroceryItem(formData: FormData) {
     const amountType = selectedAmountType === CUSTOM_AMOUNT_TYPE ? customAmountType : selectedAmountType
     const groceriesPath = `/household/${householdId}/groceries`
 
-    if (!name) {
-        redirect(`${groceriesPath}?error=${encodeURIComponent('Item name cannot be empty.')}`)
-    }
-
-    if (name.length > NAME_MAX_LENGTH) {
-        redirect(`${groceriesPath}?error=${encodeURIComponent(`Item name cannot exceed ${NAME_MAX_LENGTH} characters.`)}`)
-    }
-
-    if (customAmountType && customAmountType.length > NAME_MAX_LENGTH) {
-        redirect(`${groceriesPath}?error=${encodeURIComponent(`Custom unit cannot exceed ${NAME_MAX_LENGTH} characters.`)}`)
-    }
-
-    if (!amountRaw || !amountType) {
-        redirect(`${groceriesPath}?error=${encodeURIComponent('Amount and unit are required.')}`)
-    }
-
     const amount = Number(amountRaw)
 
-    if (Number.isNaN(amount)) {
-        redirect(`${groceriesPath}?error=${encodeURIComponent('Amount must be a number.')}`)
+    try {
+        validateGrocery({
+            name,
+            amount,
+            amountType
+        })
+    } catch (e: unknown) {
+        if (e instanceof ValidationError) {
+            redirect(`${groceriesPath}?error=${encodeURIComponent(e.message)}`)
+            return;
+        }
+        throw e;
     }
 
     const { data: existing } = await supabase
