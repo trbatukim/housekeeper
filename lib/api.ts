@@ -5,6 +5,7 @@ import {getAdmin} from "@/lib/supabase/admin";
 import {ActivityType, createLiveActivity} from "@/lib/pushward";
 import {cancelNtfyReq, sendNtfyReq} from "@/lib/ntfy";
 import {computeDurationSeconds, isValidDuration} from "@/lib/duration";
+import {AppError} from "@/core/errors/base.error";
 
 const DEFAULT_DURATION_MINUTES = 120
 
@@ -218,4 +219,11 @@ export async function deleteContentFromTable(
     }
 
     return Response.json({ deleted: data }, { status: 200 })
+}
+
+export function errorResponse(e: unknown): Response {
+    if (e instanceof AppError) {
+        return Response.json({ error: e.message }, { status: e.status })
+    }
+    throw e
 }

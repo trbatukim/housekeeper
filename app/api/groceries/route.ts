@@ -1,4 +1,9 @@
-import {authenticate, deleteContentFromTable, getAllContentFromTable, hasDuplicate, isFilled, isUuid, TableType} from "@/lib/api"
+import {
+    authenticate, deleteContentFromTable,
+    errorResponse, getAllContentFromTable, hasDuplicate, isFilled, isUuid, TableType
+} from "@/lib/api"
+import {validateGrocery} from "@/services/grocery-service";
+import {ValidationError} from "@/core/errors/validation.error";
 
 export async function POST(req: Request): Promise<Response> {
     const caller = await authenticate(req)
@@ -10,14 +15,20 @@ export async function POST(req: Request): Promise<Response> {
 
     const body = await req.json().catch(() => ({}))
 
-    if (!isFilled(body.name) || !isFilled(body.amount) || !isFilled(body.amount_type)) {
-        return Response.json({ error: "Fill in name, amount, and amount_type fields, bad request" }, { status: 400 })
-    }
-
+    const name = typeof body.name === "string" ? body.name.trim() : ""
     const amount = Number(body.amount)
+    const amountType = typeof body.amount_type === "string" ? body.amount_type.trim() : null
 
-    if (!Number.isFinite(amount)) {
-        return Response.json({ error: "Amount is not a number" }, { status: 400 })
+    try {
+        validateGrocery({
+            name,
+            amount,
+            amountType
+        })
+    } catch (e: unknown) {
+        if (e instanceof ValidationError) {
+            return Response.json(errorResponse(e));
+        }
     }
 
     const duplicate = await hasDuplicate(db, TableType.GROCERIES, "name", String(body.name), { household_id: household.id })
