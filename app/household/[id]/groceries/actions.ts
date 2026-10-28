@@ -5,8 +5,8 @@ import { redirect } from 'next/navigation'
 import { CUSTOM_AMOUNT_TYPE } from '@/lib/amountTypes'
 import { NAME_MAX_LENGTH } from '@/lib/textLimits'
 import { sendNtfyReqWithoutDelay } from '@/lib/ntfy'
-import { validateGrocery } from "@/services/grocery-service";
-import {ValidationError} from "@/core/errors/validation.error";
+import {addGrocery} from "@/services/grocery-service";
+import {AppError} from "@/core/errors/base.error";
 
 export async function addGroceryItem(formData: FormData) {
     const supabase = await createClient()
@@ -27,36 +27,16 @@ export async function addGroceryItem(formData: FormData) {
     const amount = Number(amountRaw)
 
     try {
-        validateGrocery({
-            name,
-            amount,
-            amountType
+        await addGrocery(supabase, householdId, user.id, {
+            name: name,
+            amount: amount,
+            amountType: amountType
         })
     } catch (e: unknown) {
-        if (e instanceof ValidationError) {
-            redirect(`${groceriesPath}?error=${encodeURIComponent(e.message)}`)
-            return;
+        if (e instanceof AppError) {
+            redirect(`${groceriesPath}?error=${encodeURIComponent(e.message)}`);
         }
         throw e;
-    }
-
-    const { data: existing } = await supabase
-        .from('grocery_items')
-        .select('id')
-        .eq('household_id', householdId)
-        .ilike('name', name)
-        .maybeSingle()
-
-    if (existing) {
-        redirect(`${groceriesPath}?error=${encodeURIComponent(`"${name}" is already on the list.`)}`)
-    }
-
-    const { error } = await supabase
-        .from('grocery_items')
-        .insert({ household_id: householdId, name, added_by: user.id, amount, amount_type: amountType })
-
-    if (error) {
-        redirect(`${groceriesPath}?error=${encodeURIComponent(error.message)}`)
     }
 
     revalidatePath(groceriesPath)
