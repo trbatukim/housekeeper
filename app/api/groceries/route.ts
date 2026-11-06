@@ -1,4 +1,10 @@
-import {authenticate, deleteContentFromTable, getAllContentFromTable, hasDuplicate, isFilled, isUuid, TableType} from "@/lib/api"
+import {
+    authenticate, deleteContentFromTable,
+    errorResponse, getAllContentFromTable, hasDuplicate, isFilled, isUuid
+} from "@/lib/api"
+import {addGrocery} from "@/services/grocery-service";
+import {AppError} from "@/core/errors/base.error";
+import {TableType} from "@/lib/supabase/tables";
 
 export async function POST(req: Request): Promise<Response> {
     const caller = await authenticate(req)
@@ -10,39 +16,20 @@ export async function POST(req: Request): Promise<Response> {
 
     const body = await req.json().catch(() => ({}))
 
-    if (!isFilled(body.name) || !isFilled(body.amount) || !isFilled(body.amount_type)) {
-        return Response.json({ error: "Fill in name, amount, and amount_type fields, bad request" }, { status: 400 })
-    }
-
+    const name = typeof body.name === "string" ? body.name.trim() : ""
     const amount = Number(body.amount)
+    const amountType = typeof body.amount_type === "string" ? body.amount_type.trim() : null
 
-    if (!Number.isFinite(amount)) {
-        return Response.json({ error: "Amount is not a number" }, { status: 400 })
-    }
-
-    const duplicate = await hasDuplicate(db, TableType.GROCERIES, "name", String(body.name), { household_id: household.id })
-
-    if (duplicate instanceof Response) {
-        return duplicate
-    }
-
-    if (duplicate) {
-        return Response.json({ error: `"${body.name}" is already on the list.` }, { status: 409 })
-    }
-
-    const { error } = await db
-        .from("grocery_items")
-        .insert({
-            household_id: household.id,
-            name: body.name,
-            added_by: profileId,
+    try {
+        await addGrocery(db, household.id, profileId, {
+            name: name,
             amount: amount,
-            amount_type: body.amount_type,
+            amountType: amountType
         })
-
-    if (error) {
-        console.error("Couldn't add grocery:", error)
-        return Response.json({ error: "Couldn't add grocery" }, { status: 500 })
+    } catch (e: unknown) {
+        if (e instanceof AppError) {
+            return errorResponse(e);
+        }
     }
 
     return Response.json({ ok: true })

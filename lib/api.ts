@@ -5,6 +5,8 @@ import {getAdmin} from "@/lib/supabase/admin";
 import {ActivityType, createLiveActivity} from "@/lib/pushward";
 import {cancelNtfyReq, sendNtfyReq} from "@/lib/ntfy";
 import {computeDurationSeconds, isValidDuration} from "@/lib/duration";
+import {AppError} from "@/core/errors/base.error";
+import {TableType} from "@/lib/supabase/tables";
 
 const DEFAULT_DURATION_MINUTES = 120
 
@@ -23,13 +25,6 @@ type LoadConfig = {
     activityType: ActivityType
     doneMessage: string
     onStarted?: (db: SupabaseClient, householdId: string) => Promise<void>
-}
-
-export enum TableType {
-    GROCERIES = "grocery_items",
-    EXPENSES = "expenses",
-    LAUNDRY = "laundry_loads",
-    DISHWASHER = "dishwasher_loads",
 }
 
 export async function authenticate(req: Request): Promise<Caller | Response> {
@@ -218,4 +213,11 @@ export async function deleteContentFromTable(
     }
 
     return Response.json({ deleted: data }, { status: 200 })
+}
+
+export function errorResponse(e: unknown): Response {
+    if (e instanceof AppError) {
+        return Response.json({ error: e.message }, { status: e.status })
+    }
+    throw e
 }

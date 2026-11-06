@@ -10,6 +10,7 @@ import styles from '../theme.module.css'
 import HouseholdThemeSync from '../../../HouseholdThemeSync'
 import type { Metadata } from "next";
 import { NAME_MAX_LENGTH } from '@/lib/textLimits'
+import {findAll} from "@/repositories/grocery-repository";
 
 const DEFAULT_COLOR = '#a98bff'
 
@@ -58,11 +59,7 @@ export default async function Groceries({
         notFound()
     }
 
-    const { data: groceries, error } = await supabase
-        .from('grocery_items')
-        .select('id, name, is_purchased, amount, amount_type')
-        .eq('household_id', household.id)
-        .order('created_at')
+    const groceries = await findAll(supabase, household.id)
 
     const primaryColor = household.primary_color ?? DEFAULT_COLOR
 
