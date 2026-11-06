@@ -139,6 +139,7 @@ export async function deleteGrocery(formData: FormData) {
         if (e instanceof AppError) {
             redirect(`${groceriesPath}?error=${encodeURIComponent(e.message)}`)
         }
+        throw e
     }
 
     revalidatePath(groceriesPath)

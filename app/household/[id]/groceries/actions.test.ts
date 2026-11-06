@@ -1,8 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { addGroceryItem, deleteGrocery, clearGroceryList, toggleGrocery } from './actions'
+import { addGroceryItem, editGroceryItem, deleteGrocery, clearGroceryList, clearCheckedGroceries, toggleGrocery } from './actions'
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
-import { mockSupabaseClient, mockQueryBuilder, queryResult, formData } from '@/lib/supabase/testing'
+import { redirect } from 'next/navigation'
+import { mockSupabaseClient, formData } from '@/lib/supabase/testing'
+import { addGrocery, updateGrocery, clearAllGroceries, clearPurchasedGroceries } from '@/services/grocery-service'
+import { deleteById } from '@/repositories/grocery-repository'
+import { ValidationError } from '@/core/errors/validation.error'
+import { DuplicateError } from '@/core/errors/conflict.error'
+import { DatabaseError } from '@/core/errors/database.error'
+import { NotFoundError } from '@/core/errors/not-found.error'
 
 vi.mock('@/lib/supabase/server', () => ({
     createClient: vi.fn(),
@@ -12,148 +19,120 @@ vi.mock('next/cache', () => ({
     revalidatePath: vi.fn(),
 }))
 
+vi.mock('next/navigation', () => ({
+    redirect: vi.fn(() => { throw new Error('NEXT_REDIRECT') }),
+}))
+
+vi.mock('@/services/grocery-service', () => ({
+    addGrocery: vi.fn(),
+    updateGrocery: vi.fn(),
+    clearAllGroceries: vi.fn(),
+    clearPurchasedGroceries: vi.fn(),
+}))
+
+vi.mock('@/repositories/grocery-repository', () => ({
+    deleteById: vi.fn(),
+}))
+
+const groceriesPath = '/household/h1/groceries'
+
+function signIn(user: { id: string } | null = { id: 'u1' }) {
+    const supabase = mockSupabaseClient({ user })
+    vi.mocked(createClient).mockResolvedValue(supabase as never)
+    return supabase
+}
+
 describe('addGroceryItem', () => {
     beforeEach(() => {
         vi.clearAllMocks()
     })
 
     it('does nothing when there is no authenticated user', async () => {
-        const supabase = mockSupabaseClient({ user: null })
-        vi.mocked(createClient).mockResolvedValue(supabase as never)
+        signIn(null)
 
-        await addGroceryItem(formData({
-            householdId: 'h1',
-            name: 'Milk'
-        }))
+        await addGroceryItem(formData({ householdId: 'h1', name: 'Milk' }))
 
-        expect(supabase.from).not.toHaveBeenCalled()
+        expect(addGrocery).not.toHaveBeenCalled()
         expect(revalidatePath).not.toHaveBeenCalled()
     })
 
-    it('redirects with an error when amount or unit is missing', async () => {
-        const groceryItems = mockQueryBuilder(queryResult(null))
-        const supabase = mockSupabaseClient({ user: { id: 'u1' }, from: { grocery_items: groceryItems } })
-        vi.mocked(createClient).mockResolvedValue(supabase as never)
+    it('adds the parsed item and revalidates on success', async () => {
+        const supabase = signIn()
 
-        await expect(addGroceryItem(formData({
-            householdId: 'h1',
-            name: 'Milk'
-        }))).rejects.toThrow('NEXT_REDIRECT')
+        await addGroceryItem(formData({ householdId: 'h1', name: '  Milk  ', amount: '2', amountType: 'kg' }))
 
-        expect(groceryItems.insert).not.toHaveBeenCalled()
-        expect(revalidatePath).not.toHaveBeenCalled()
-    })
-
-    it('redirects with an error when amount is not a number', async () => {
-        const groceryItems = mockQueryBuilder(queryResult(null))
-        const supabase = mockSupabaseClient({ user: { id: 'u1' }, from: { grocery_items: groceryItems } })
-        vi.mocked(createClient).mockResolvedValue(supabase as never)
-
-        await expect(addGroceryItem(formData({
-            householdId: 'h1',
-            name: 'Milk',
-            amount: 'not-a-number',
-            amountType: 'kg'
-        }))).rejects.toThrow('NEXT_REDIRECT')
-
-        expect(groceryItems.insert).not.toHaveBeenCalled()
-        expect(revalidatePath).not.toHaveBeenCalled()
-    })
-
-    it('redirects with an error when a custom unit is selected but left blank', async () => {
-        const groceryItems = mockQueryBuilder(queryResult(null))
-        const supabase = mockSupabaseClient({ user: { id: 'u1' }, from: { grocery_items: groceryItems } })
-        vi.mocked(createClient).mockResolvedValue(supabase as never)
-
-        await expect(addGroceryItem(formData({
-            householdId: 'h1',
-            name: 'Milk',
-            amount: '2',
-            amountType: '__custom'
-        }))).rejects.toThrow('NEXT_REDIRECT')
-
-        expect(groceryItems.insert).not.toHaveBeenCalled()
-        expect(revalidatePath).not.toHaveBeenCalled()
-    })
-
-    it('redirects with an error when the item is already on the list', async () => {
-        const groceryItems = mockQueryBuilder(queryResult({ id: 'existing' }))
-        const supabase = mockSupabaseClient({ user: { id: 'u1' }, from: { grocery_items: groceryItems } })
-        vi.mocked(createClient).mockResolvedValue(supabase as never)
-
-        await expect(addGroceryItem(formData({
-            householdId: 'h1',
-            name: 'Milk',
-            amount: '2',
-            amountType: 'kg'
-        }))).rejects.toThrow('NEXT_REDIRECT')
-
-        expect(groceryItems.insert).not.toHaveBeenCalled()
-        expect(revalidatePath).not.toHaveBeenCalled()
-    })
-
-    it('redirects with an error when the insert fails', async () => {
-        const groceryItems = mockQueryBuilder(queryResult(null, { message: 'boom' }))
-        const supabase = mockSupabaseClient({ user: { id: 'u1' }, from: { grocery_items: groceryItems } })
-        vi.mocked(createClient).mockResolvedValue(supabase as never)
-
-        await expect(addGroceryItem(formData({
-            householdId: 'h1',
-            name: 'Milk',
-            amount: '2',
-            amountType: 'kg'
-        }))).rejects.toThrow('NEXT_REDIRECT')
-
-        expect(revalidatePath).not.toHaveBeenCalled()
-    })
-
-    it('inserts the item and revalidates on success', async () => {
-        const groceryItems = mockQueryBuilder(queryResult(null))
-        const supabase = mockSupabaseClient({ user: { id: 'u1' }, from: { grocery_items: groceryItems } })
-        vi.mocked(createClient).mockResolvedValue(supabase as never)
-
-        await addGroceryItem(formData({
-            householdId: 'h1',
-            name: 'Milk',
-            amount: '2',
-            amountType: 'kg'
-        }))
-
-        expect(groceryItems.eq).toHaveBeenCalledWith('household_id', 'h1')
-        expect(groceryItems.ilike).toHaveBeenCalledWith('name', 'Milk')
-        expect(groceryItems.insert).toHaveBeenCalledWith({ household_id: 'h1', name: 'Milk', added_by: 'u1', amount: 2, amount_type: 'kg' })
-        expect(revalidatePath).toHaveBeenCalledWith('/household/h1/groceries')
+        expect(addGrocery).toHaveBeenCalledWith(supabase, 'h1', 'u1', { name: 'Milk', amount: 2, amountType: 'kg' })
+        expect(revalidatePath).toHaveBeenCalledWith(groceriesPath)
     })
 
     it('uses the custom unit when "Other" is selected', async () => {
-        const groceryItems = mockQueryBuilder(queryResult(null))
-        const supabase = mockSupabaseClient({ user: { id: 'u1' }, from: { grocery_items: groceryItems } })
-        vi.mocked(createClient).mockResolvedValue(supabase as never)
+        signIn()
 
-        await addGroceryItem(formData({
-            householdId: 'h1',
-            name: 'Milk',
-            amount: '2',
-            amountType: '__custom',
-            customAmountType: 'bottles'
-        }))
+        await addGroceryItem(formData({ householdId: 'h1', name: 'Milk', amount: '2', amountType: '__custom', customAmountType: ' bottles ' }))
 
-        expect(groceryItems.insert).toHaveBeenCalledWith({ household_id: 'h1', name: 'Milk', added_by: 'u1', amount: 2, amount_type: 'bottles' })
+        expect(addGrocery).toHaveBeenCalledWith(expect.anything(), 'h1', 'u1', { name: 'Milk', amount: 2, amountType: 'bottles' })
     })
 
-    it('trims whitespace from the item name', async () => {
-        const groceryItems = mockQueryBuilder(queryResult(null))
-        const supabase = mockSupabaseClient({ user: { id: 'u1' }, from: { grocery_items: groceryItems } })
-        vi.mocked(createClient).mockResolvedValue(supabase as never)
+    it.each([
+        new ValidationError('Amount must be a number'),
+        new DuplicateError('"Milk" is already on the list.'),
+        new DatabaseError('Database add query failed'),
+    ])('redirects with the message when the service throws $name', async (error) => {
+        signIn()
+        vi.mocked(addGrocery).mockRejectedValueOnce(error)
 
-        await addGroceryItem(formData({
-            householdId: 'h1',
-            name: '  Milk  ',
-            amount: '2',
-            amountType: 'kg'
-        }))
+        await expect(addGroceryItem(formData({ householdId: 'h1', name: 'Milk', amount: '2', amountType: 'kg' })))
+            .rejects.toThrow('NEXT_REDIRECT')
 
-        expect(groceryItems.insert).toHaveBeenCalledWith({ household_id: 'h1', name: 'Milk', added_by: 'u1', amount: 2, amount_type: 'kg' })
+        expect(redirect).toHaveBeenCalledWith(`${groceriesPath}?error=${encodeURIComponent(error.message)}`)
+        expect(revalidatePath).not.toHaveBeenCalled()
+    })
+
+    it('rethrows errors that are not AppErrors', async () => {
+        signIn()
+        const error = new Error('unexpected')
+        vi.mocked(addGrocery).mockRejectedValueOnce(error)
+
+        await expect(addGroceryItem(formData({ householdId: 'h1', name: 'Milk', amount: '2', amountType: 'kg' })))
+            .rejects.toBe(error)
+
+        expect(redirect).not.toHaveBeenCalled()
+        expect(revalidatePath).not.toHaveBeenCalled()
+    })
+})
+
+describe('editGroceryItem', () => {
+    beforeEach(() => {
+        vi.clearAllMocks()
+    })
+
+    it('does nothing when there is no authenticated user', async () => {
+        signIn(null)
+
+        await editGroceryItem(formData({ householdId: 'h1', itemId: 'i1', name: 'Milk' }))
+
+        expect(updateGrocery).not.toHaveBeenCalled()
+        expect(revalidatePath).not.toHaveBeenCalled()
+    })
+
+    it('updates the parsed item and revalidates on success', async () => {
+        const supabase = signIn()
+
+        await editGroceryItem(formData({ householdId: 'h1', itemId: 'i1', name: ' Oat milk ', amount: '3', amountType: 'l' }))
+
+        expect(updateGrocery).toHaveBeenCalledWith(supabase, 'i1', 'h1', { name: 'Oat milk', amount: 3, amountType: 'l' })
+        expect(revalidatePath).toHaveBeenCalledWith(groceriesPath)
+    })
+
+    it('redirects with the message when the service throws an AppError', async () => {
+        signIn()
+        vi.mocked(updateGrocery).mockRejectedValueOnce(new NotFoundError("Item you're trying to edit does not exist"))
+
+        await expect(editGroceryItem(formData({ householdId: 'h1', itemId: 'i1', name: 'Milk', amount: '2', amountType: 'kg' })))
+            .rejects.toThrow('NEXT_REDIRECT')
+
+        expect(redirect).toHaveBeenCalledWith(`${groceriesPath}?error=${encodeURIComponent("Item you're trying to edit does not exist")}`)
+        expect(revalidatePath).not.toHaveBeenCalled()
     })
 })
 
@@ -163,36 +142,56 @@ describe('clearGroceryList', () => {
     })
 
     it('does nothing when there is no authenticated user', async () => {
-        const supabase = mockSupabaseClient({ user: null })
-        vi.mocked(createClient).mockResolvedValue(supabase as never)
+        signIn(null)
 
         await clearGroceryList(formData({ householdId: 'h1' }))
 
-        expect(supabase.from).not.toHaveBeenCalled()
+        expect(clearAllGroceries).not.toHaveBeenCalled()
         expect(revalidatePath).not.toHaveBeenCalled()
     })
 
-    it('redirects with an error when the delete fails', async () => {
-        const groceryItems = mockQueryBuilder(queryResult(null, { message: 'boom' }))
-        const supabase = mockSupabaseClient({ user: { id: 'u1' }, from: { grocery_items: groceryItems } })
-        vi.mocked(createClient).mockResolvedValue(supabase as never)
-
-        await expect(clearGroceryList(formData({ householdId: 'h1' })))
-            .rejects.toThrow('NEXT_REDIRECT')
-
-        expect(revalidatePath).not.toHaveBeenCalled()
-    })
-
-    it('deletes all household items and revalidates on success', async () => {
-        const groceryItems = mockQueryBuilder(queryResult(null))
-        const supabase = mockSupabaseClient({ user: { id: 'u1' }, from: { grocery_items: groceryItems } })
-        vi.mocked(createClient).mockResolvedValue(supabase as never)
+    it('clears the household list and revalidates on success', async () => {
+        const supabase = signIn()
 
         await clearGroceryList(formData({ householdId: 'h1' }))
 
-        expect(groceryItems.delete).toHaveBeenCalled()
-        expect(groceryItems.eq).toHaveBeenCalledWith('household_id', 'h1')
-        expect(revalidatePath).toHaveBeenCalledWith('/household/h1/groceries')
+        expect(clearAllGroceries).toHaveBeenCalledWith(supabase, 'h1')
+        expect(revalidatePath).toHaveBeenCalledWith(groceriesPath)
+    })
+
+    it('redirects with the message when the service throws an AppError', async () => {
+        signIn()
+        vi.mocked(clearAllGroceries).mockRejectedValueOnce(new DatabaseError('Database delete all query failed'))
+
+        await expect(clearGroceryList(formData({ householdId: 'h1' }))).rejects.toThrow('NEXT_REDIRECT')
+
+        expect(redirect).toHaveBeenCalledWith(`${groceriesPath}?error=${encodeURIComponent('Database delete all query failed')}`)
+        expect(revalidatePath).not.toHaveBeenCalled()
+    })
+})
+
+describe('clearCheckedGroceries', () => {
+    beforeEach(() => {
+        vi.clearAllMocks()
+    })
+
+    it('clears purchased items and revalidates on success', async () => {
+        const supabase = signIn()
+
+        await clearCheckedGroceries(formData({ householdId: 'h1' }))
+
+        expect(clearPurchasedGroceries).toHaveBeenCalledWith(supabase, 'h1')
+        expect(revalidatePath).toHaveBeenCalledWith(groceriesPath)
+    })
+
+    it('redirects with the message when the service throws an AppError', async () => {
+        signIn()
+        vi.mocked(clearPurchasedGroceries).mockRejectedValueOnce(new DatabaseError('Database clear purchased query failed'))
+
+        await expect(clearCheckedGroceries(formData({ householdId: 'h1' }))).rejects.toThrow('NEXT_REDIRECT')
+
+        expect(redirect).toHaveBeenCalledWith(`${groceriesPath}?error=${encodeURIComponent('Database clear purchased query failed')}`)
+        expect(revalidatePath).not.toHaveBeenCalled()
     })
 })
 
@@ -202,37 +201,41 @@ describe('deleteGrocery', () => {
     })
 
     it('does nothing when there is no authenticated user', async () => {
-        const supabase = mockSupabaseClient({ user: null })
-        vi.mocked(createClient).mockResolvedValue(supabase as never)
+        signIn(null)
 
         await deleteGrocery(formData({ householdId: 'h1', itemId: 'i1' }))
 
-        expect(supabase.from).not.toHaveBeenCalled()
-        expect(revalidatePath).not.toHaveBeenCalled()
-    })
-
-    it('redirects with an error when the delete fails', async () => {
-        const groceryItems = mockQueryBuilder(queryResult(null, { message: 'boom' }))
-        const supabase = mockSupabaseClient({ user: { id: 'u1' }, from: { grocery_items: groceryItems } })
-        vi.mocked(createClient).mockResolvedValue(supabase as never)
-
-        await expect(deleteGrocery(formData({ householdId: 'h1', itemId: 'i1' })))
-            .rejects.toThrow('NEXT_REDIRECT')
-
+        expect(deleteById).not.toHaveBeenCalled()
         expect(revalidatePath).not.toHaveBeenCalled()
     })
 
     it('deletes the item and revalidates on success', async () => {
-        const groceryItems = mockQueryBuilder(queryResult(null))
-        const supabase = mockSupabaseClient({ user: { id: 'u1' }, from: { grocery_items: groceryItems } })
-        vi.mocked(createClient).mockResolvedValue(supabase as never)
+        const supabase = signIn()
 
         await deleteGrocery(formData({ householdId: 'h1', itemId: 'i1' }))
 
-        expect(groceryItems.delete).toHaveBeenCalled()
-        expect(groceryItems.eq).toHaveBeenCalledWith('household_id', 'h1')
-        expect(groceryItems.eq).toHaveBeenCalledWith('id', 'i1')
-        expect(revalidatePath).toHaveBeenCalledWith('/household/h1/groceries')
+        expect(deleteById).toHaveBeenCalledWith(supabase, 'i1', 'h1')
+        expect(revalidatePath).toHaveBeenCalledWith(groceriesPath)
+    })
+
+    it('redirects with the message when the delete throws an AppError', async () => {
+        signIn()
+        vi.mocked(deleteById).mockRejectedValueOnce(new DatabaseError('Database delete query failed'))
+
+        await expect(deleteGrocery(formData({ householdId: 'h1', itemId: 'i1' }))).rejects.toThrow('NEXT_REDIRECT')
+
+        expect(redirect).toHaveBeenCalledWith(`${groceriesPath}?error=${encodeURIComponent('Database delete query failed')}`)
+        expect(revalidatePath).not.toHaveBeenCalled()
+    })
+
+    it('rethrows errors that are not AppErrors', async () => {
+        signIn()
+        const error = new Error('unexpected')
+        vi.mocked(deleteById).mockRejectedValueOnce(error)
+
+        await expect(deleteGrocery(formData({ householdId: 'h1', itemId: 'i1' }))).rejects.toBe(error)
+
+        expect(revalidatePath).not.toHaveBeenCalled()
     })
 })
 
@@ -242,25 +245,21 @@ describe('toggleGrocery', () => {
     })
 
     it('updates the purchased status and revalidates', async () => {
-        const groceryItems = mockQueryBuilder(queryResult(null))
-        const supabase = mockSupabaseClient({ from: { grocery_items: groceryItems } })
-        vi.mocked(createClient).mockResolvedValue(supabase as never)
+        const supabase = signIn()
 
         await toggleGrocery('i1', true, 'h1')
 
-        expect(groceryItems.update).toHaveBeenCalledWith({ is_purchased: true })
-        expect(groceryItems.eq).toHaveBeenCalledWith('id', 'i1')
-        expect(revalidatePath).toHaveBeenCalledWith('/household/h1/groceries')
+        expect(updateGrocery).toHaveBeenCalledWith(supabase, 'i1', 'h1', { isPurchased: true })
+        expect(revalidatePath).toHaveBeenCalledWith(groceriesPath)
     })
 
-    it('still revalidates when the update fails', async () => {
-        const groceryItems = mockQueryBuilder(queryResult(null, { message: 'boom' }))
-        const supabase = mockSupabaseClient({ from: { grocery_items: groceryItems } })
-        vi.mocked(createClient).mockResolvedValue(supabase as never)
-        vi.spyOn(console, 'error').mockImplementation(() => {})
+    it('redirects with the message when the update throws an AppError', async () => {
+        signIn()
+        vi.mocked(updateGrocery).mockRejectedValueOnce(new NotFoundError("Item you're trying to edit does not exist"))
 
-        await toggleGrocery('i1', false, 'h1')
+        await expect(toggleGrocery('i1', false, 'h1')).rejects.toThrow('NEXT_REDIRECT')
 
-        expect(revalidatePath).toHaveBeenCalledWith('/household/h1/groceries')
+        expect(redirect).toHaveBeenCalledWith(`${groceriesPath}?error=${encodeURIComponent("Item you're trying to edit does not exist")}`)
+        expect(revalidatePath).not.toHaveBeenCalled()
     })
 })
