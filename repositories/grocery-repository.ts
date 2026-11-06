@@ -46,34 +46,36 @@ export async function update(db: SupabaseClient, id: string, householdId: string
     return data;
 }
 
-export async function deleteById(db: SupabaseClient, id: string, householdId: string): Promise<void> {
-    const { error } = await db
+export async function deleteById(db: SupabaseClient, id: string, householdId: string): Promise<GroceryType[]> {
+    const { data, error } = await db
         .from(TableType.GROCERIES)
         .delete()
         .eq("household_id", householdId)
         .eq("id", id)
-        .select()
-        .maybeSingle();
+        .select();
 
     if (error) {
         console.error("Couldn't delete groceries: ", error)
         throw new DatabaseError("Database delete query failed");
     }
+
+    return data ?? [];
 }
 
-export async function deleteByName(db: SupabaseClient, name: string, householdId: string): Promise<void> {
-    const { error } = await db
+export async function deleteByName(db: SupabaseClient, name: string, householdId: string): Promise<GroceryType[]> {
+    const { data, error } = await db
         .from(TableType.GROCERIES)
         .delete()
         .eq("household_id", householdId)
         .eq("name", name)
-        .select()
-        .maybeSingle();
+        .select();
 
     if (error) {
         console.error("Couldn't delete groceries: ", error)
         throw new DatabaseError("Database delete query failed");
     }
+
+    return data ?? [];
 }
 
 export async function deletePurchased(db: SupabaseClient, householdId: string): Promise<void> {

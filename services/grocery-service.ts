@@ -1,7 +1,7 @@
 import { NAME_MAX_LENGTH } from '@/lib/textLimits';
 import {ValidationError} from '@/core/errors/validation.error';
 import {SupabaseClient} from "@supabase/supabase-js";
-import {deleteAll, deletePurchased, insert, nameExists, update} from "@/repositories/grocery-repository";
+import {deleteAll, deleteById, deleteByName, deletePurchased, insert, nameExists, update} from "@/repositories/grocery-repository";
 import {DuplicateError} from "@/core/errors/conflict.error";
 import {GroceryType, GroceryUpdate} from "@/core/types/grocery";
 import {NotFoundError} from "@/core/errors/not-found.error";
@@ -90,6 +90,15 @@ export async function updateGrocery(db: SupabaseClient, id: string, householdId:
     }
 
     return updated;
+}
+
+export async function deleteGroceryById(db: SupabaseClient, id: string, householdId: string): Promise<GroceryType[]> {
+    return deleteById(db, id, householdId);
+}
+
+// Exact, case-sensitive match on the stored name.
+export async function deleteGroceryByName(db: SupabaseClient, name: string, householdId: string): Promise<GroceryType[]> {
+    return deleteByName(db, name, householdId);
 }
 
 export async function clearPurchasedGroceries(db: SupabaseClient, householdId: string): Promise<void> {

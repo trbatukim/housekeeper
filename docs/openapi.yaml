@@ -2,7 +2,7 @@ openapi: 3.0.3
 
 info:
   title: HouseKeeper API
-  version: 1.1.0
+  version: 1.2.0
   description: |
     Automate your household from outside the app: start a dishwasher or laundry
     cycle, add groceries, and log expenses.
@@ -236,8 +236,9 @@ paths:
       tags: [Groceries]
       summary: Add an item to the grocery list
       description: |
-        Adds one item. Item names are compared case-insensitively, so adding a
-        name already on the list returns `409` instead of creating a duplicate.
+        Adds one item. `name` and `amount_type` are trimmed before they are
+        checked. Item names are compared case-insensitively, so adding a name
+        already on the list returns `409` instead of creating a duplicate.
       requestBody:
         required: true
         content:
@@ -251,7 +252,24 @@ paths:
         '200':
           $ref: '#/components/responses/Ok'
         '400':
-          $ref: '#/components/responses/BadRequest'
+          description: |
+            Validation failed. Fields are checked in order (`name`, `amount`,
+            `amount_type`) and only the first failure is returned. Possible
+            `error` values:
+
+            - `Grocery name cannot be empty`
+            - `Grocery name is too long`
+            - `Amount must be a number`
+            - `Amount must be finite`
+            - `Amount cannot be empty`
+            - `Amount type cannot be empty`
+            - `Amount type name is too long`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: Amount cannot be empty
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -267,7 +285,16 @@ paths:
               example:
                 error: '"Milk" is already on the list.'
         '500':
-          $ref: '#/components/responses/ServerError'
+          description: The duplicate check or the insert failed. Nothing was saved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                search:
+                  value: { error: Database search query failed }
+                insert:
+                  value: { error: Database add query failed }
       x-codeSamples:
         - lang: curl
           source: |
@@ -280,8 +307,9 @@ paths:
       tags: [Groceries]
       summary: Edit an item on the grocery list
       description: |
-        Updates only the fields you send. Renaming an item to a name already
-        on the list (compared case-insensitively) returns `409`.
+        Updates only the fields you send, with the same rules as `POST`. A
+        field set to `null` or left out is not changed. Renaming an item to a
+        name already on the list (compared case-insensitively) returns `409`.
       requestBody:
         required: true
         content:
@@ -300,8 +328,14 @@ paths:
 
             - `Fill in the id field, bad request`
             - `id must be a valid UUID`
-            - `Amount is not a number`
-            - `Fill in at least one of name, amount, or amount_type fields, bad request`
+            - `Grocery name cannot be empty`
+            - `Grocery name is too long`
+            - `Amount must be a number`
+            - `Amount must be finite`
+            - `Amount cannot be empty`
+            - `Amount type cannot be empty`
+            - `Amount type name is too long`
+            - `Fill in at least one of name, amount, or amount_type`
           content:
             application/json:
               schema:
@@ -329,7 +363,16 @@ paths:
               example:
                 error: '"Milk" is already on the list.'
         '500':
-          $ref: '#/components/responses/ServerError'
+          description: The duplicate check or the update failed. Nothing was changed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                search:
+                  value: { error: Database search query failed }
+                update:
+                  value: { error: Database update query failed }
       x-codeSamples:
         - lang: curl
           source: |
@@ -389,7 +432,13 @@ paths:
         '404':
           $ref: '#/components/responses/HouseholdNotFound'
         '500':
-          $ref: '#/components/responses/DeleteFailed'
+          description: The delete failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: Database delete query failed
       x-codeSamples:
         - lang: curl
           source: |
@@ -640,18 +689,27 @@ components:
       properties:
         name:
           type: string
-          description: Compared case-insensitively against the existing list.
+          minLength: 1
+          maxLength: 50
+          description: |
+            Trimmed, then must be 1 to 50 characters. Compared
+            case-insensitively against the existing list.
           example: Milk
         amount:
           type: number
-          description: Any finite number, including 0.
+          description: |
+            Any finite number except 0. Numeric strings such as `"2"` are
+            accepted; a missing or non-numeric value is rejected.
           example: 2
         amount_type:
           type: string
+          minLength: 1
+          maxLength: 50
           description: |
-            Free-form unit. The app's own picker offers `g`, `kg`, `mL`, `L`,
-            `pcs`, `dozen`, `packet(s)`, `bottle(s)`, `can(s)`, `bag(s)`,
-            `jar(s)`, and `loaf/loaves`, but any string is accepted.
+            Free-form unit, trimmed, then must be 1 to 50 characters. The app's
+            own picker offers `g`, `kg`, `mL`, `L`, `pcs`, `dozen`,
+            `packet(s)`, `bottle(s)`, `can(s)`, `bag(s)`, `jar(s)`, and
+            `loaf/loaves`, but any string within that length is accepted.
           example: L
 
     ExpenseRequest:
@@ -722,20 +780,28 @@ components:
     GroceryUpdateRequest:
       type: object
       required: [id]
-      description: Send `id` plus at least one other field.
+      description: |
+        Send `id` plus at least one other field. Each field follows the same
+        rules as in `GroceryRequest`.
       properties:
         id:
           type: string
           format: uuid
         name:
           type: string
-          description: Compared case-insensitively against the rest of the list.
+          minLength: 1
+          maxLength: 50
+          description: Trimmed. Compared case-insensitively against the rest of the list.
           example: Oat milk
         amount:
           type: number
+          description: Any finite number except 0.
           example: 3
         amount_type:
           type: string
+          minLength: 1
+          maxLength: 50
+          description: Trimmed.
           example: L
 
     ExpenseUpdateRequest:
