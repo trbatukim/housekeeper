@@ -4,6 +4,7 @@ import {
 } from "@/lib/api"
 import {addGrocery} from "@/services/grocery-service";
 import {AppError} from "@/core/errors/base.error";
+import {TableType} from "@/lib/supabase/tables";
 
 export async function POST(req: Request): Promise<Response> {
     const caller = await authenticate(req)

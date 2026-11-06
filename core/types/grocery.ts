@@ -10,4 +10,4 @@ export type GroceryType = {
 }
 
 export type NewGroceryType = Omit<GroceryType, "id" | "is_purchased" | "created_at">
-export type GroceryUpdate = Partial<Pick<GroceryType, "name" | "amount" | "amount_type">>
+export type GroceryUpdate = Partial<Pick<GroceryType, "name" | "amount" | "amount_type" | "is_purchased">>

@@ -1,6 +1,7 @@
 import { ActivityType, deleteLiveActivity } from "@/lib/pushward"
 import { cancelNtfyReq } from "@/lib/ntfy"
-import {deleteContentFromTable, getAllContentFromTable, startLoad, TableType} from "@/lib/api"
+import {deleteContentFromTable, getAllContentFromTable, startLoad} from "@/lib/api"
+import {TableType} from "@/lib/supabase/tables"
 
 export async function POST(req: Request) {
     return startLoad(req, {

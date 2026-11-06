@@ -1,25 +1,25 @@
 import { NAME_MAX_LENGTH } from '@/lib/textLimits';
-import {InputTooLongError, EmptyFieldError, NaNFieldError, NotFiniteError} from '@/core/errors/validation.error';
+import {ValidationError} from '@/core/errors/validation.error';
 import {SupabaseClient} from "@supabase/supabase-js";
-import {insert, nameExists, update} from "@/repositories/grocery-repository";
+import {deleteAll, deletePurchased, insert, nameExists, update} from "@/repositories/grocery-repository";
 import {DuplicateError} from "@/core/errors/conflict.error";
 import {GroceryType, GroceryUpdate} from "@/core/types/grocery";
 import {NotFoundError} from "@/core/errors/not-found.error";
 
 export function validateGroceryName(name: string) {
-    if (!name) throw new EmptyFieldError("Grocery name cannot be empty");
-    if (name.length > NAME_MAX_LENGTH) throw new InputTooLongError("Grocery name is too long");
+    if (!name) throw new ValidationError("Grocery name cannot be empty");
+    if (name.length > NAME_MAX_LENGTH) throw new ValidationError("Grocery name is too long");
 }
 
 export function validateAmount(amount: number) {
-    if (Number.isNaN(amount)) throw new NaNFieldError("Amount must be a number");
-    if (!Number.isFinite(amount)) throw new NotFiniteError("Amount must be finite")
-    if (amount === 0) throw new EmptyFieldError("Amount cannot be empty")
+    if (Number.isNaN(amount)) throw new ValidationError("Amount must be a number");
+    if (!Number.isFinite(amount)) throw new ValidationError("Amount must be finite")
+    if (amount === 0) throw new ValidationError("Amount cannot be empty")
 }
 
 export function validateAmountType(amountType: string | null | undefined) {
-    if (!amountType) throw new EmptyFieldError("Amount type cannot be empty");
-    if (amountType.length > NAME_MAX_LENGTH) throw new InputTooLongError("Amount type name is too long");
+    if (!amountType) throw new ValidationError("Amount type cannot be empty");
+    if (amountType.length > NAME_MAX_LENGTH) throw new ValidationError("Amount type name is too long");
 }
 
 export function validateGrocery(input: {
@@ -56,6 +56,7 @@ export async function updateGrocery(db: SupabaseClient, id: string, householdId:
     name?: string,
     amount?: number,
     amountType?: string | null,
+    isPurchased?: boolean,
 }): Promise<GroceryType> {
     const updates: GroceryUpdate = {};
 
@@ -71,9 +72,12 @@ export async function updateGrocery(db: SupabaseClient, id: string, householdId:
         validateAmountType(input.amountType);
         updates.amount_type = input.amountType;
     }
+    if (input.isPurchased !== undefined) {
+        updates.is_purchased = input.isPurchased;
+    }
 
     if (Object.keys(updates).length === 0) {
-        throw new EmptyFieldError("Fill in at least one of name, amount, or amount_type");
+        throw new ValidationError("Fill in at least one of name, amount, or amount_type");
     }
 
     if (updates.name !== undefined && await nameExists(db, updates.name, householdId, id)) {
@@ -86,4 +90,12 @@ export async function updateGrocery(db: SupabaseClient, id: string, householdId:
     }
 
     return updated;
+}
+
+export async function clearPurchasedGroceries(db: SupabaseClient, householdId: string): Promise<void> {
+    await deletePurchased(db, householdId);
+}
+
+export async function clearAllGroceries(db: SupabaseClient, householdId: string): Promise<void> {
+    await deleteAll(db, householdId);
 }

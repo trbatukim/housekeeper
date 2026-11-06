@@ -1,4 +1,5 @@
-import {authenticate, deleteContentFromTable, getAllContentFromTable, hasDuplicate, isFilled, isUuid, TableType} from "@/lib/api";
+import {authenticate, deleteContentFromTable, getAllContentFromTable, hasDuplicate, isFilled, isUuid} from "@/lib/api";
+import {TableType} from "@/lib/supabase/tables";
 import {parseDueDate} from "@/lib/dates";
 import {CURRENCY_VALUES} from "@/lib/currencies";
 import {TEXT_MAX_LENGTH} from "@/lib/textLimits";

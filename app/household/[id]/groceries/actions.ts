@@ -4,9 +4,9 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { CUSTOM_AMOUNT_TYPE } from '@/lib/amountTypes'
 import { sendNtfyReqWithoutDelay } from '@/lib/ntfy'
-import {addGrocery, updateGrocery} from "@/services/grocery-service";
+import {addGrocery, clearAllGroceries, clearPurchasedGroceries, updateGrocery} from "@/services/grocery-service";
 import {AppError} from "@/core/errors/base.error";
-import {deleteById, update} from "@/repositories/grocery-repository";
+import {deleteById} from "@/repositories/grocery-repository";
 
 export async function addGroceryItem(formData: FormData) {
     const supabase = await createClient()
@@ -86,13 +86,13 @@ export async function clearGroceryList(formData: FormData) {
     const householdId = formData.get('householdId') as string
     const groceriesPath = `/household/${householdId}/groceries`
 
-    const { error } = await supabase
-        .from('grocery_items')
-        .delete()
-        .eq('household_id', householdId)
-
-    if (error) {
-        redirect(`${groceriesPath}?error=${encodeURIComponent(error.message)}`)
+    try {
+        await clearAllGroceries(supabase, householdId);
+    } catch (e: unknown) {
+        if (e instanceof AppError) {
+            redirect(`${groceriesPath}?error=${encodeURIComponent(e.message)}`);
+        }
+        throw e;
     }
 
     revalidatePath(groceriesPath)
@@ -109,14 +109,13 @@ export async function clearCheckedGroceries(formData: FormData) {
     const householdId = formData.get('householdId') as string
     const groceriesPath = `/household/${householdId}/groceries`
 
-    const { error } = await supabase
-        .from('grocery_items')
-        .delete()
-        .eq('household_id', householdId)
-        .eq('is_purchased', true)
-
-    if (error) {
-        redirect(`${groceriesPath}?error=${encodeURIComponent(error.message)}`)
+    try {
+        await clearPurchasedGroceries(supabase, householdId)
+    } catch (e: unknown) {
+        if (e instanceof AppError) {
+            redirect(`${groceriesPath}?error=${encodeURIComponent(e.message)}`)
+        }
+        throw e
     }
 
     revalidatePath(groceriesPath)
@@ -150,14 +149,21 @@ export async function toggleGrocery(
   isPurchased: boolean,
   householdId: string
 ) {
-  const supabase = await createClient()
-  const { error } = await supabase
-    .from('grocery_items')
-    .update({ is_purchased: isPurchased })
-    .eq('id', itemId)
+    const supabase = await createClient()
+    const groceriesPath = `/household/${householdId}/groceries`
 
-  if (error) console.error(error)
-  revalidatePath(`/household/${householdId}/groceries`)
+    try {
+        await updateGrocery(supabase, itemId, householdId, {
+            isPurchased: isPurchased
+        });
+    } catch (e: unknown) {
+        if (e instanceof AppError) {
+            redirect(`${groceriesPath}?error=${encodeURIComponent(e.message)}`);
+        }
+        throw e;
+    }
+
+  revalidatePath(groceriesPath)
 }
 
 export async function sendReminder(formData: FormData) {
